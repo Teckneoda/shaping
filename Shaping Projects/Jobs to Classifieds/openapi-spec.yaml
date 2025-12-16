@@ -1,0 +1,685 @@
+openapi: 3.0.3
+info:
+  title: Unified Listing Service API
+  description: REST API consolidating Jobs, Classifieds, Cars, and Homes. Consumed by marketplace-graphql gateway.
+  version: 1.0.0
+  contact:
+    name: Marketplace Team
+    email: marketplace@ksl.com
+
+servers:
+  - {url: 'https://api.ksl.com/listing/v1'}
+  - {url: 'https://api-staging.ksl.com/listing/v1'}
+  - {url: 'http://localhost:8080/listing/v1'}
+
+tags:
+  - {name: Listings}
+  - {name: Search}
+  - {name: Photos}
+  - {name: Favorites}
+  - {name: Saved Searches}
+  - {name: Categories}
+  - {name: Boost}
+  - {name: Support}
+
+security:
+  - BearerAuth: []
+
+paths:
+  /listings/create-draft:
+    post:
+      tags: [Listings]
+      summary: Create listing draft
+      operationId: createListingDraft
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/CreateListingInput'}}}}
+      responses:
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '500': {$ref: '#/components/responses/InternalError'}
+
+  /listings/{id}:
+    get:
+      tags: [Listings]
+      summary: Get listing by ID
+      operationId: getListing
+      security: []
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+    put:
+      tags: [Listings]
+      summary: Update listing
+      operationId: updateListing
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/UpdateListingInput'}}}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+    delete:
+      tags: [Listings]
+      summary: Delete listing
+      operationId: deleteListing
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      responses:
+        '204': {description: No Content}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+
+  /listings/{id}/thanks-page:
+    get:
+      tags: [Listings]
+      summary: Get listing data for thanks page
+      operationId: getListingThanksPage
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '404': {$ref: '#/components/responses/NotFound'}
+
+  /listings/{id}/renew:
+    put:
+      tags: [Listings]
+      summary: Renew listing
+      operationId: renewListing
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+
+  /listings/{id}/expire:
+    put:
+      tags: [Listings]
+      summary: Expire listing (Jobs)
+      operationId: expireListing
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+
+  /listings/{id}/mark-sold:
+    put:
+      tags: [Listings]
+      summary: Mark listing as sold
+      operationId: markListingSold
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+
+  /listings/meta:
+    get:
+      tags: [Support]
+      summary: Get listing metadata
+      operationId: getListingMeta
+      security: []
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingMeta'}}}}
+
+  /listings/contact-info:
+    get:
+      tags: [Support]
+      summary: Get user default contact info
+      operationId: getListingContactInfo
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Contact'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+
+  /listings:
+    get:
+      tags: [Search]
+      summary: Search listings
+      operationId: searchListings
+      security: []
+      parameters:
+        - {name: keyword, in: query, schema: {type: string}}
+        - {name: listingType, in: query, schema: {$ref: '#/components/schemas/ListingType'}}
+        - {name: category, in: query, schema: {type: string}}
+        - {name: subCategory, in: query, schema: {type: string}}
+        - {name: city, in: query, schema: {type: string}}
+        - {name: state, in: query, schema: {type: string}}
+        - {name: zip, in: query, schema: {type: string}}
+        - {name: radius, in: query, schema: {type: integer}}
+        - {name: priceMin, in: query, schema: {type: integer}}
+        - {name: priceMax, in: query, schema: {type: integer}}
+        - {name: marketType, in: query, schema: {$ref: '#/components/schemas/MarketType'}}
+        - {name: topJobsOnly, in: query, schema: {type: boolean}}
+        - {name: featured, in: query, schema: {type: boolean}}
+        - {name: sort, in: query, schema: {type: string, enum: [date_desc, date_asc, price_desc, price_asc, relevance], default: date_desc}}
+        - {$ref: '#/components/parameters/Page'}
+        - {$ref: '#/components/parameters/PerPage'}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/SearchResults'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+
+  /listings/{id}/photos:
+    post:
+      tags: [Photos]
+      summary: Upload listing photo
+      operationId: uploadListingPhoto
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo: {type: string, format: binary}
+                caption: {type: string}
+                order: {type: integer}
+      responses:
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/Photo'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+
+  /listings/{id}/photos/{photoId}:
+    post:
+      tags: [Photos]
+      summary: Edit photo metadata
+      operationId: editListingPhoto
+      parameters:
+        - {$ref: '#/components/parameters/ListingId'}
+        - {name: photoId, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption: {type: string}
+                order: {type: integer}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Photo'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+    delete:
+      tags: [Photos]
+      summary: Delete photo
+      operationId: deleteListingPhoto
+      parameters:
+        - {$ref: '#/components/parameters/ListingId'}
+        - {name: photoId, in: path, required: true, schema: {type: string}}
+      responses:
+        '204': {description: No Content}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+
+  /listings/{listingId}/favorites:
+    post:
+      tags: [Favorites]
+      summary: Favorite listing
+      operationId: createListingFavorite
+      parameters: [{name: listingId, in: path, required: true, schema: {type: integer}}]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notifyOnPriceDrop: {type: boolean, default: false}
+                notifyOnExpiration: {type: boolean, default: false}
+      responses:
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/Favorite'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+    put:
+      tags: [Favorites]
+      summary: Update favorite
+      operationId: updateListingFavorite
+      parameters: [{name: listingId, in: path, required: true, schema: {type: integer}}]
+      requestBody: {required: true, content: {application/json: {schema: {type: object, properties: {notifyOnPriceDrop: {type: boolean}, notifyOnExpiration: {type: boolean}}}}}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Favorite'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+    delete:
+      tags: [Favorites]
+      summary: Unfavorite listing
+      operationId: deleteListingFavorite
+      parameters: [{name: listingId, in: path, required: true, schema: {type: integer}}]
+      responses:
+        '204': {description: No Content}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+
+  /saved-searches:
+    post:
+      tags: [Saved Searches]
+      summary: Create saved search
+      operationId: createSavedSearch
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/SavedSearchInput'}}}}
+      responses:
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/SavedSearch'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+
+  /saved-searches/{id}:
+    put:
+      tags: [Saved Searches]
+      summary: Update saved search
+      operationId: updateSavedSearch
+      parameters: [{name: id, in: path, required: true, schema: {type: integer}}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/SavedSearchInput'}}}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/SavedSearch'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+    delete:
+      tags: [Saved Searches]
+      summary: Delete saved search
+      operationId: deleteSavedSearch
+      parameters: [{name: id, in: path, required: true, schema: {type: integer}}]
+      responses:
+        '204': {description: No Content}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+
+  /categories:
+    get:
+      tags: [Categories]
+      summary: Get category tree
+      operationId: getCategoriesTree
+      security: []
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {type: object, properties: {categories: {type: array, items: {$ref: '#/components/schemas/Category'}}}}}}}
+
+  /category-filters:
+    get:
+      tags: [Categories]
+      summary: Get category filters
+      operationId: getCategoryFilters
+      security: []
+      parameters:
+        - {name: category, in: query, required: true, schema: {type: string}}
+        - {name: subCategory, in: query, schema: {type: string}}
+      responses:
+        '200': {description: OK}
+
+  /sub-categories/specifications:
+    get:
+      tags: [Categories]
+      summary: Get subcategory specs
+      operationId: getSubCategorySpecifications
+      security: []
+      parameters:
+        - {name: category, in: query, required: true, schema: {type: string}}
+        - {name: subCategory, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {type: object, properties: {specifications: {type: array, items: {$ref: '#/components/schemas/Specification'}}}}}}}
+
+  /listings/{id}/boost:
+    post:
+      tags: [Boost]
+      summary: Boost listing (Jobs)
+      operationId: boostListing
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                boostType: {type: string, enum: [free, paid]}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {description: Boost not available}
+
+  /listings/{id}/auto-boost:
+    put:
+      tags: [Boost]
+      summary: Configure auto-boost
+      operationId: configureAutoBoost
+      parameters: [{$ref: '#/components/parameters/ListingId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled: {type: boolean}
+                frequency: {type: integer, enum: [3, 7, 14]}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/ListingResponse'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ListingId: {name: id, in: path, required: true, schema: {type: integer, format: int64}}
+    Page: {name: page, in: query, schema: {type: integer, minimum: 1, default: 1}}
+    PerPage: {name: perPage, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+
+  schemas:
+    Listing:
+      type: object
+      required: [id, listingType, status, title, createTime, modifyTime, memberId]
+      properties:
+        id: {type: integer, format: int64}
+        listingType: {$ref: '#/components/schemas/ListingType'}
+        status: {$ref: '#/components/schemas/ListingStatus'}
+        title: {type: string, minLength: 1, maxLength: 200}
+        description: {type: string, maxLength: 10000}
+        price: {type: integer, minimum: 0}
+        priceModifier: {$ref: '#/components/schemas/PriceModifier'}
+        createTime: {type: string, format: date-time}
+        modifyTime: {type: string, format: date-time}
+        displayTime: {type: string, format: date-time}
+        expireTime: {type: string, format: date-time}
+        memberId: {type: integer, format: int64}
+        authorizedUsers: {type: array, items: {type: integer}}
+        location: {$ref: '#/components/schemas/Location'}
+        contact: {$ref: '#/components/schemas/Contact'}
+        primaryImage: {$ref: '#/components/schemas/Image'}
+        photos: {type: array, items: {$ref: '#/components/schemas/Photo'}}
+        sellerType: {$ref: '#/components/schemas/SellerType'}
+        category: {type: string}
+        subCategory: {type: string}
+        marketType: {$ref: '#/components/schemas/MarketType'}
+        isFeatured: {type: boolean}
+        topJob: {type: boolean}
+        stats: {$ref: '#/components/schemas/ListingStats'}
+        carDetails: {$ref: '#/components/schemas/CarDetails'}
+        homeDetails: {$ref: '#/components/schemas/HomeDetails'}
+        jobDetails: {$ref: '#/components/schemas/JobDetails'}
+        classifiedDetails: {$ref: '#/components/schemas/ClassifiedDetails'}
+        specifications: {type: object, additionalProperties: true}
+
+    ListingType: {type: string, enum: [JOB, CLASSIFIED, CAR, HOME_BUY, HOME_RENT]}
+    ListingStatus: {type: string, enum: [Draft, Active, Expired, Sold, Deleted, Pending]}
+    PriceModifier: {type: string, enum: [perDay, perWeek, perMonth, perYear, obo, call]}
+    MarketType: {type: string, enum: [Sale, Wanted, Rent, Service, Buy]}
+    SellerType: {type: string, enum: [Owner, Dealer, Employer, Agent, Builder]}
+
+    JobDetails:
+      type: object
+      required: [jobTitle, companyName]
+      properties:
+        jobTitle: {type: string}
+        companyName: {type: string}
+        payRangeType: {type: string, enum: [hourly, salary]}
+        salaryFrom: {type: integer}
+        salaryTo: {type: integer}
+        hourlyFrom: {type: integer}
+        hourlyTo: {type: integer}
+        employmentType: {type: string, enum: [ft, pt, ct, temp, sj, inter]}
+        educationLevel: {type: integer, minimum: 0, maximum: 4}
+        yearsOfExperience: {type: integer, minimum: 0, maximum: 5}
+        qualifications: {type: string}
+        applicationUrl: {type: string, format: uri}
+        allowFreeBoost: {type: boolean}
+        autoBoost: {$ref: '#/components/schemas/AutoBoostConfig'}
+        paid: {type: boolean}
+
+    ClassifiedDetails:
+      type: object
+      properties:
+        category: {type: string}
+        subCategory: {type: string}
+        marketType: {$ref: '#/components/schemas/MarketType'}
+        newUsed: {type: string, enum: [New, Used]}
+        isRental: {type: boolean}
+        condition: {type: string}
+        stockNumber: {type: string}
+
+    CarDetails:
+      type: object
+      required: [vin, make, model, makeYear, mileage, newUsed]
+      properties:
+        vin: {type: string}
+        make: {type: string}
+        model: {type: string}
+        trim: {type: string}
+        makeYear: {type: integer}
+        mileage: {type: integer}
+        newUsed: {type: string, enum: [New, Used, Certified]}
+        body: {type: string}
+        transmission: {type: string}
+        drive: {type: string, enum: [FWD, RWD, AWD, 4WD]}
+        fuel: {type: string}
+        exteriorColor: {type: string}
+        interiorColor: {type: string}
+        titleType: {type: string}
+        dealerId: {type: integer}
+        msrp: {type: integer}
+
+    HomeDetails:
+      type: object
+      required: [bed, bath, squareFoot]
+      properties:
+        bed: {type: integer}
+        bath: {type: number}
+        squareFoot: {type: integer}
+        acre: {type: number}
+        buildYear: {type: integer}
+        garage: {type: integer}
+        cooling: {type: string}
+        heating: {type: string}
+        parking: {type: array, items: {type: string}}
+        schoolDistrict: {type: string}
+        agencyName: {type: string}
+        mlsNumber: {type: string}
+        hoaFees: {type: number}
+
+    Location:
+      type: object
+      required: [city, state, zip]
+      properties:
+        street1: {type: string}
+        city: {type: string}
+        state: {type: string}
+        zip: {type: string}
+        coordinates: {$ref: '#/components/schemas/Coordinates'}
+
+    Coordinates:
+      type: object
+      required: [latitude, longitude]
+      properties:
+        latitude: {type: number, format: double}
+        longitude: {type: number, format: double}
+
+    Contact:
+      type: object
+      required: [name, email]
+      properties:
+        memberId: {type: integer}
+        name: {type: string}
+        email: {type: string, format: email}
+        phone: {type: string}
+        cellPhone: {type: string}
+        contactMethod: {type: array, items: {type: string, enum: [email, phone, text, inApp]}}
+        displayPhone: {type: boolean}
+        displayEmail: {type: boolean}
+
+    Photo:
+      type: object
+      required: [id, url, order]
+      properties:
+        id: {type: string}
+        url: {type: string, format: uri}
+        order: {type: integer}
+        caption: {type: string}
+
+    Image:
+      type: object
+      required: [url]
+      properties:
+        url: {type: string, format: uri}
+        description: {type: string}
+
+    AutoBoostConfig:
+      type: object
+      required: [enabled, frequency]
+      properties:
+        enabled: {type: boolean}
+        frequency: {type: integer, enum: [3, 7, 14]}
+        lastBoostTime: {type: string, format: date-time}
+        nextBoostTime: {type: string, format: date-time}
+
+    ListingStats:
+      type: object
+      properties:
+        pageViews: {type: integer}
+        favoriteCount: {type: integer}
+        viewCount: {type: integer}
+        emailCount: {type: integer}
+        phoneCount: {type: integer}
+        applicationCount: {type: integer}
+
+    CreateListingInput:
+      type: object
+      required: [listingType, title]
+      properties:
+        listingType: {$ref: '#/components/schemas/ListingType'}
+        title: {type: string}
+        description: {type: string}
+        price: {type: integer}
+        location: {$ref: '#/components/schemas/Location'}
+        contact: {$ref: '#/components/schemas/Contact'}
+        category: {type: string}
+        subCategory: {type: string}
+
+    UpdateListingInput:
+      type: object
+      properties:
+        title: {type: string}
+        description: {type: string}
+        price: {type: integer}
+        location: {$ref: '#/components/schemas/Location'}
+        contact: {$ref: '#/components/schemas/Contact'}
+
+    ListingResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data: {$ref: '#/components/schemas/Listing'}
+        meta: {$ref: '#/components/schemas/ResponseMeta'}
+
+    SearchResults:
+      type: object
+      required: [data, pagination, meta]
+      properties:
+        data: {type: array, items: {$ref: '#/components/schemas/Listing'}}
+        facets: {type: array, items: {$ref: '#/components/schemas/Facet'}}
+        pagination: {$ref: '#/components/schemas/Pagination'}
+        meta: {$ref: '#/components/schemas/ResponseMeta'}
+
+    Facet:
+      type: object
+      required: [name, values]
+      properties:
+        name: {type: string}
+        values: {type: array, items: {$ref: '#/components/schemas/FacetValue'}}
+
+    FacetValue:
+      type: object
+      required: [value, count]
+      properties:
+        value: {type: string}
+        count: {type: integer}
+
+    Pagination:
+      type: object
+      required: [page, perPage, total, totalPages, hasNext, hasPrev]
+      properties:
+        page: {type: integer}
+        perPage: {type: integer}
+        total: {type: integer}
+        totalPages: {type: integer}
+        hasNext: {type: boolean}
+        hasPrev: {type: boolean}
+
+    Favorite:
+      type: object
+      required: [id, memberId, listingId, createTime]
+      properties:
+        id: {type: integer}
+        memberId: {type: integer}
+        listingId: {type: integer}
+        notifyOnPriceDrop: {type: boolean}
+        notifyOnExpiration: {type: boolean}
+        createTime: {type: string, format: date-time}
+
+    SavedSearch:
+      type: object
+      required: [id, memberId, name, filters, createTime]
+      properties:
+        id: {type: integer}
+        memberId: {type: integer}
+        name: {type: string}
+        filters: {type: object}
+        notifyOnMatch: {type: boolean}
+        createTime: {type: string, format: date-time}
+
+    SavedSearchInput:
+      type: object
+      required: [name, filters]
+      properties:
+        name: {type: string}
+        filters: {type: object}
+        notifyOnMatch: {type: boolean}
+
+    Category:
+      type: object
+      required: [id, name]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        parent: {type: string}
+        subCategories: {type: array, items: {$ref: '#/components/schemas/Category'}}
+
+    Specification:
+      type: object
+      required: [name, type]
+      properties:
+        name: {type: string}
+        type: {type: string, enum: [string, int, float, select, multiselect, range]}
+        label: {type: string}
+        required: {type: boolean}
+        options: {type: array, items: {type: string}}
+
+    ListingMeta:
+      type: object
+      properties:
+        categories: {type: array, items: {$ref: '#/components/schemas/Category'}}
+        employmentTypes: {type: array, items: {type: object}}
+        educationLevels: {type: array, items: {type: object}}
+
+    ResponseMeta:
+      type: object
+      properties:
+        timestamp: {type: string, format: date-time}
+        requestId: {type: string}
+
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: string, enum: [VALIDATION_ERROR, NOT_FOUND, UNAUTHORIZED, FORBIDDEN, CONFLICT, INTERNAL_ERROR]}
+        message: {type: string}
+        details: {type: array, items: {type: object, properties: {field: {type: string}, message: {type: string}}}}
+
+  responses:
+    BadRequest: {description: Invalid request, content: {application/json: {schema: {type: object, properties: {error: {$ref: '#/components/schemas/Error'}, meta: {$ref: '#/components/schemas/ResponseMeta'}}}}}}
+    Unauthorized: {description: Authentication required, content: {application/json: {schema: {type: object, properties: {error: {$ref: '#/components/schemas/Error'}, meta: {$ref: '#/components/schemas/ResponseMeta'}}}}}}
+    Forbidden: {description: Insufficient permissions, content: {application/json: {schema: {type: object, properties: {error: {$ref: '#/components/schemas/Error'}, meta: {$ref: '#/components/schemas/ResponseMeta'}}}}}}
+    NotFound: {description: Resource not found, content: {application/json: {schema: {type: object, properties: {error: {$ref: '#/components/schemas/Error'}, meta: {$ref: '#/components/schemas/ResponseMeta'}}}}}}
+    InternalError: {description: Internal server error, content: {application/json: {schema: {type: object, properties: {error: {$ref: '#/components/schemas/Error'}, meta: {$ref: '#/components/schemas/ResponseMeta'}}}}}}
