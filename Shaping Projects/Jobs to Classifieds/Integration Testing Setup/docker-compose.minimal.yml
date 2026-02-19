@@ -1,0 +1,28 @@
+# Minimal Docker Compose for MongoDB only
+# Use this for local development when services are running outside Docker
+
+services:
+  # MongoDB - Shared database for integration tests
+  mongodb:
+    image: mongo:5.0
+    container_name: integration-test-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      # Mount seed scripts for automatic initialization
+      - ./test-data:/docker-entrypoint-initdb.d:ro
+      # Optional: Persist data between runs
+      # - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=classifieds_test
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+# Uncomment to persist MongoDB data
+# volumes:
+#   mongodb_data:
+#     name: integration-test-mongodb-data

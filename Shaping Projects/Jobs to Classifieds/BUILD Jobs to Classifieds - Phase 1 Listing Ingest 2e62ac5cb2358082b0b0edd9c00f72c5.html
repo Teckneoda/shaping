@@ -1,0 +1,795 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="2e62ac5c-b235-8082-b0b0-edd9c00f72c5" class="page sans"><header><h1 class="page-title" dir="auto">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</h1><p class="page-description" dir="auto"></p><table class="properties"><tbody><tr class="property-row property-row-status"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/burst_gray.svg" style="width:14px;height:14px;display:block"/></span>Status</th><td><span class="status-value select-value-color-blue"><div class="status-dot status-dot-color-blue"></div>Building</span></td></tr><tr class="property-row property-row-relation"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Shaped Package</th><td><a href="https://www.notion.so/SHAPED-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2cb2ac5cb235804e9f3bf19415c99799?pvs=21">SHAPED: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td></tr><tr class="property-row property-row-relation"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Product Division</th><td><a href="https://www.notion.so/Core-Web-1d62ac5cb2358062adbfceb03bdc7395?pvs=21"><img class="icon notion-static-icon" src="https://www.notion.so/icons/spider_purple.svg"/>Core Web</a></td></tr><tr class="property-row property-row-last_edited_time"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/clock_gray.svg" style="width:14px;height:14px;display:block"/></span>Updated</th><td><time>@January 21, 2026 11:17 PM</time></td></tr><tr class="property-row property-row-status"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/burst_gray.svg" style="width:14px;height:14px;display:block"/></span>Build Status</th><td><span class="status-value select-value-color-purple"><div class="status-dot status-dot-color-purple"></div>Build Planning</span></td></tr><tr class="property-row property-row-status"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/burst_gray.svg" style="width:14px;height:14px;display:block"/></span>Investment Status</th><td><span class="status-value select-value-color-green"><div class="status-dot status-dot-color-green"></div>Invested</span></td></tr><tr class="property-row property-row-status"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/burst_gray.svg" style="width:14px;height:14px;display:block"/></span>Shaped Status</th><td><span class="status-value select-value-color-green"><div class="status-dot status-dot-color-green"></div>Shaped</span></td></tr></tbody></table></header><div class="page-body"><div style="display:contents" dir="auto"><h1 id="2e62ac5c-b235-8074-8f21-cf0cb2112df6" class="">Hillchart</h1></div><div style="display:contents" dir="ltr"><figure id="2e62ac5c-b235-80dc-b244-d0e2b6719412"><div class="source"><a href="https://ddm-notion-widgets-1000081038196.us-central1.run.app/hillchart/2e62ac5cb2358082b0b0edd9c00f72c5">https://ddm-notion-widgets-1000081038196.us-central1.run.app/hillchart/2e62ac5cb2358082b0b0edd9c00f72c5</a></div></figure></div><div style="display:contents" dir="ltr"><div id="2e62ac5c-b235-80fe-af90-c23bf59f8a8a" class="collection-content"><h4 class="collection-title">Slice of Build Plan DB</h4><table class="collection-content"><thead><tr><th><span class="icon property-icon"><img src="https://www.notion.so/icons/numero_gray.svg" style="width:14px;height:14px;display:block"/></span>ID</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/font_gray.svg" style="width:14px;height:14px;display:block"/></span>Name</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/hashtag_gray.svg" style="width:14px;height:14px;display:block"/></span>Done</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Build Plan</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/search_gray.svg" style="width:14px;height:14px;display:block"/></span>HillChartID</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/search_gray.svg" style="width:14px;height:14px;display:block"/></span>Build Plan Title</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Description</th></tr></thead><tbody><tr id="2e72ac5c-b235-817e-a9cc-d3eb68a45797"><td class="cell-;tv?">344</td><td class="cell-title"><a href="https://www.notion.so/PAL-Configuration-2e72ac5cb235817ea9ccd3eb68a45797?pvs=21">PAL Configuration</a></td><td class="cell-SPTl">100</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e72ac5c-b235-8186-9535-f9785f4cc8f9"><td class="cell-;tv?">346</td><td class="cell-title"><a href="https://www.notion.so/Additional-Services-Side-Effects-2e72ac5cb23581869535f9785f4cc8f9?pvs=21">Additional Services / Side Effects</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e72ac5c-b235-811e-9801-fe10e0cf5341"><td class="cell-;tv?">347</td><td class="cell-title"><a href="https://www.notion.so/Feeds-2e72ac5cb235811e9801fe10e0cf5341?pvs=21">Feeds</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e72ac5c-b235-810d-b524-df6c0e2e8660"><td class="cell-;tv?">348</td><td class="cell-title"><a href="https://www.notion.so/Cloud-task-delayed-queue-2e72ac5cb235810db524df6c0e2e8660?pvs=21">Cloud task delayed queue</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e92ac5c-b235-81ad-9d4a-e4d770c592d5"><td class="cell-;tv?">375</td><td class="cell-title"><a href="https://www.notion.so/Implement-service-authenticated-endpoint-to-retrieve-member-s-listings-2e92ac5cb23581ad9d4ae4d770c592d5?pvs=21">Implement service-authenticated endpoint to retrieve member&#x27;s listings</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e92ac5c-b235-8076-bfd6-eff010fdae1a"><td class="cell-;tv?">376</td><td class="cell-title"><a href="https://www.notion.so/Implement-GetListing-endpoint-2e92ac5cb2358076bfd6eff010fdae1a?pvs=21">Implement GetListing endpoint</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e92ac5c-b235-80ac-9670-d95dc0bdabad"><td class="cell-;tv?">377</td><td class="cell-title"><a href="https://www.notion.so/Implement-CreateListing-endpoint-2e92ac5cb23580ac9670d95dc0bdabad?pvs=21">Implement CreateListing endpoint</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e92ac5c-b235-80c0-8fa0-e5b56d007e6f"><td class="cell-;tv?">378</td><td class="cell-title"><a href="https://www.notion.so/Implement-UpdateListing-endpoint-2e92ac5cb23580c08fa0e5b56d007e6f?pvs=21">Implement UpdateListing endpoint</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e92ac5c-b235-8048-ada0-d820668bd6a8"><td class="cell-;tv?">379</td><td class="cell-title"><a href="https://www.notion.so/Implement-ActivateListing-endpoint-2e92ac5cb2358048ada0d820668bd6a8?pvs=21">Implement ActivateListing endpoint </a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e92ac5c-b235-8029-8cd2-f860be9004ac"><td class="cell-;tv?">380</td><td class="cell-title"><a href="https://www.notion.so/Implement-DeleteListing-endpoint-2e92ac5cb23580298cd2f860be9004ac?pvs=21">Implement DeleteListing endpoint</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr><tr id="2e92ac5c-b235-80e8-bab7-dd5367f339c4"><td class="cell-;tv?">381</td><td class="cell-title"><a href="https://www.notion.so/Implement-CheckoutListing-endpoint-2e92ac5cb23580e8bab7dd5367f339c4?pvs=21">Implement CheckoutListing endpoint</a></td><td class="cell-SPTl">0</td><td class="cell-ul?v"><a href="https://www.notion.so/BUILD-Jobs-to-Classifieds-Phase-1-Listing-Ingestion-PAL-feeds-2e62ac5cb2358082b0b0edd9c00f72c5?pvs=21">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</a></td><td class="cell-G;an"></td><td class="cell-&gt;lWE">BUILD: Jobs to Classifieds - Phase 1 Listing Ingestion (PAL &amp; feeds)</td><td class="cell-w?[;"></td></tr></tbody></table><br/><br/></div></div><div style="display:contents" dir="auto"><h1 id="2e62ac5c-b235-8016-8d5a-ffbb7eab9499" class="">Kickoff &amp; Planning Notes</h1></div><div style="display:contents" dir="auto"><p id="2e62ac5c-b235-80e8-a63a-f1468fa919aa" class="">
+</p></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="2e62ac5c-b235-809d-a595-c006652e7906"><div style="font-size:1.5em"><span class="icon">📝</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="2e62ac5c-b235-80d6-be86-e0f363beff37" class="">Create new pages for notes, investigations, etc. by typing <code>/page</code> below. Use this for notes for the build team, and those notes should result in a Build Plan at the end of this document.</p></div></div></figure></div><div style="display:contents" dir="auto"><p id="2e62ac5c-b235-80ac-ac5c-c6c2e71f0dab" class="">There are 5 major pieces that need to be build out</p></div><div style="display:contents" dir="auto"><ol type="1" id="2e62ac5c-b235-8050-a4d3-d907387a710c" class="numbered-list" start="1"><li><del>PAL configuration</del></li></ol></div><div style="display:contents" dir="auto"><ol type="1" id="2e62ac5c-b235-8001-885c-e1420ab42f71" class="numbered-list" start="2"><li>Listing Service endpoints</li></ol></div><div style="display:contents" dir="auto"><ol type="1" id="2e62ac5c-b235-806b-9bff-eb94438a8755" class="numbered-list" start="3"><li>Additional services / side effects (price drop notifications, emails, 3rd party calls, etc.)</li></ol></div><div style="display:contents" dir="auto"><ol type="1" id="2e62ac5c-b235-80a3-9909-d53c824fcffa" class="numbered-list" start="4"><li>Feeds</li></ol></div><div style="display:contents" dir="auto"><ol type="1" id="2e62ac5c-b235-8034-891e-df20c3b662b8" class="numbered-list" start="5"><li>Cloud task <a href="https://docs.cloud.google.com/tasks/docs">delayed queue</a> for future displayTime needs.</li></ol></div><div style="display:contents" dir="auto"><p id="2e72ac5c-b235-80d2-a589-d6ab77777249" class="">
+</p></div><div style="display:contents" dir="ltr"><figure id="2e72ac5c-b235-80a2-a9e4-f088abd8e03e" class="link-to-page"><a href="https://www.notion.so/New-Listing-Service-Additional-Services-Side-Effects-Investigation-2e72ac5cb23580a2a9e4f088abd8e03e?pvs=21">New Listing Service Additional Services / Side Effects Investigation</a></figure></div><div style="display:contents" dir="auto"><h2 id="2e62ac5c-b235-80fa-b9f3-e61f80e50def" class="">Mid-point / Tangible Goal</h2></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="2e62ac5c-b235-800e-8662-c4888274989a"><div style="font-size:1.5em"><span class="icon">🗒️</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="2e62ac5c-b235-80a3-acda-c5714bd4d489" class="">Describe the first deliverable version of this package. How can we know at the mid-point of a project that we’re able to ship this package OR do we need to intentionally reduce scope?</p></div></div></figure></div><div style="display:contents" dir="auto"><p id="2e62ac5c-b235-80d9-a036-f320d1765574" class="">{Describe what the mid-point should look like}</p></div><div style="display:contents" dir="auto"><h1 id="2e62ac5c-b235-8024-8243-da9492ab299e" class="">How We’re Going To Do This</h1></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="2e62ac5c-b235-80a2-a419-f4c2281bf30c"><div style="font-size:1.5em"><span class="icon">📝</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="2e62ac5c-b235-80b6-b8a5-ca0bd4114fb8" class="">Build Team: Draw out how you’re going to implement this feature. Use diagrams if needed.</p></div></div></figure></div><div style="display:contents" dir="auto"><h2 id="2e62ac5c-b235-8035-b8c5-f9fed5275a63" class="">Listing Ingestion</h2></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2e82ac5c-b235-8067-b725-fe1792d788f2" class="code code-wrap"><code class="language-Mermaid" style="white-space:pre-wrap;word-break:break-all">graph TD
+  subgraph FeedsGroup[Feeds]
+    Feeds[XML Feed&lt;br&gt;#40;Cron#41;] --&gt; Get([Get Listings by MemberID])
+    Feeds --&gt; FeedDecision{Create, Update, Delete?}
+    FeedDecision --&gt; |protobuf|FeedEvents((CRUD Feed Events&lt;br&gt;#40;Pub/Sub#41;))
+    FeedEvents --&gt; FeedEventProcessor[Feed Event Processor&lt;br&gt;#40;Service#41;]
+  end
+
+  subgraph APILayer[Post-a-Listing]
+    PAL[PAL Frontend] &lt;--&gt; GraphQL[GraphQL]
+  end
+
+  subgraph ListingServiceGroup[Listing Service &amp; Side Effects]
+    ListingService[Listing Service&lt;br&gt;#40;CRUD operations#41;]
+    ListingEvents((CRUD Listing Events&lt;br&gt;#40;Pub/Sub#41;))
+    ListingActivation[Listing Activation&lt;br&gt;#40;Service#41;]
+    ML[ML checks] ~~~ SIFT[SIFT]
+    SSA[Saved Search &amp; Alerts]
+    ActivatedEvent((Activation Event&lt;br&gt;#40;Pub/Sub#41;))
+    Email
+    PriceDrop[Price Drop Notify]
+    PriceDrop ~~~ BigQuery
+    AbuseQueue[Abuse Queue]
+
+    ListingService --&gt; ListingEvents
+    ListingEvents --&gt; |pending status| ListingActivation
+    ListingActivation &lt;--&gt; ML
+    ListingActivation &lt;--&gt; |Fire and forget|SIFT
+    SIFT --&gt; SiftEvent((Sift Event&lt;br&gt;pass/fail&lt;br&gt;Carmony work))
+    SiftEvent --&gt; ListingActivation
+    ListingActivation --&gt; ChecksDecision{ML and SIFT checks passed?}
+    ChecksDecision --&gt; |Yes|ActivatedEvent
+    ChecksDecision --&gt; |No|AbuseQueue
+    ActivatedEvent --&gt; SSA
+    ActivatedEvent --&gt; BigQuery
+    ActivatedEvent --&gt; PriceDrop
+    ListingEvents --&gt; Email
+    ListingEvents --&gt; BigQuery
+  end
+
+  Get &lt;--&gt; ListingService
+  FeedEventProcessor --&gt; ListingService
+  GraphQL &lt;--&gt; ListingService</code></pre></div><div style="display:contents" dir="auto"><h2 id="2e92ac5c-b235-8047-9b49-ed19a3e45150" class="">New Services needed:</h2></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80ae-b0db-c3418762d76b" class="bulleted-list"><li style="list-style-type:disc">listing-cron-feeds<div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8077-82fe-c0f606aaae15" class="bulleted-list"><li style="list-style-type:circle">Will connect to Listing API to get listings by ListingType</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8092-a1d5-d6cb658dae0d" class="bulleted-list"><li style="list-style-type:circle">Will publish to pub/sub</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80e1-9f41-eb2f66540b51" class="bulleted-list"><li style="list-style-type:disc">listing-ps-feed-processor<div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80d9-b5ed-f2b34f32b381" class="bulleted-list"><li style="list-style-type:circle">Pub/sub subscriber to process feed listings</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80c8-a72e-f0d69da87d9e" class="bulleted-list"><li style="list-style-type:disc">listing-ps-price-drop-notify<div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80fc-a0e3-f6d27f0ec67e" class="bulleted-list"><li style="list-style-type:circle">Subscribes to Listing Update events</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80cb-bc49-f1c7672ddfe4" class="bulleted-list"><li style="list-style-type:disc">listing-ps-security-administrator<div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8035-acce-f8e60083cc10" class="bulleted-list"><li style="list-style-type:circle">Subscribes to Listing Update events</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8099-91f0-db0ccf24a2ea" class="bulleted-list"><li style="list-style-type:circle">Handles activation logic and additional checks<div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80da-8645-f4a44f3a8b2d" class="bulleted-list"><li style="list-style-type:square">ML</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-809c-8b8e-d2be3aed1b9c" class="bulleted-list"><li style="list-style-type:square">SIFT</li></ul></div></li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-805d-a779-eb1264ed8239" class="bulleted-list"><li style="list-style-type:disc">listing-ps-new-listing-email<div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80d3-b71d-c51c3d68cf3a" class="bulleted-list"><li style="list-style-type:circle">Subscribes to Listing update events and send “thank you for posting email”</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><p id="2ea2ac5c-b235-80f2-a34e-cc8d410c6a29" class="">
+</p></div><div style="display:contents" dir="auto"><p id="2ea2ac5c-b235-8031-ad49-f5078ad54abd" class="">PubSub Topic Ideas:</p></div><div style="display:contents" dir="auto"><p id="2ea2ac5c-b235-8041-9361-c2cce170a019" class="">Idea 1</p></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-809e-9953-c209bda5e421" class="bulleted-list"><li style="list-style-type:disc">Public_ClassifiedsPreFraudUpdates_v2</li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-800c-bfda-cb8bde9eebf8" class="bulleted-list"><li style="list-style-type:disc">Public_ClassifiedsPostFraudUpdates_v2</li></ul></div><div style="display:contents" dir="auto"><p id="2ea2ac5c-b235-8067-a4e1-c7def2779568" class="">Idead 2</p></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8038-89e2-d1be913d6214" class="bulleted-list"><li style="list-style-type:disc">Public_Classifieds_v2_ListingMongoUpdates (All Raw Mutations to MongoDB)</li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8051-8e32-e57e3c107103" class="bulleted-list"><li style="list-style-type:disc">Public_Classifieds_v2_ListingActivated</li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-809d-93a2-cee5dfefe7ad" class="bulleted-list"><li style="list-style-type:disc">Public_Classifieds</li></ul></div><div style="display:contents" dir="auto"><p id="2ea2ac5c-b235-80aa-a140-fbee2337cbeb" class="">
+</p></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-802a-ac12-f516f1519f5e" class="bulleted-list"><li style="list-style-type:disc">Public_ClassifiedsListingUpdates_v2<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-80c6-b737-ecef0933d5bf" class="bulleted-list"><li style="list-style-type:circle"></li></ul></div></li></ul></div><div style="display:contents" dir="auto"><p id="2ea2ac5c-b235-809f-9fbe-ddef61d40287" class="">
+</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2ea2ac5c-b235-8086-b3d9-d4f46dcee308" class="code code-wrap"><code class="language-JSON" style="white-space:pre-wrap;word-break:break-all">{
+	&quot;event&quot;: {
+		&quot;type&quot;: 
+		// meta data about the change
+		// where the change came from
+		// timestamp
+		// who initiated it
+	},
+	
+}</code></pre></div><div style="display:contents" dir="auto"><p id="2e92ac5c-b235-805b-98b0-d47958fecf55" class="">
+</p></div><div style="display:contents" dir="auto"><h2 id="2e82ac5c-b235-80cb-b87f-c9fc11e4cff9" class="">Listing Service</h2></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2e82ac5c-b235-80ad-8525-d5008ef5ee43" class="code code-wrap"><code class="language-Mermaid" style="white-space:pre-wrap;word-break:break-all">graph TD
+	Internal[Internal Services] --- ListingService[Listing Service]
+	Mongo[(MongoDB)] --- ListingService
+	GraphQL --- ListingService
+	ListingService --- Create(CreateListing&lt;br&gt;#40;endpoint#41;)
+	ListingService --- Update(UpdateListing&lt;br&gt;#40;endpoint#41;)
+	ListingService --- Checkout(CheckoutListing&lt;br&gt;#40;endpoint#41;)
+	ListingService --- Activate(ActivateListing&lt;br&gt;#40;endpoint#41;)
+	ListingService --- Delete(DeleteListing&lt;br&gt;#40;endpoint#41;)
+	ListingService --- Listing(GetListing&lt;br&gt;#40;endpoint#41;)
+	ListingService --- Listings(GetListingsByMemberID&lt;br&gt;#40;endpoint#41;&lt;br&gt;#40;requires pagination#41;&lt;br&gt;#40;initially requires listingType param#41;)
+	Create --&gt; PS((Pub/Sub Event))
+	Update --&gt; PS
+	Activate --&gt; PS
+	Delete --&gt; PS</code></pre></div><div style="display:contents" dir="auto"><p id="2e82ac5c-b235-807c-a5cd-ec9907443455" class="">
+</p></div><div style="display:contents" dir="auto"><h2 id="2e82ac5c-b235-80c2-9180-edce74b138ba" class="">Payment things</h2></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2e82ac5c-b235-8091-979e-c2fb448b1640" class="code code-wrap"><code class="language-Mermaid" style="white-space:pre-wrap;word-break:break-all">graph TD
+  Activate[Activate Listing button click]
+  Activate --&gt; RequiresPayment{Requires Payment to activate?}
+  RequiresPayment --&gt; |yes|CheckoutFlow[Frontend Checkout Flow]
+  RequiresPayment --&gt; |no|ActivateLising[ActivateListing endpoint]
+  CheckoutFlow --&gt; GraphQLCheckout[Checkout GraphQL mutation&lt;br&gt; with payment and purchased item details]
+  GraphQLCheckout --&gt; Update[UpdateListing&lt;br&gt; *see note below chart]</code></pre></div><div style="display:contents" dir="auto"><p id="2e92ac5c-b235-809e-9709-e0f9c0ccd1e8" class="">*Note: Does the following:</p></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-801f-99b2-df462002553b" class="bulleted-list"><li style="list-style-type:disc">validates purchase details</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8014-98fb-cbf995f35045" class="bulleted-list"><li style="list-style-type:disc">initiates payment (Stripe)</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80b8-84c4-ce7aae0d15e4" class="bulleted-list"><li style="list-style-type:disc">saves transaction details on listing</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8056-91c0-d6d607f62d9a" class="bulleted-list"><li style="list-style-type:disc">saves payment intent to StripeCharges (collection)</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8026-93f9-e2ed5baef27c" class="bulleted-list"><li style="list-style-type:disc">merges featured dates with previously purchased</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80c5-b679-cd966a694870" class="bulleted-list"><li style="list-style-type:disc">determines if all payments have been made in order to active listing</li></ul></div><div style="display:contents" dir="auto"><p id="2e92ac5c-b235-80f4-8d80-dcc67394c1f8" class="">
+</p></div><div style="display:contents" dir="auto"><p id="2e92ac5c-b235-8070-8e6e-fe7a42c0c35f" class="">
+</p></div><div style="display:contents" dir="auto"><h2 id="2e92ac5c-b235-80c2-90ab-e55ceab85ed6" class="">New deployments needed:</h2></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-80c3-9196-da91160220f5" class="bulleted-list"><li style="list-style-type:disc">Jobs Feed Cron</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8090-b8ae-f6c2c786d634" class="bulleted-list"><li style="list-style-type:disc">Feed event processor</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-805b-978e-f23092eb2753" class="bulleted-list"><li style="list-style-type:disc">price drop notify</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-801c-a89a-ef85e6449698" class="bulleted-list"><li style="list-style-type:disc">email</li></ul></div><div style="display:contents" dir="auto"><ul id="2e92ac5c-b235-8042-8833-f0f5f6a28900" class="bulleted-list"><li style="list-style-type:disc">Listing Activation</li></ul></div><div style="display:contents" dir="auto"><p id="2ea2ac5c-b235-801e-9478-debeebe58071" class="">
+</p></div><div style="display:contents" dir="auto"><h2 id="2ea2ac5c-b235-801b-8ddd-d35a86edeec1" class="">New endpoints and their needed logic</h2></div><div style="display:contents" dir="auto"><p id="2ea2ac5c-b235-80d2-acca-ed16763937dc" class="">All listings MUST ALWAYS contain a <code>listingType</code> to allow the service to determine the shape of the date.</p></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8084-a83a-d30b0705a3bb" class="bulleted-list"><li style="list-style-type:disc">Create ( <code>POST listing/</code> )<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-80c1-9136-ead5bc6aaf2d" class="bulleted-list"><li style="list-style-type:circle">The body of the post MUST contain the memberId to whom the listing belongs</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8050-899e-f6d4fcf7fea8" class="bulleted-list"><li style="list-style-type:disc">Update ( <code>PUT listing/{id}</code> )<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8076-8b1f-e32f4db8c5a8" class="bulleted-list"><li style="list-style-type:circle">This endpoint MUST match the owner to the caller.</li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8007-b402-c91be73b310a" class="bulleted-list"><li style="list-style-type:circle">Received a partial set of data and updates specific fields in the record.</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-806b-af76-dd760cea2d00" class="bulleted-list"><li style="list-style-type:disc">Activate ( <code>PUT listing/{id}/activate</code> )</li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-807d-92d3-ff22016bff34" class="bulleted-list"><li style="list-style-type:disc">Checkout ( <code>PUT listing/{id}/checkout</code> )</li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8071-83c9-d62a315ae1d7" class="bulleted-list"><li style="list-style-type:disc">Delete Listing ( <code>DELETE listing/{id}</code>)<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8043-a54a-dda2235d31ab" class="bulleted-list"><li style="list-style-type:circle">Must validate request by</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-803a-a1a3-c04cef957d16" class="bulleted-list"><li style="list-style-type:disc">Get ( <code>GET listing/{id}</code> )<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-80d4-94a2-ff7a00ac3968" class="bulleted-list"><li style="list-style-type:circle">For Detail Page (full details)</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8053-b0f3-d2f7b6514c35" class="bulleted-list"><li style="list-style-type:disc">GetByMember<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8005-9467-ec689116bc18" class="bulleted-list"><li style="list-style-type:circle">We will <em>possibly </em>need two versions.<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-801f-9b52-ecebfcbac464" class="bulleted-list"><li style="list-style-type:square">One for getting just the ID and Stock#, so the feeds system can know which listings to create, update, or delete ( <code>GET/PUT/DELETE listing/partial?memberId={memberId}</code> )</li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8081-b109-ffe2cace0f80" class="bulleted-list"><li style="list-style-type:square">The other for pulling the full details the listings ( <code>GET listing?memberId={memberId}</code> )<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8015-9a14-e561fdacb65e" class="bulleted-list"><li style="list-style-type:disc">Would this be paginated?</li></ul></div></li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-80a1-9606-d971d0fb8505" class="bulleted-list"><li style="list-style-type:circle">For getting canonical source of truth data for internal services.<div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-80bf-9665-ec48255e2555" class="bulleted-list"><li style="list-style-type:square">Feeds</li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8005-a657-eb2b28b83633" class="bulleted-list"><li style="list-style-type:square">CX tools</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="2ea2ac5c-b235-8088-abdc-f17d2019e715" class="bulleted-list"><li style="list-style-type:circle">For MyAccount</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><p id="2e82ac5c-b235-805c-b18a-e609b2d9f662" class="">
+</p></div><div style="display:contents" dir="auto"><h1 id="2e62ac5c-b235-80e6-a887-ecf5ef6ceca4" class="">Timeline Records</h1></div></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
