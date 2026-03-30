@@ -1,0 +1,13 @@
+{
+  "repositories": [
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-graphql"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "nest"
+    }
+  ],
+  "notion_docs": []
+}

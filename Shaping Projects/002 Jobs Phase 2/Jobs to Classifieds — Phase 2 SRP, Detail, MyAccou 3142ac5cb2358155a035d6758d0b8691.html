@@ -1,0 +1,713 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Jobs to Classifieds — Phase 2 SRP, Detail, MyAccount</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="3142ac5c-b235-8155-a035-d6758d0b8691" class="page sans"><header><h1 class="page-title" dir="auto">Jobs to Classifieds — Phase 2 SRP, Detail, MyAccount</h1><p class="page-description" dir="auto"></p><table class="properties"><tbody><tr class="property-row property-row-auto_increment_id"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/numero_gray.svg" style="width:14px;height:14px;display:block"/></span>ID</th><td>127</td></tr><tr class="property-row property-row-created_by"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/user-circle_gray.svg" style="width:14px;height:14px;display:block"/></span>Created by</th><td><span class="user"><img src="https://lh6.googleusercontent.com/-N1eO1Qxle5I/AAAAAAAAAAI/AAAAAAAAAKM/9rdYQ9CfsJw/photo.jpg" class="icon user-icon"/>Justin Carmony</span></td></tr><tr class="property-row property-row-created_time"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/clock_gray.svg" style="width:14px;height:14px;display:block"/></span>Created time</th><td><time>@February 27, 2026 3:20 PM</time></td></tr><tr class="property-row property-row-last_edited_by"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/user-circle_gray.svg" style="width:14px;height:14px;display:block"/></span>Last edited by</th><td><span class="user"><img src="T03C26XU9-U0AL7KU67-8ae4c885fb8c-512-2.png" class="icon user-icon"/>Stephan Bergen</span></td></tr><tr class="property-row property-row-last_edited_time"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/clock_gray.svg" style="width:14px;height:14px;display:block"/></span>Last edited time</th><td><time>@March 2, 2026 3:52 PM</time></td></tr><tr class="property-row property-row-select"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-circle-down_gray.svg" style="width:14px;height:14px;display:block"/></span>Status</th><td><span class="selected-value select-value-color-purple">PKG: Shaping</span></td></tr><tr class="property-row property-row-person"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/friends_gray.svg" style="width:14px;height:14px;display:block"/></span>PMs</th><td><span class="user"><img src="T03C26XU9-U0AL7KU67-8ae4c885fb8c-512-2.png" class="icon user-icon"/>Stephan Bergen</span></td></tr><tr class="property-row property-row-person"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/friends_gray.svg" style="width:14px;height:14px;display:block"/></span>Engineers</th><td><span class="user"><img src="https://lh3.googleusercontent.com/a-/AOh14GhNXNIJNglx6iKnY8WW6_Y2nsP43Z5S2LRNmxEi=s100" class="icon user-icon"/>Chris Pies</span></td></tr><tr class="property-row property-row-relation"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Product Division</th><td><a href="https://www.notion.so/Core-Web-1d62ac5cb2358062adbfceb03bdc7395?pvs=21"><img class="icon notion-static-icon" src="https://www.notion.so/icons/spider_purple.svg"/>Core Web</a></td></tr><tr class="property-row property-row-multi_select"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/list_gray.svg" style="width:14px;height:14px;display:block"/></span>Labels</th><td></td></tr></tbody></table></header><div class="page-body"><div style="display:contents" dir="auto"><h1 id="fe9c93d3-3149-42e0-b307-b59e8ef3f6ce" class="block-color-teal">FRAMING</h1></div><div style="display:contents" dir="auto"><hr id="2f3a4c71-5b81-4b2f-819d-ea0f23843023"/></div><div style="display:contents" dir="auto"><div id="b380703d-90b1-419f-8104-0fa46ca2bb77" class="column-list"><div style="display:contents" dir="auto"><div id="6e922837-5509-4c55-80b8-b67298257b7b" style="width:100%" class="column"><div style="display:contents" dir="auto"><h3 id="e236c902-22b9-48ad-bd90-6cbd62fd67dd" class="">PROBLEM STATEMENT:</h3></div><div style="display:contents" dir="auto"><p id="b6a2d1ef-45a2-4ad1-a4b8-f7524bf9d4fb" class="">The Jobs vertical needs to be integrated into the General Classifieds platform to unify KSL&#x27;s marketplace products and modernize the underlying technology. The legacy Jobs infrastructure carries significant technical debt, risks $1.2M in annual revenue, and blocks the future Homes vertical migration.</p></div><div style="display:contents" dir="auto"><p id="c999aadd-1f19-4d82-8265-d8b55ce58d29" class="">Phase 2 specifically addresses the <strong>user-facing layers</strong>: Search Results Page (SRP), listing Detail Page, and MyAccount — the pieces needed to make Jobs listings fully discoverable, viewable, and manageable by users on the new platform.</p></div></div></div><div style="display:contents" dir="auto"><div id="07c6014a-c692-4500-a01c-47de5d83e039" style="width:100%" class="column"><div style="display:contents" dir="auto"><h3 id="4037d46e-055f-4d1c-8551-3bb90d72378d" class="">POTENTIAL SOLUTION/S:</h3></div><div style="display:contents" dir="auto"><p id="7b0927b6-59fb-4692-9fbc-df07326935ee" class="">Build the backend infrastructure to support Jobs on the SRP, Detail Page, and MyAccount by:</p></div><div style="display:contents" dir="auto"><ul id="32b5733c-10cb-4671-a3d7-4f4137e7a655" class="bulleted-list"><li style="list-style-type:disc"><del>Replacing the legacy subcategory-driven specs model with a semantic facets/filters system (e.g., </del><del><code>jobtype=parttime</code></del><del>)</del></li></ul></div><div style="display:contents" dir="auto"><ul id="d4b48293-e4c8-4f8a-96a7-828d87fa81f6" class="bulleted-list"><li style="list-style-type:disc">Syncing Jobs data through Mongo connectors to Elasticsearch</li></ul></div><div style="display:contents" dir="auto"><ul id="8968c530-2ef1-4e1d-a475-bb94702fb15f" class="bulleted-list"><li style="list-style-type:disc">Providing GraphQL endpoints for SRP, Detail, and MyAccount</li></ul></div><div style="display:contents" dir="auto"><ul id="88c5c172-6474-429d-a9ca-f60825169fc6" class="bulleted-list"><li style="list-style-type:disc">Implementing soft delete so Customer Experience can restore listings</li></ul></div><div style="display:contents" dir="auto"><ul id="19296511-f5a1-4d72-becb-7ef6b742db5a" class="bulleted-list"><li style="list-style-type:disc">Supporting app-side rendering of Jobs-specific fields in PAL, SRP, and Detail</li></ul></div></div></div></div></div><div style="display:contents" dir="auto"><hr id="ece063e5-ba9c-4435-acd9-f834951a630d"/></div><div style="display:contents" dir="auto"><div id="ad486e83-bd71-4e06-b3c7-efa8bd15d0d4" class="column-list"><div style="display:contents" dir="auto"><div id="885571a1-5156-4066-a174-351041245b50" style="width:100%" class="column"><div style="display:contents" dir="auto"><h3 id="dedf7842-034f-442f-ab26-514210bb42ee" class="">APPETITE &amp; COST:</h3></div><div style="display:contents" dir="auto"><p id="63c26ca8-7c32-4233-a1a9-fe640a729843" class=""><strong>Web: 4 weeks | App: 2 weeks</strong></p></div><div style="display:contents" dir="auto"><p id="48e54287-e896-416c-83ad-797d63d972af" class=""><em>(Requires frontend resources TBD)</em></p></div></div></div><div style="display:contents" dir="auto"><div id="ad7e9114-ab79-4862-ae1e-2c310b550588" style="width:100%" class="column"><div style="display:contents" dir="auto"><h3 id="69e734ca-d3f2-4ea0-be86-b00d65cbef61" class="">BUSINESS IMPACT &amp; VALUE:</h3></div><div style="display:contents" dir="auto"><ul id="f517ef07-02b1-417f-a947-91a7510130f2" class="bulleted-list"><li style="list-style-type:disc"><strong>Revenue Protection:</strong> Safeguards ~$1.2M in annual Jobs revenue ($80K/mo self-serve + $20K/mo direct sales)</li></ul></div><div style="display:contents" dir="auto"><ul id="e5c13753-79a5-41e9-ad14-96c8660a4c11" class="bulleted-list"><li style="list-style-type:disc"><strong>User Scale:</strong> Protects 400K monthly page views, ~1,200 active listings/mo, 15,401+ uploaded resumes, and 12,000+ saved searches</li></ul></div><div style="display:contents" dir="auto"><ul id="88edafe4-e501-4a5b-ad09-e52e86c3b349" class="bulleted-list"><li style="list-style-type:disc"><strong>Platform Modernization:</strong> Eliminates legacy PHP infrastructure, consolidates tech stack, and enables future Homes vertical migration without duplicate work</li></ul></div></div></div></div></div><div style="display:contents" dir="auto"><hr id="1552aa6a-f1c0-4d75-8328-eb20c4149b40"/></div><div style="display:contents" dir="auto"><h3 id="e091a5da-9c19-4b10-af27-cde02689405a" class="">SCREENSHOTS, THICK MARKER, COMPETITOR EXAMPLES</h3></div><div style="display:contents" dir="auto"><ul id="b138cf17-660e-4280-aed2-936632f9e189" class="bulleted-list"><li style="list-style-type:disc">Figma Mockup: <a href="https://www.figma.com/design/334e13Bg1yyLReJTpAgM13/Jobs-PDP-and-Home-page?node-id=1-3&amp;t=7BLjI1c8pt3fX8Ug-1">Jobs SRP</a></li></ul></div><div style="display:contents" dir="auto"><ul id="845fd69e-48d9-4c2a-8550-a2eef19cc64a" class="bulleted-list"><li style="list-style-type:disc"><a href="https://www.notion.so/Job-Facets-and-Specifications-3132ac5cb235806da903e777b55be742?pvs=21">List of Job Facets and Specifications</a></li></ul></div><div style="display:contents" dir="auto"><hr id="07b1b024-7d5f-47e7-8722-721aec19f7d3"/></div><div style="display:contents" dir="auto"><h3 id="38f05ad5-3da9-410d-b194-50fe6343cd2d" class="">SUPPORTING DATA</h3></div><div style="display:contents" dir="auto"><ul id="f583a999-41a6-4f4c-88bc-c517b906b4ce" class="bulleted-list"><li style="list-style-type:disc">~$1.2M annual revenue at risk on legacy platform</li></ul></div><div style="display:contents" dir="auto"><ul id="dc385223-f7a6-430a-b223-46f59f03a4a2" class="bulleted-list"><li style="list-style-type:disc">400K monthly page views | ~1,200 active listings/mo</li></ul></div><div style="display:contents" dir="auto"><ul id="20e683cc-4589-43cc-be8a-6648f63a8738" class="bulleted-list"><li style="list-style-type:disc">15,401+ uploaded resumes | 12,000+ saved searches requiring careful migration</li></ul></div><div style="display:contents" dir="auto"><hr id="1d3b1062-7f34-4f31-99ca-f621e431db9c"/></div><div style="display:contents" dir="auto"><h3 id="901b50f1-b997-4c87-8fae-f18ac08ce4d4" class="">STAKEHOLDER FEEDBACK</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="465edcfb-a116-46ef-a11f-a9024682ad4c"><div style="font-size:1.5em"><span class="icon">🗣️</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="61f0e96e-8af4-458a-a38f-faa95f401b48" class="">Notes gathered during OPS meetings</p></div></div></figure></div><div style="display:contents" dir="auto"><div id="c8643f99-da76-4370-899c-569b51747631" class="column-list"><div style="display:contents" dir="auto"><div id="6d1b805e-42a2-430f-8745-6b1c704d21b0" style="width:100%" class="column"><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">PROJECT REQUIREMENTS:</summary><div class="indented"><div style="display:contents" dir="auto"><ul id="534da433-7836-4f57-b498-8e3af79689a7" class="bulleted-list"><li style="list-style-type:disc">Frontend resources required (TBD)</li></ul></div><div style="display:contents" dir="auto"><ul id="7a9d1e31-e820-4131-8b6f-7b2bc107a34e" class="bulleted-list"><li style="list-style-type:disc">Legal input needed on soft-delete retention and purge behavior</li></ul></div></div></details></div></div></div><div style="display:contents" dir="auto"><div id="d9f35471-523d-4f1f-9230-c523f862dddb" style="width:100%" class="column"><div style="display:contents" dir="auto"><h3 id="7d061890-ee80-4158-a951-7338c80d1002" class="">CHECKLIST</h3></div><div style="display:contents" dir="auto"><p id="358983b7-0880-4488-ab47-8d01094c85ec" class="">Highlight which are needed</p></div><div style="display:contents" dir="auto"><ul id="8c4d90b6-aa52-4ee2-8161-c1df893deb8e" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">Design Review</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="ea7f047a-ed4d-42a4-923c-2c3fc0e4c303" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">Marketing Plan</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="ed851a17-a89f-4d6e-90d8-50cd6503bce5" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">Analytics Plan</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="3269e044-8cc3-4881-8664-8b53be9f2eb7" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">Revenue Plan</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="99c672db-f880-4688-ae7b-4e31157bfbd6" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">App Plan</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="7720523b-375b-4564-8e8e-c0afb257a2b6" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">Legal Check</span><div class="indented"></div></li></ul></div></div></div></div></div><div style="display:contents" dir="auto"><hr id="783146dc-b751-4587-90d1-2c3501ab4b29"/></div><div style="display:contents" dir="auto"><hr id="2662db80-2421-450d-8b9d-42dd358cf98b"/></div><div style="display:contents" dir="auto"><hr id="d5c1ff9c-9a8d-4c9b-9925-1b548b7ce74a"/></div><div style="display:contents" dir="auto"><h1 id="9caba028-c79d-4451-add3-f2c6fc9a202a" class="block-color-blue">SHAPING</h1></div><div style="display:contents" dir="auto"><hr id="97fe7b0e-2d09-4386-a2d7-dc5e45e5103b"/></div><div style="display:contents" dir="auto"><h3 id="b7627101-35a5-4d69-a357-f5c046b07d1e" class="">IDENTIFIED SOLUTION SUMMARY (TL;DR)</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="39eb8d6f-8fce-4d1c-bb87-e87d4e48bcb9"><div style="font-size:1.5em"><span class="icon">📝</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="aa07e98d-0f43-4ee4-a175-ea7c186172f0" class="">Write a short, 1-2 paragraph summary of the solution; think of external stakeholders as the primary audience.</p></div></div></figure></div><div style="display:contents" dir="auto"><p id="873bc1d4-e426-4b66-9515-1228f5ca7dd5" class="">This phase delivers three main pieces: the Search Results Page, the listing Detail Page, and a MyAccount area where people can manage their listings. <del>We are also updating how listing specs and filters work — replacing subcategory-specific rules and hard-to-read IDs in the URL with clear, meaningful filters (e.g., </del><del><code>jobtype=parttime</code></del><del>)</del>. When someone browses Jobs, they will see job-related filters like salary range, hourly rate, and job type.</p></div><div style="display:contents" dir="auto"><p id="72f330c7-cee8-40fc-8220-6818a56948a0" class="">On the SRP, job listings will be included in search and filterable by listing type. For the Detail Page, we&#x27;ll provide the data needed to display and update a listing. MyAccount will let users view, edit, and delete their existing listings. As this phase deals with front-end components, it will require some frontend resources (TBD).</p></div><div style="display:contents" dir="auto"><hr id="7fd27208-0049-48e7-a328-43db9e5b2042"/></div><div style="display:contents" dir="auto"><h3 id="ddb9811e-04fb-4006-a23d-b90eb34bca33" class="">GOALS</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="9db7a0bc-647d-42e5-8dc7-05551e55af59"><div style="font-size:1.5em"><span class="icon">🥅</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="c0f36fc2-3699-445f-a589-701d413064b1" class="">In order of priority, what are the goals of this package? What is the outcome we&#x27;re looking for?</p></div></div></figure></div><div style="display:contents" dir="auto"><p id="2fcfcf81-2828-4c30-b3f0-54c1b65d684c" class=""><strong>Specifications Architecture Change</strong></p></div><div style="display:contents" dir="auto"><ul id="29600ddb-0268-46b5-b607-6c675b5ce78b" class="bulleted-list"><li style="list-style-type:disc"><del>Replace non-semantic spec identifiers in URLs (e.g., </del><del><code>specs/1</code></del><del>) with semantic key/value filters (e.g., </del><del><code>sex=male</code></del><del>)</del></li></ul></div><div style="display:contents" dir="auto"><ul id="5307d866-d02a-4f43-b52e-297d46a9f669" class="bulleted-list"><li style="list-style-type:disc">Deliver a facets/filters system that shows Jobs-specific filters (salary range, hourly rate, job type) when Jobs category or listing type is selected</li></ul></div><div style="display:contents" dir="auto"><ul id="1ac9a62d-af8a-4c83-ac6c-83e77d1961fe" class="bulleted-list"><li style="list-style-type:disc">Make available filters dynamic based on selected category and listing type, rather than subcategory-dependent</li></ul></div><div style="display:contents" dir="auto"><ul id="a2dae809-0ec9-486a-a0eb-016b31817c28" class="bulleted-list"><li style="list-style-type:disc">Model and store specification definitions with clear parent dependencies (category, listing type, seller type, etc.)</li></ul></div><div style="display:contents" dir="auto"><ul id="c1ffbdf5-8370-465c-9ec3-4c531f855666" class="bulleted-list"><li style="list-style-type:disc">Implement an initial config path in code; capture requirements for a future Specifications Manager admin UI</li></ul></div><div style="display:contents" dir="auto"><p id="4e89a286-9782-4e50-86f3-10ce6ed3f2cf" class=""><strong>SRP</strong></p></div><div style="display:contents" dir="auto"><ul id="16a0004a-63f3-4cc5-96ea-b67093ad8beb" class="bulleted-list"><li style="list-style-type:disc">Update Mongo connectors to sync job data to ES</li></ul></div><div style="display:contents" dir="auto"><ul id="33eb5976-e6ba-45a5-8dbb-28af1799e25a" class="bulleted-list"><li style="list-style-type:disc">Update ES queries to filter by listing type (Classified vs. Jobs) — same index filtering</li></ul></div><div style="display:contents" dir="auto"><ul id="e30dcafb-9dd3-4b09-b7a6-f16785a662c7" class="bulleted-list"><li style="list-style-type:disc">GraphQL data structure for front end</li></ul></div><div style="display:contents" dir="auto"><ul id="92be9f4f-9946-4c3a-81f5-7b8a62f3c0f8" class="bulleted-list"><li style="list-style-type:disc">Front End Requirements (TBD)</li></ul></div><div style="display:contents" dir="auto"><p id="af649d18-0bcf-46bc-89e7-c48a427a80ea" class=""><strong>Detail Page</strong></p></div><div style="display:contents" dir="auto"><ul id="f5d34b0c-2f09-438e-8eb5-a75a93d9b19f" class="bulleted-list"><li style="list-style-type:disc">Read endpoints with all detail page data needed for Jobs</li></ul></div><div style="display:contents" dir="auto"><ul id="de584eba-6e45-4d41-ac17-3ce922ab1f7f" class="bulleted-list"><li style="list-style-type:disc">GraphQL endpoint for Detail Page updates</li></ul></div><div style="display:contents" dir="auto"><p id="a3a78fa3-ed2a-4a84-9c7c-1c4d45a4db29" class=""><strong>MyAccount</strong></p></div><div style="display:contents" dir="auto"><ul id="8e49c699-e53f-4fae-9e40-69a1dad20e87" class="bulleted-list"><li style="list-style-type:disc">View, update, and delete listings (using existing ES queries to view)</li></ul></div><div style="display:contents" dir="auto"><ul id="1c83355a-77f5-40fc-984c-7bba88265fed" class="bulleted-list"><li style="list-style-type:disc">Add Soft Delete functionality</li></ul></div><div style="display:contents" dir="auto"><ul id="a71b1c36-1abb-4182-862d-ce775a35e310" class="bulleted-list"><li style="list-style-type:disc">New endpoint for Nest Listing Restore tool</li></ul></div><div style="display:contents" dir="auto"><p id="becc8133-e283-4940-90c3-2fd071382662" class=""><strong>App Work (2-week estimate)</strong></p></div><div style="display:contents" dir="auto"><ul id="355c6ccd-9a40-4fc1-bb0a-de178700384b" class="bulleted-list"><li style="list-style-type:disc">SRP: Users select Jobs, opens to pre-selected Jobs subcategories; remove Jobs from global search</li></ul></div><div style="display:contents" dir="auto"><ul id="6942eee8-13d2-4139-8b3b-882083e580bc" class="bulleted-list"><li style="list-style-type:disc">Detail Page: Hook into pre-existing unified detail page</li></ul></div><div style="display:contents" dir="auto"><ul id="ec97555e-583b-4d13-b1f5-da0aef0e9c1c" class="bulleted-list"><li style="list-style-type:disc">PAL: Render job-specific fields; update to use PAL endpoint for posting/editing; hard-code fields (similar to Cars)</li></ul></div><div style="display:contents" dir="ltr"><figure class="block-color-pink_background callout" style="white-space:pre-wrap;display:flex" id="27631bcf-294c-4369-8d87-bc0ed84ec106"><div style="font-size:1.5em"><span class="icon">⚠️</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="468eeebe-b5e0-4c83-b4d8-944a0bc47995" class="">NOTE: Take into consideration what effect this work will have on Saved Search.</p></div></div></figure></div><div style="display:contents" dir="auto"><hr id="8c9f55f6-3b82-4014-81bb-c66263b989f0"/></div><div style="display:contents" dir="auto"><h3 id="be3b9218-bbe0-41f5-8ee7-4a456ea44231" class="">ACCEPTANCE CRITERIA</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="67ec6c3b-f741-4f6a-bb11-d0500259b657"><div style="font-size:1.5em"><span class="icon">📝</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="ef310860-612f-415f-8809-c43b0ec09957" class="">In order of priority, how can we tell if the solution is done?</p></div></div></figure></div><div style="display:contents" dir="auto"><ul id="d396508a-74c2-4069-af35-a1ead698a88e" class="bulleted-list"><li style="list-style-type:disc"><del>Filters use semantic key/value pairs in URLs (e.g., </del><del><code>sex=male</code></del><del>); legacy </del><del><code>specs/&lt;id&gt;</code></del><del> pattern no longer required for new Jobs SRP/filter URLs</del></li></ul></div><div style="display:contents" dir="auto"><ul id="fa0705c9-935a-4056-a052-411d64fd339a" class="bulleted-list"><li style="list-style-type:disc"><del>Available filters are driven by selection context (category, listing type, seller type) rather than subcategory-specific mappings</del></li></ul></div><div style="display:contents" dir="auto"><ul id="33a6a236-2f0d-49df-8aae-d53bc5a1f197" class="bulleted-list"><li style="list-style-type:disc">When Jobs is selected, SRP shows Jobs-specific filters including salary range, hourly rate, and job type</li></ul></div><div style="display:contents" dir="auto"><ul id="d36f1af5-8d0d-4ff2-9acc-e9c7f180421a" class="bulleted-list"><li style="list-style-type:disc">A data model exists for specification definitions including parent dependencies; Jobs can be represented without special-case behavior</li></ul></div><div style="display:contents" dir="auto"><ul id="b185c8d6-1e86-4237-a12d-0e34ce114a23" class="bulleted-list"><li style="list-style-type:disc">SRP search logic previously embedded in GraphQL is implemented in a dedicated service</li></ul></div><div style="display:contents" dir="auto"><ul id="5fdfed01-e9bb-4553-aad0-3b23a73328eb" class="bulleted-list"><li style="list-style-type:disc">SRP results can be filtered by listing type (Classifieds vs. Jobs) using same-index filtering</li></ul></div><div style="display:contents" dir="auto"><ul id="bd80daa6-6412-4318-b224-ec66fd12a3cb" class="bulleted-list"><li style="list-style-type:disc">SRP display rules implemented:<div style="display:contents" dir="auto"><ul id="e3df0079-c217-4d68-acdb-d6ffc8140af2" class="bulleted-list"><li style="list-style-type:circle">Jobs mixed with other listing types → standard grid format</li></ul></div><div style="display:contents" dir="auto"><ul id="72bd90cd-0e7a-4ed9-8195-c64f0f1c2b5c" class="bulleted-list"><li style="list-style-type:circle">Jobs is the only selected category → Jobs list format</li></ul></div><div style="display:contents" dir="auto"><ul id="94f3c029-bd0a-4568-9ae8-7e21f1147110" class="bulleted-list"><li style="list-style-type:circle">Jobs + Services selected → standard grid style</li></ul></div><div style="display:contents" dir="auto"><ul id="b24afd6a-04c6-4f75-868d-c67de3d54222" class="bulleted-list"><li style="list-style-type:circle">Jobs available as a listing type option alongside For Sale, In Search Of, and For Rent</li></ul></div></li></ul></div><div style="display:contents" dir="auto"><ul id="056c4274-5fa7-4a86-95b3-a927a80913d5" class="bulleted-list"><li style="list-style-type:disc">Detail Page reads for Jobs listings served from new Listing Service endpoints, including all data needed for the unified detail page</li></ul></div><div style="display:contents" dir="auto"><ul id="a330ae28-68ea-4d50-92c8-3a09ecc9547d" class="bulleted-list"><li style="list-style-type:disc">Detail Page supports updating a listing via the defined GraphQL endpoint(s), validated end-to-end</li></ul></div><div style="display:contents" dir="auto"><ul id="19f21504-363c-4c29-bd04-2e1006c34d38" class="bulleted-list"><li style="list-style-type:disc">MyAccount allows users to view, edit, and delete listings using the new Listing Service, reusing existing ES queries where appropriate</li></ul></div><div style="display:contents" dir="auto"><ul id="51fac131-7bb6-4459-876a-168e6715a8ef" class="bulleted-list"><li style="list-style-type:disc">Deleting a listing performs a <strong>soft delete</strong> (not hard delete); CX can restore without losing photos</li></ul></div><div style="display:contents" dir="auto"><ul id="f094a819-d4a1-4cf5-b77d-e79b92acbee4" class="bulleted-list"><li style="list-style-type:disc">Soft-delete retention and final purge behavior are documented and agreed (including Legal inputs)</li></ul></div><div style="display:contents" dir="auto"><hr id="4f1ba074-60a1-4b3a-8846-17b2284c7d6e"/></div><div style="display:contents" dir="auto"><h3 id="9b3acea6-e8d8-4494-aaa6-4c89f1123a70" class="">EXPECTED METRIC IMPACT</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="edd4eda2-18bd-49c1-8e30-ce55319682fe"><div style="font-size:1.5em"><span class="icon">📊</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="f6a5961d-f604-48b0-bb43-57e3d6cefea8" class="">Which metrics do you expect this solution to influence?</p></div></div></figure></div><div style="display:contents" dir="auto"><ul id="222649f1-241e-494b-b89d-5508f203aba3" class="bulleted-list"><li style="list-style-type:disc">Jobs listings become fully discoverable, filterable, and manageable on the unified Classifieds platform</li></ul></div><div style="display:contents" dir="auto"><ul id="1a8c31d7-197a-4896-9c8f-43b47ef681e2" class="bulleted-list"><li style="list-style-type:disc">Protects 400K monthly page views and $1.2M annual revenue from legacy platform risk</li></ul></div><div style="display:contents" dir="auto"><ul id="c21d85b7-7a86-4737-ba0a-c163a05ca14f" class="bulleted-list"><li style="list-style-type:disc">Unblocks Phase 3 (Saved Search &amp; Alerts) and future phases</li></ul></div><div style="display:contents" dir="auto"><hr id="40d3fd3f-c08a-4935-8aac-4283765c0496"/></div><div style="display:contents" dir="auto"><h2 id="6cae7257-06b8-486a-af5e-1b685858c834" class="">SOLUTION DETAILS</h2></div><div style="display:contents" dir="auto"><h3 id="dd9f3f19-181d-4eb1-b6b0-5700ae933d35" class="">FEATURE DESCRIPTION</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1a11ed41-d446-47ec-b68d-c90db1b184a4"><div style="font-size:1.5em"><span class="icon">✍️</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="147d0a7b-d97b-41f6-aa7e-d6434073366b" class="">Describe how the feature should function in detail.</p></div></div></figure></div><div style="display:contents" dir="auto"><p id="ed1b3773-d89c-45f8-aedb-56cf905c5705" class=""><strong>Specifications Architecture Change</strong></p></div><div style="display:contents" dir="auto"><ul id="aca3d23b-54a8-4ed2-98ad-6cacf07ea11e" class="bulleted-list"><li style="list-style-type:disc"><del>Replace the legacy, subcategory-driven specs model with a facets/filters system using semantic key/value pairs</del></li></ul></div><div style="display:contents" dir="auto"><ul id="d3f87602-ba1e-4b62-a690-f1127bf61467" class="bulleted-list"><li style="list-style-type:disc">When a user selects Jobs (by category or listing type), the SRP dynamically surfaces Jobs-specific filters (salary range, hourly rate, job type)</li></ul></div><div style="display:contents" dir="auto"><ul id="1e0135b5-ac42-4596-bc03-02059b52ed0b" class="bulleted-list"><li style="list-style-type:disc"><del>Available filters driven by current selection context, not hard-coupled to subcategories</del></li></ul></div><div style="display:contents" dir="auto"><ul id="99b07c9e-d27a-4a31-a2eb-e6407da6d79a" class="bulleted-list"><li style="list-style-type:disc"><del>Define a clear data model for specification definitions with parent dependencies, expandable to other verticals later</del></li></ul></div><div style="display:contents" dir="auto"><ul id="e08f367e-fad4-45c0-80df-48c6fc40bf12" class="bulleted-list"><li style="list-style-type:disc"><del>Deprecate reliance on Category Manager for specs; start with config in code</del></li></ul></div><div style="display:contents" dir="auto"><p id="1e018131-c129-4b94-9d5b-e4bc3f30687c" class=""><strong>Search Results Page (SRP)</strong></p></div><div style="display:contents" dir="auto"><ul id="a69f7449-b731-4cd7-8782-c041ac5460dc" class="bulleted-list"><li style="list-style-type:disc">Move SRP search logic (currently embedded in GraphQL ES query building) into a dedicated service</li></ul></div><div style="display:contents" dir="auto"><ul id="05b366f1-8ba5-4bf4-b086-8570e928996c" class="bulleted-list"><li style="list-style-type:disc">Confirm whether Jobs filters appear immediately when Jobs is selected or only after subcategory selection</li></ul></div><div style="display:contents" dir="auto"><ul id="b178da95-4db5-4f2c-895b-a0159bca684d" class="bulleted-list"><li style="list-style-type:disc">Define filter grouping and display in collapsible sections</li></ul></div><div style="display:contents" dir="auto"><ul id="f61ef764-0b8c-4d54-8567-f4bbd970f5dd" class="bulleted-list"><li style="list-style-type:disc"><strong>Reference: </strong><strong><a href="https://www.notion.so/Job-Facets-and-Specifications-3132ac5cb235806da903e777b55be742?pvs=21">List of Job Facets and Specifications</a></strong></li></ul></div><div style="display:contents" dir="auto"><ul id="bfd51d11-aa1f-42bc-9050-9d333ba40685" class="bulleted-list"><li style="list-style-type:disc"><strong>Reference: </strong><strong><a href="https://www.figma.com/design/334e13Bg1yyLReJTpAgM13/Jobs-PDP-and-Home-page?node-id=1-3&amp;t=7BLjI1c8pt3fX8Ug-1">Figma Mockup of Jobs SRP</a></strong></li></ul></div><div style="display:contents" dir="auto"><p id="ec083b6b-7ac7-419e-adb6-b283167f3b5c" class=""><strong>Detail Page</strong></p></div><div style="display:contents" dir="auto"><ul id="f10d4bfc-43e9-49b7-99d5-994151d80f45" class="bulleted-list"><li style="list-style-type:disc">Migrate Detail Page reads from the current GraphQL-through-CAPI approach to new Listing Service endpoints</li></ul></div><div style="display:contents" dir="auto"><ul id="6195450c-ed36-4376-947f-c29371e922c4" class="bulleted-list"><li style="list-style-type:disc">Maintain legacy compatibility near-term by continuing to store contact info and verification status on listing documents while downstream consumers migrate</li></ul></div><div style="display:contents" dir="auto"><p id="c9b57b55-10b5-429f-9a6b-4d7579d51770" class=""><strong>MyAccount</strong></p></div><div style="display:contents" dir="auto"><ul id="8e05c165-0f03-4f7a-87db-8e5f14b45f1e" class="bulleted-list"><li style="list-style-type:disc">View, update, and delete listings via new Listing Service, reusing existing ES queries where it makes sense</li></ul></div><div style="display:contents" dir="auto"><ul id="3a34535d-5c20-4dbe-bec5-4d387525f4c6" class="bulleted-list"><li style="list-style-type:disc">Implement soft delete so CX can reactivate listings without losing photos</li></ul></div><div style="display:contents" dir="auto"><ul id="58182032-b534-4599-8749-25b550ba4565" class="bulleted-list"><li style="list-style-type:disc">Define retention period and final purge behavior for soft-deleted listings (requires Legal input)</li></ul></div><div style="display:contents" dir="auto"><p id="3f7a35d0-5837-4a9a-b350-e35174a1e4ef" class=""><strong>Technical Implementation Steps</strong></p></div><div style="display:contents" dir="auto"><ol type="1" id="d88f59de-ddd1-4925-a8e3-a83fb64cf66f" class="numbered-list" start="1"><li>Update Mongo connectors to sync additional Jobs fields to ES</li></ol></div><div style="display:contents" dir="auto"><ol type="1" id="6b040a99-11a3-4512-8389-facfa30c7be4" class="numbered-list" start="2"><li>Update AvailableFilters from SRP GraphQL call to include Jobs field filters</li></ol></div><div style="display:contents" dir="auto"><ol type="1" id="41f43dce-93e6-45aa-a95e-61c8384d8584" class="numbered-list" start="3"><li>Build out SRP search queries functionality in backend (move from GraphQL into dedicated service)</li></ol></div><div style="display:contents" dir="auto"><ol type="1" id="74ec453b-44cb-432a-9fd8-51cac28f4ac6" class="numbered-list" start="4"><li>Expand current Detail Page endpoints to send back Jobs-specific fields</li></ol></div><div style="display:contents" dir="auto"><h3 id="8a7430ed-9e74-41cb-b4b6-64cb5ca64889" class="">THICK MARKER DESIGNS</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="7d8cd5c4-3448-4e68-b6d0-30cab58c1c8c"><div style="font-size:1.5em"><span class="icon">🖼️</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="af2a25b6-2b5e-4bc4-8776-d87fbba3b516" class="">See Figma for design assets. No images were in the original shaped package.</p></div></div></figure></div><div style="display:contents" dir="auto"><ul id="ecf43221-3575-4851-b79d-9ad252b10306" class="bulleted-list"><li style="list-style-type:disc"><a href="https://www.figma.com/design/334e13Bg1yyLReJTpAgM13/Jobs-PDP-and-Home-page?node-id=1-3&amp;t=7BLjI1c8pt3fX8Ug-1">Jobs SRP Figma</a></li></ul></div><div style="display:contents" dir="auto"><ul id="99d35d48-b6b7-414c-98e9-b604fb1dacbe" class="bulleted-list"><li style="list-style-type:disc">Source: <a href="https://www.notion.so/SHAPED-Jobs-to-Classifieds-Phase-2-SRP-Detail-MyAccount-2cb2ac5cb235805e9bc7ccdfce262676?pvs=21">SHAPED: Jobs to Classifieds - Phase 2</a><br/><br/><mark class="highlight-red_background">TO DO: Include screenshots of updated mockups</mark></li></ul></div><div style="display:contents" dir="auto"><h3 id="b63ca6a7-6949-4564-8127-e651bb98f9ca" class="">OUT OF SCOPE</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="3a7303c0-7a74-4264-9b02-89a6c2765f04"><div style="font-size:1.5em"><span class="icon">🚫</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="45b4fcad-39f8-491a-8c29-3c7402b59444" class="">What is considered out of scope for this package?</p></div></div></figure></div><div style="display:contents" dir="auto"><ul id="74cb43d7-b75a-4077-8c05-de438cbe61f1" class="bulleted-list"><li style="list-style-type:disc">Saved Search &amp; Alerts for Jobs (Phase 3)</li></ul></div><div style="display:contents" dir="auto"><ul id="f287be31-44e0-4257-8950-1386df398340" class="bulleted-list"><li style="list-style-type:disc">Quick Apply / Resume uploads / Virus scanning (Phase 4)</li></ul></div><div style="display:contents" dir="auto"><ul id="c4de7ee2-1298-4760-8000-ac9d90ceaae0" class="bulleted-list"><li style="list-style-type:disc">Full migration of existing Jobs listings (Phase 5)</li></ul></div><div style="display:contents" dir="auto"><ul id="2a0ec6f9-90ab-4746-9f6a-c627efc75534" class="bulleted-list"><li style="list-style-type:disc">Any frontend work beyond agreed scope (TBD with frontend team)</li></ul></div><div style="display:contents" dir="auto"><h3 id="7f87e818-fdaf-4457-80ea-c22fa92a38d0" class="">HUDDLE COORDINATION CHECKLIST</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="4f6b83fc-5b51-4db0-8d01-0b52ca77f7c1"><div style="font-size:1.5em"><span class="icon">✅</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="b7bd3f05-e928-494b-9cb2-2fd0eafb39c6" class="">Go through and mark when each conversation has been had.</p></div></div></figure></div><div style="display:contents" dir="auto"><ul id="6f2d2f8f-221d-4ca3-9edc-d7e93d7e5c71" class="to-do-list"><li><div class="checkbox checkbox-on"></div> <span class="to-do-children-checked">ANALYTICS: Do you have data to support your problem &amp; solution? Have you discussed a measurement plan with the analytics team?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="ed77c759-1ecf-462a-b7b7-e7c2135ca59d" class="to-do-list"><li><div class="checkbox checkbox-on"></div> <span class="to-do-children-checked">DESIGN: Have you met with design? Do you have a thick marker design?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="5c18af23-d26f-4945-a9df-05104e3a2be2" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">MARKETING: Is there a plan for Marketing to support this new feature?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="7a8ba252-26ed-4656-9aad-363a08e16734" class="to-do-list"><li><div class="checkbox checkbox-on"></div> <span class="to-do-children-checked">SALES: Have you spoken with your sales counterpart?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="bd1a6dac-6fa4-4fc7-af6e-eee8728b3bc7" class="to-do-list"><li><div class="checkbox checkbox-on"></div> <span class="to-do-children-checked">APP: Have you worked with the App team?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="5da0b1f1-c3d9-4391-801a-51edced88c4d" class="to-do-list"><li><div class="checkbox checkbox-on"></div> <span class="to-do-children-checked">CX: Does this impact a CX workflow/process?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="5fd7d070-862f-4f87-ac25-f97f6ddc0d5d" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">TRUST &amp; SAFETY: Have you worked with Trufty? Integrations or dependencies?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="60a2ea85-aeb6-48dd-a8e5-2f64fabfae5e" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">PLATFORM: Have you worked with Platform? Integrations or dependencies?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="9d719baf-c927-460b-add4-d984232eccdd" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">UNIFICATION: Should the solution be unified?</span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><ul id="ce918dd3-e767-4ad0-a002-a3b5b8c88e7c" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">LEGAL: Are there legal considerations? <em>(Yes — soft delete retention/purge behavior)</em></span><div class="indented"></div></li></ul></div><div style="display:contents" dir="auto"><hr id="b3d923ed-55cf-49d2-ba4b-60fd6a91cef8"/></div><div style="display:contents" dir="auto"><h3 id="c0cb67d9-2bde-4a6c-94ff-5f0ff4b73948" class="">TECHNICAL DETAILS <em>(Engineering)</em></h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="28ffdf4e-087c-4b3c-8036-bea58f2dd2f2"><div style="font-size:1.5em"><span class="icon">🖍️</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="88e1a82e-fdc8-4cd1-8c01-908db7194252" class="">Sketch out a diagram of how we could build this.</p></div></div></figure></div><div style="display:contents" dir="auto"><ul id="b92a3eb4-7bed-44bd-94b8-75317776eede" class="bulleted-list"><li style="list-style-type:disc"><strong>Diagram of System Flows:</strong> {insert diagram}</li></ul></div><div style="display:contents" dir="auto"><h3 id="8f2bf2f0-f306-44a4-a7a8-8450020488b1" class="">RISKS &amp; RABBIT HOLES <em>(Engineering)</em></h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="d84913b4-87fe-434d-92b1-73e7f2d48c02"><div style="font-size:1.5em"><span class="icon">🐇</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="e29ba73f-8b87-408e-99ca-473a21c89f75" class="">Identify the risks and rabbit holes you discovered while shaping.</p></div></div></figure></div><div style="display:contents" dir="ltr"><table id="9ce130f2-0ec1-460f-b7d3-c03747b2d866" class="simple-table"><thead class="simple-table-header"><div style="display:contents" dir="ltr"><tr id="3c9f0117-aed5-423f-8abf-64fd9055f1b9"><th id="h;wn" class="simple-table-header-color simple-table-header">Risk</th><th id="B\AJ" class="simple-table-header-color simple-table-header">Description</th><th id="j`hM" class="simple-table-header-color simple-table-header">Findings for Builders</th></tr></div></thead><tbody><div style="display:contents" dir="ltr"><tr id="b4f9f243-bf97-4141-b4c3-e0ad67ba18a4"><td id="h;wn" class="">Saved Search Impact</td><td id="B\AJ" class="">Changes to specs/filters architecture may affect existing Saved Search behavior</td><td id="j`hM" class="">Evaluate Saved Search dependencies before finalizing the specs model. Phase 3 will address Saved Search migration explicitly.</td></tr></div><div style="display:contents" dir="ltr"><tr id="72614223-d239-477d-84e3-609c5628aba3"><td id="h;wn" class="">Frontend Resource Dependency</td><td id="B\AJ" class="">SRP and Detail Page require frontend resources that are TBD</td><td id="j`hM" class="">Coordinate with frontend team early to avoid blocking backend completion</td></tr></div><div style="display:contents" dir="ltr"><tr id="d4eebada-6128-4935-9e6e-ec5226dc57fb"><td id="h;wn" class="">Legal Input on Soft Delete</td><td id="B\AJ" class="">Retention period and final purge behavior for soft-deleted listings needs Legal sign-off</td><td id="j`hM" class="">Loop Legal in before finalizing soft-delete implementation details</td></tr></div></tbody></table></div><div style="display:contents" dir="auto"><hr id="b2c28ce5-e8b4-4b5d-8f73-94a6ab34c236"/></div><div style="display:contents" dir="auto"><hr id="7ad761c8-212f-4fc4-a2d4-2612f1368133"/></div><div style="display:contents" dir="auto"><hr id="2e135201-bffd-4fc8-a24b-91c0fdf96bf5"/></div><div style="display:contents" dir="auto"><h1 id="83680210-20db-4836-89fa-959df3520a41" class="block-color-purple">POST-SHAPING (INVESTMENT &amp; BUILD)</h1></div><div style="display:contents" dir="auto"><h3 id="212c6661-ec56-4b1f-a460-d4d0af21b6b7" class="">INVESTMENT TABLE NOTES</h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="5b995e60-82a6-4159-aea0-a9b571da98b5"><div style="font-size:1.5em"><span class="icon">📝</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="5853e803-295b-4160-a4b5-b6d5c8726f6a" class="">Any notes or key things brought up during Investment Table discussions.</p></div></div></figure></div><div style="display:contents" dir="auto"><h3 id="4528ea19-25bf-468c-ba62-fbc4cfe58658" class="">ARCHITECT&#x27;S NOTES <em>(Engineering)</em></h3></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="c1b4472a-bfca-4bc6-9578-f3fb66846db3"><div style="font-size:1.5em"><span class="icon">📝</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="cd24de84-16d4-4378-aafd-863e62db303a" class="">Architect, Staff Engineer, or Director: Write out any details you&#x27;d expect to see in a build plan, any concerns to call out.</p></div></div></figure></div><div style="display:contents" dir="auto"><h3 id="6eb2207c-f2b3-421c-a773-562291d53bdd" class="">Build Plan Requirements</h3></div><div style="display:contents" dir="auto"><ul id="945fb18a-ec07-4ea0-8ee1-3c1ec85640d1" class="bulleted-list"><li style="list-style-type:disc"><strong>MUST:</strong> {hard requirement}</li></ul></div><div style="display:contents" dir="auto"><ul id="0055a1ef-2e61-4ee6-b28e-b0fb61cea57d" class="bulleted-list"><li style="list-style-type:disc"><strong>SHOULD:</strong> {soft requirement}</li></ul></div><div style="display:contents" dir="auto"><hr id="20ad71bc-be83-4463-8cfa-f35c7c0339d5"/></div><div style="display:contents" dir="auto"><hr id="4aa0e414-50b2-47cb-b5e9-1c0d674c6b4c"/></div><div style="display:contents" dir="auto"><hr id="7a46516e-4a27-44bf-a114-4d4a0cf96d0e"/></div><div style="display:contents" dir="auto"><h1 id="702e0cf0-870f-4e7d-be3f-6912bce53f3a" class="block-color-red">POST-LAUNCH RESULTS</h1></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="3d6c542c-4b06-4b7e-a272-04b50eb2e0b0"><div style="font-size:1.5em"><span class="icon">📈</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="64800b26-aaa0-4b40-aaa8-fec041ba7476" class="">After launch (at least 60 days), return here to document actual outcomes against baselines.</p></div></div></figure></div><div style="display:contents" dir="ltr"><table id="ba533958-25e0-44f4-8c0c-bf75459eb6fa" class="simple-table"><thead class="simple-table-header"><div style="display:contents" dir="ltr"><tr id="8b6fd4be-6294-47b4-a81b-28d1b79f73c4"><th id="{HE^" class="simple-table-header-color simple-table-header">Metric</th><th id="bTkp" class="simple-table-header-color simple-table-header">Baseline</th><th id="`a_`" class="simple-table-header-color simple-table-header">Target</th><th id="n?DI" class="simple-table-header-color simple-table-header">Actual Result</th><th id="dq;W" class="simple-table-header-color simple-table-header">Measurement Date</th><th id="U{~G" class="simple-table-header-color simple-table-header">% Change</th></tr></div></thead><tbody><div style="display:contents" dir="ltr"><tr id="8eeb5d6e-3f26-4528-bd43-3251ee7ba446"><td id="{HE^" class="">{Metric 1}</td><td id="bTkp" class="">{from above}</td><td id="`a_`" class="">{from above}</td><td id="n?DI" class="">{actual}</td><td id="dq;W" class="">{date}</td><td id="U{~G" class="">{+/-X%}</td></tr></div></tbody></table></div><div style="display:contents" dir="auto"><p id="c122c3de-7e1b-4fff-90db-09793a86aed8" class=""><strong>Result Summary:</strong> {Did we hit our goals? What did we learn?}</p></div><div style="display:contents" dir="auto"><p id="af6b92e0-08b4-429e-b033-3708d6a8dc3b" class=""><strong>Follow-up Actions:</strong> {Any iterations or next steps based on results?}</p></div><div style="display:contents" dir="auto"><hr id="4564fd88-e018-4c73-a689-b82e106c7ea9"/></div></div></article><span class="sans" style="font-size:14px;padding-top:2em"><hr/><details open="" style="padding-top:1em"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Inline comments</summary><div class="indented"><div><p style="padding:0.2em"><b>Block text</b>: <mark class="highlight-yellow_background">Figma Mockup</mark></p><ul class="toggle"><li><div><span class="user" style="padding:0.2em"><img src="https://lh3.googleusercontent.com/a-/AOh14GhNXNIJNglx6iKnY8WW6_Y2nsP43Z5S2LRNmxEi=s100" class="icon user-icon"/><span><b>Chris Pies</b> <time style="font-size:0.8em">Mar 2, 2026, 3:47 PM</time></span></span></div><div style="padding:0.2em"><span class="user">@Stephan Bergen</span> The Figma mockup for the SRP takes into account the idea we had of moving away from subcategory specifications.<br/><br/>Is it okay as an MVP to not include the additional filters as shown in the mockup, and just apply that data as specifications for this project?</div><div style="padding:0.3em"></div></li></ul></div><hr/></div><div class="indented"><div><p style="padding:0.2em"><b>Block text</b>: <mark class="highlight-yellow_background">Replace non-semantic spec identifiers in URLs (e.g., <code>specs/1</code>) with semantic key/value filters (e.g., <code>sex=male</code>)</mark></p><ul class="toggle"><li><div><span class="user" style="padding:0.2em"><img src="https://lh3.googleusercontent.com/a-/AOh14GhNXNIJNglx6iKnY8WW6_Y2nsP43Z5S2LRNmxEi=s100" class="icon user-icon"/><span><b>Chris Pies</b> <time style="font-size:0.8em">Feb 27, 2026, 3:44 PM</time></span></span></div><div style="padding:0.2em">We will not be doing this for this project. After having a conversation with Devin, Amelia and Carmony, there are a lot of things to consider before implementing something new.<br/><br/>  1. There is no Admin UI to manage a new way<br/>  2. We would need to take into consideration what impact it may have on ES<br/>  3. As we start to update our search experience with either new tech, or optimizing ES, we don’t currently know what we need these to look like yet.<br/>  4. The SEO problem <em>could </em>be solved by the frontend as it is today if there is a strong desire to fix that.</div><div style="padding:0.3em"></div></li></ul></div><hr/></div><div class="indented"><div><p style="padding:0.2em"><b>Block text</b>: <mark class="highlight-yellow_background">Make available filters dynamic based on selected category and listing type, rather than subcategory-dependent<br/>Model and store specification definitions with clear parent dependencies (category, listing type, seller type, etc.)<br/>Implement an initial config path in code; capture requirements for a future Specifications Manager admin UI</mark></p><ul class="toggle"><li><div><span class="user" style="padding:0.2em"><img src="https://s3-us-west-2.amazonaws.com/public.notion-static.com/cf956be2-38c1-4036-84df-090758c4b2ac/T03C26XU9-U0AL7KU67-8ae4c885fb8c-512-2.png" class="icon user-icon"/><span><b>Stephan Bergen</b> <time style="font-size:0.8em">Mar 2, 2026, 3:33 PM</time></span></span></div><div style="padding:0.2em"><span class="user">@Chris Pies</span> I am assuming we will also not be implementing any of these point either?</div><div style="padding:0.3em"></div></li><li><div><span class="user" style="padding:0.2em"><img src="https://lh3.googleusercontent.com/a-/AOh14GhNXNIJNglx6iKnY8WW6_Y2nsP43Z5S2LRNmxEi=s100" class="icon user-icon"/><span><b>Chris Pies</b> <time style="font-size:0.8em">Mar 2, 2026, 3:48 PM</time></span></span></div><div style="padding:0.2em">Correct.<br/>These points were specific to the problem we have decided not to solve in this project.</div><div style="padding:0.3em"></div></li></ul></div><hr/></div><div class="indented"><div><p style="padding:0.2em"><b>Block text</b>: <mark class="highlight-yellow_background">Make available filters dynamic based on selected category and listing type, rather than subcategory-dependent<br/>Model and store specification definitions with clear parent dependencies (category, listing type, seller type, etc.)<br/>Implement an initial config path in code; capture requirements for a future Specifications Manager admin UI</mark></p><ul class="toggle"><li><div><span class="user" style="padding:0.2em"><img src="https://s3-us-west-2.amazonaws.com/public.notion-static.com/cf956be2-38c1-4036-84df-090758c4b2ac/T03C26XU9-U0AL7KU67-8ae4c885fb8c-512-2.png" class="icon user-icon"/><span><b>Stephan Bergen</b> <time style="font-size:0.8em">Mar 2, 2026, 3:33 PM</time></span></span></div><div style="padding:0.2em"><span class="user">@Chris Pies</span> I am assuming we will also not be implementing any of these point either?</div><div style="padding:0.3em"></div></li><li><div><span class="user" style="padding:0.2em"><img src="https://lh3.googleusercontent.com/a-/AOh14GhNXNIJNglx6iKnY8WW6_Y2nsP43Z5S2LRNmxEi=s100" class="icon user-icon"/><span><b>Chris Pies</b> <time style="font-size:0.8em">Mar 2, 2026, 3:48 PM</time></span></span></div><div style="padding:0.2em">Correct.<br/>These points were specific to the problem we have decided not to solve in this project.</div><div style="padding:0.3em"></div></li></ul></div><hr/></div><div class="indented"><div><p style="padding:0.2em"><b>Block text</b>: <mark class="highlight-yellow_background">Make available filters dynamic based on selected category and listing type, rather than subcategory-dependent<br/>Model and store specification definitions with clear parent dependencies (category, listing type, seller type, etc.)<br/>Implement an initial config path in code; capture requirements for a future Specifications Manager admin UI</mark></p><ul class="toggle"><li><div><span class="user" style="padding:0.2em"><img src="https://s3-us-west-2.amazonaws.com/public.notion-static.com/cf956be2-38c1-4036-84df-090758c4b2ac/T03C26XU9-U0AL7KU67-8ae4c885fb8c-512-2.png" class="icon user-icon"/><span><b>Stephan Bergen</b> <time style="font-size:0.8em">Mar 2, 2026, 3:33 PM</time></span></span></div><div style="padding:0.2em"><span class="user">@Chris Pies</span> I am assuming we will also not be implementing any of these point either?</div><div style="padding:0.3em"></div></li><li><div><span class="user" style="padding:0.2em"><img src="https://lh3.googleusercontent.com/a-/AOh14GhNXNIJNglx6iKnY8WW6_Y2nsP43Z5S2LRNmxEi=s100" class="icon user-icon"/><span><b>Chris Pies</b> <time style="font-size:0.8em">Mar 2, 2026, 3:48 PM</time></span></span></div><div style="padding:0.2em">Correct.<br/>These points were specific to the problem we have decided not to solve in this project.</div><div style="padding:0.3em"></div></li></ul></div><hr/></div><div class="indented"><div><p style="padding:0.2em"><b>Block text</b>: <mark class="highlight-yellow_background"><del>Filters use semantic key/value pairs in URLs (e.g., </del><del><code>sex=male</code></del><del>); legacy </del><del><code>specs/&lt;id&gt;</code></del><del> pattern no longer required for new Jobs SRP/filter URLs</del><br/><del>Available filters are driven by selection context (category, listing type, seller type) rather than subcategory-specific mappings</del></mark></p><ul class="toggle"><li><div><span class="user" style="padding:0.2em"><img src="https://s3-us-west-2.amazonaws.com/public.notion-static.com/cf956be2-38c1-4036-84df-090758c4b2ac/T03C26XU9-U0AL7KU67-8ae4c885fb8c-512-2.png" class="icon user-icon"/><span><b>Stephan Bergen</b> <time style="font-size:0.8em">Mar 2, 2026, 3:47 PM</time></span></span></div><div style="padding:0.2em"><span class="user">@Chris Pies</span> I’ve made some assumptions based on us not redoing the sub cat specs..  here and under “Solution Details” I’ve strikethrough’d items we won’t be doing. Feel free to add to any I missed (there are a couple I was not sure of)</div><div style="padding:0.3em"></div></li></ul></div><hr/></div><div class="indented"><div><p style="padding:0.2em"><b>Block text</b>: <mark class="highlight-yellow_background"><del>Filters use semantic key/value pairs in URLs (e.g., </del><del><code>sex=male</code></del><del>); legacy </del><del><code>specs/&lt;id&gt;</code></del><del> pattern no longer required for new Jobs SRP/filter URLs</del><br/><del>Available filters are driven by selection context (category, listing type, seller type) rather than subcategory-specific mappings</del></mark></p><ul class="toggle"><li><div><span class="user" style="padding:0.2em"><img src="https://s3-us-west-2.amazonaws.com/public.notion-static.com/cf956be2-38c1-4036-84df-090758c4b2ac/T03C26XU9-U0AL7KU67-8ae4c885fb8c-512-2.png" class="icon user-icon"/><span><b>Stephan Bergen</b> <time style="font-size:0.8em">Mar 2, 2026, 3:47 PM</time></span></span></div><div style="padding:0.2em"><span class="user">@Chris Pies</span> I’ve made some assumptions based on us not redoing the sub cat specs..  here and under “Solution Details” I’ve strikethrough’d items we won’t be doing. Feel free to add to any I missed (there are a couple I was not sure of)</div><div style="padding:0.3em"></div></li></ul></div><hr/></div><div class="indented"><div><p style="padding:0.2em"><b>Block text</b>: <mark class="highlight-yellow_background">Replacing the legacy subcategory-driven specs model with a semantic facets/filters system (e.g., <code>jobtype=parttime</code>)</mark></p><ul class="toggle"><li><div><span class="user" style="padding:0.2em"><img src="https://lh3.googleusercontent.com/a-/AOh14GhNXNIJNglx6iKnY8WW6_Y2nsP43Z5S2LRNmxEi=s100" class="icon user-icon"/><span><b>Chris Pies</b> <time style="font-size:0.8em">Mar 2, 2026, 3:44 PM</time></span></span></div><div style="padding:0.2em">This is going to be a much larger problem to solve than what we have time for in this build cycle.<br/><br/>I think we should solve this problem as a separate package.</div><div style="padding:0.3em"></div></li></ul></div><hr/></div></details></span></body></html>

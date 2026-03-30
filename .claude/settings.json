@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/cpies/.claude/**)",
+      "Read(//Users/cpies/**)",
+      "Bash(claude mcp:*)",
+      "mcp__notion__notion-fetch",
+      "Bash(gh pr:*)",
+      "Bash(gh issue:*)"
+    ]
+  }
+}

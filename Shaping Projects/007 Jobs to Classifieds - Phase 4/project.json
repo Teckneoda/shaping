@@ -1,0 +1,15 @@
+{
+  "repositories": [
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-backend"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-graphql"
+    }
+  ],
+  "notion_docs": [
+    "https://www.notion.so/deseret/Jobs-to-Classifieds-Phase-4-Jobs-Apply-Now-Quick-Apply-Employer-notifications-3142ac5cb23581858037c31abf7d6800?v=30a2ac5cb23580049061000c0318e39a&source=copy_link"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "repositories": [
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-backend"
+    }
+  ],
+  "notion_docs": [
+    "https://www.notion.so/deseret/Jobs-to-Classifieds-Phase-3-2-Migrate-saved-search-3212ac5cb235808991fbd3a730bb78dd?source=copy_link"
+  ]
+}
