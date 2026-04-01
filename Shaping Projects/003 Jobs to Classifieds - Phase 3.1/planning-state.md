@@ -1,6 +1,6 @@
 # Jobs to Classifieds — Phase 3.1: Migrate Listings — Planning State
 
-**Last updated**: 2026-03-31
+**Last updated**: 2026-04-01
 
 ---
 
@@ -23,6 +23,27 @@
 - `PUT /listing/{id}/renew` now returns 200 with renewed listing data
 - Publishes raw listing and activated listing lifecycle events
 - No longer a blocker for migrated expired listings
+
+### Activation Flow for Migration (decided 2026-04-01)
+- **Decision**: Migration uses `RequestActivation` only (not `Activate`). Fraud-validator auto-activates after ~5 min delay.
+- `RequestActivation` checks `member.EmailVerified`, but `requireVerifiedEmail()` in `auth.go` bypasses for `IsPrivileged=true` (service callers). **No issue for migration.**
+- `Activate` endpoint is intended **only** for fraud-validator service — migration will NOT call it directly, as that would bypass fraud checks.
+- With PubSub concurrency (one message per listing), 1,300 active listings can process in parallel; 5-min delay is per-listing, not sequential.
+- Both handlers now use shared `activateAndReadBack` helper with fallback publishing if post-read fails.
+
+### Update Handler Changes (identified 2026-04-01)
+- Now **requires** a primary MongoDB read before update (fails 500 if read fails, 404 if not found)
+- Added pre/post-persistence sidecar chains (dealer enrichment, profile verification)
+- **Impact on migration**: Minimal — create-stub ensures listing exists before PUT. Sidecars (e.g., dealer enrichment) may run, which could be beneficial for dealer listings.
+
+### Category Count Correction (identified 2026-04-01)
+- **40 categories** with IDs 1–45 (not 1–43 as previously noted). IDs 4, 13, 25, 31, 34 are missing/unused.
+- Full category table now documented in Notion doc with all names.
+
+### Auto-CSL Auth Pattern Clarified (identified 2026-04-01)
+- Auto-CSL uses **CAPI client** (nonce-based signing + admin MemberId/Persistent token), calling CAPI's `PUT /listings/{id}` — NOT listing-http-rest directly.
+- Jobs migration will call listing-http-rest directly and authenticate as service caller via Member API service-sessions endpoint (service JWT with `role: "service"`, `IsPrivileged=true`).
+- Direct MongoDB writes (expired/deleted listings) don't need API auth.
 
 ### Status Mapping
 
@@ -80,7 +101,7 @@
 - **listing-http-rest** has full Jobs support:
   - `MarketType: Job` with fields: `JobsApplicationURL`, `JobsPayRangeType`, `JobsPayFrom`, `JobsPayTo`
   - Jobs activation policy (no price required; validates title, description, category, subCategory, city, state, name, contactMethod)
-  - Lifecycle: delete, deactivate, renew (501 — not implemented), mark-sold/mark-sale-pending (blocked for Jobs)
+  - Lifecycle: delete, deactivate, renew (fully implemented), mark-sold/mark-sale-pending (blocked for Jobs)
   - Status: Stub -> PendingActivation -> Active -> Inactive/Sold/Expired/Deleted
   - Visibility: Inactive/deleted listings hidden from public, visible to owner/admin
   - MongoDB storage with ClassifiedListing canonical model
@@ -169,7 +190,7 @@
 
 ## Still Needs Research
 
-1. **Category mapping table** — Need the actual mapping from legacy numeric IDs (1-43) to new category/subCategory strings. **Blocked**: Someone else owns this mapping. Categories stored in MongoDB `generalCategory` collection with string titles externally, numeric IDs internally. No seed data in repo — categories managed directly in MongoDB.
+1. **Category mapping table** — Need the actual mapping from legacy numeric IDs (1-45, 40 categories — IDs 4, 13, 25, 31, 34 are unused) to new category/subCategory strings. **Blocked**: Someone else owns this mapping. Categories stored in MongoDB `generalCategory` collection with string titles externally, numeric IDs internally. No seed data in repo — categories managed directly in MongoDB. Full legacy category table now documented in Notion doc.
 
 2. ~~**Pay range edge cases**~~ — **Decided**: Listings must be one or the other (salary or hourly), not both.
 
@@ -193,9 +214,10 @@
 1. ~~**Is `RenewListing` (501) a blocker?**~~ — **Resolved**: Fully implemented as of 2026-03-31.
 2. **Legacy platform messaging content** — Who provides the verbiage and timing?
 3. ~~**Elasticsearch indexing post-migration**~~ — **Resolved**: API-based migration via listing-http-rest handles this automatically.
-4. **Category mapping ownership** — Someone else needs to define the legacy numeric ID (1-43) → new string category/subCategory mapping. Who is responsible?
-5. ~~**Migration script authentication**~~ — **Resolved**: Follow `auto-csl` pattern. Worker obtains a service JWT from Member API via `POST {MEMBER_API_URL}/service-sessions` with `Authorization: ddm-member-api-key {INTERSERVICE_KEY}`. JWT has `role: "service"` which grants `IsPrivileged = true` and access to service-only endpoints like `/listing/{id}/activate`. Interservice key stored in Google Secret Manager.
+4. **Category mapping ownership** — Someone else needs to define the legacy numeric ID (1-45, 40 categories) → new string category/subCategory mapping. Who is responsible?
+5. ~~**Migration script authentication**~~ — **Resolved**: Worker authenticates as service caller via Member API service-sessions endpoint (service JWT with `role: "service"`, `IsPrivileged = true`). Note: auto-csl uses a different auth path (CAPI client with nonce-based signing), but Jobs migration calls listing-http-rest directly. Interservice key stored in Google Secret Manager.
 6. ~~**Batch ID list support**~~ — **Resolved**: Follow `auto-csl` pattern. HTTP entry point accepts `{ "listingIds": [...], "reimport": false }`. Each ID published as a separate PubSub message to a migration topic. Worker subscription processes each listing individually. `reimport` flag serves as the overwrite flag.
+7. ~~**Activation endpoint choice**~~ — **Resolved (2026-04-01)**: Migration uses `RequestActivation` only (not `Activate`). `Activate` is reserved for the fraud-validator service. `RequestActivation` triggers fraud-validator, which auto-activates after ~5 min. Email verification check is bypassed for service callers (`IsPrivileged=true` in `requireVerifiedEmail()`).
 
 ---
 
@@ -219,3 +241,8 @@
 | `apps/auto-csl/` | Services migration tool | Proven API-based migration pattern: create-stub → save → activate via CAPI. Handles ES indexing via PubSub automatically. `serviceListingMigrations` tracking collection pattern. |
 | `apps/listing/services/listing-http-rest/internal/handler/renew.go` | Handler | RenewListing fully implemented — returns 200, publishes lifecycle events |
 | `apps/listing/services/listing-http-rest/docs/openapi.yaml` | OpenAPI spec | New member listings endpoint (GET /listing), health route moved to /listing/health |
+| `apps/listing/services/listing-http-rest/internal/handler/activation.go` | Handler (updated 2026-04-01) | RequestActivation + Activate handlers. Email verification check added, bypassed for IsPrivileged. Shared `activateAndReadBack` helper. |
+| `apps/listing/services/listing-http-rest/internal/domain/auth.go` | Domain auth | `requireVerifiedEmail()` — bypasses check for `IsPrivileged=true` callers |
+| `apps/listing/services/listing-http-rest/internal/handler/update.go` | Handler (updated 2026-04-01) | Now requires primary read before update. Pre/post-persistence sidecar chains added. |
+| `apps/auto-csl/services/auto-csl-ps-processor/domain/listing.go` | Auto-CSL domain | Uses CAPI `PUT /listings/{id}` with `classifiedStatus: Active` — different from listing-http-rest direct calls |
+| `deseretdigital/marketplace-backend` (local, synced to origin/main 2026-04-01) | Repository | Pulled activation handler updates, update handler changes, profile firestore config |

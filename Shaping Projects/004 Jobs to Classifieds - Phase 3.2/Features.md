@@ -1,24 +1,15 @@
 # Jobs to Classifieds - Phase 3.2 — Features
 
-## F1: CAPI Saved Search — Jobs Support via Classifieds Flow
+## F1: CAPI Saved Search — No Changes Needed
 
-**Goal:** Update the existing CAPI saved search endpoints to accept Jobs saved searches as Classifieds searches with `marketType: "Job"` and pay range fields.
+**Goal:** Verify that Jobs saved searches flow through CAPI without modification.
 
-**Requirements:**
-- CAPI `/saved-searches/` (POST) and `/saved-searches/{id}` (PUT) accept a `vertical` parameter instead of hardcoding `"general"`
-- When `vertical` is Jobs (or `marketType: "Job"`), route to the correct downstream KSL API path and MongoDB collection (`generalSavedSearch` — Jobs are now Classifieds)
-- `searchParams` pass-through supports Jobs-specific fields:
-  - `payRangeType` (salary vs hourly)
-  - `salaryFrom`, `salaryTo` (when payRangeType = salary)
-  - `hourlyFrom`, `hourlyTo` (when payRangeType = hourly)
-  - `marketType: "Job"`
-  - `employerStatus`, `educationLevel`, `yearsOfExperience`, `companyPerks`, `category`
-  - Standard: `keyword`, `city`, `state`, `zip`, `miles`
-- Alert threshold validation (`excessiveSavedSearchCheck`) queries the Classifieds ES index (not a separate Jobs index)
+**Why no changes:** CAPI hardcodes `vertical: "general"` which is correct — Jobs listings are now general Classifieds listings with `marketType: "Job"`. The KSL API downstream stores `searchParams` as a JSON blob with minimal validation, so Jobs-specific fields (pay range, employer status, education, etc.) pass through without modification. KSL API publishes `SavedSearchEvent v5` to PubSub on create/update, keeping the percolation pipeline in sync.
 
-**Changes Required:**
-- [SavedSearchHelper.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api/src/Helper/SavedSearchHelper.php) — Make `vertical` dynamic (lines 96, 158, 380 currently hardcode `"general"`)
-- [SavedSearchController.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api/src/Controller/SavedSearchController.php) — Accept `vertical` or `listingType` from request
+**Key Files (reference only):**
+- [SavedSearchHelper.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api/src/Helper/SavedSearchHelper.php) — `vertical: "general"` at lines 96, 158, 380 (correct as-is)
+- [SavedSearchesController.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/ksl-api/public_html/classifieds/common/api/controllers/SavedSearchesController.php) — Unified KSL API handler
+- [SavedSearch.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/ksl-api/public_html/classifieds/common/api/models/SavedSearch.php) — Model with JSON pass-through and PubSub publishing
 
 ---
 

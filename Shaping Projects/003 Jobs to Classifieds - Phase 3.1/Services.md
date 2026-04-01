@@ -28,7 +28,7 @@
 
 **Changes needed**:
 - Add Jobs category and subcategories to `generalCategory` MongoDB collection
-- Map legacy numeric category IDs (1-43) to new category/subCategory strings
+- Map legacy numeric category IDs (1-45, 40 categories — IDs 4, 13, 25, 31, 34 unused) to new category/subCategory strings
 - Configure `listingTypes` to allow `Job` market type on appropriate subcategories
 
 ## Services to Create
@@ -53,7 +53,7 @@
 2. Create stub via `POST /listing` (listing-http-rest assigns new ID)
 3. Save mapped field data via `PUT /listing/{id}`
 4. Upload photos via `POST /listing/{id}/photos` (non-dealer only)
-5. Request activation via `POST /listing/{id}/request-activation` (triggers fraud-validator, which auto-activates after 5-min delay)
+5. Request activation via `POST /listing/{id}/request-activation` (triggers fraud-validator, which auto-activates after 5-min delay). Note: `Activate` endpoint is reserved for fraud-validator only — migration must NOT call it directly.
 6. Log migration in `jobListingMigrations` collection (legacy ID → new listing ID)
 
 **Migration flow — Expired/soft-deleted listings** (direct MongoDB path):
@@ -76,7 +76,7 @@
   - `moderate`, `abuse`, `inprogress` → **skip entirely**
 - Field transforms:
   - Pay conversion: legacy dollars (int) → cents (int, `* 100`)
-  - Category conversion: legacy numeric IDs (1-43) → new string-based category/subCategory
+  - Category conversion: legacy numeric IDs (1-45, 40 categories) → new string-based category/subCategory
   - `employerStatus`, `educationLevel`, `yearsOfExperience` → sub-category spec fields
   - `companyName` → `BusinessName`
   - `companyLogo` → photo array (first image)

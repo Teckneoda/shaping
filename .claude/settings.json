@@ -8,18 +8,14 @@
       "Bash(gh pr:*)",
       "Bash(gh issue:*)",
       "mcp__notion__notion-update-page",
-      "Bash(find /Users/cpies/code/* *)",
-      "Bash(grep * /Users/cpies/code/* *)",
-      "Bash(grep * '/Users/cpies/code/*'*)",
-      "Bash(find /Users/cpies/code/shaping/\"Research Repos\"/marketplace-backend/apps/profile/services -type f -name \"routes.go\" -exec head -50 {} +)",
-      "Bash(find /Users/cpies/code/shaping/\"Research Repos\"/marketplace-backend/apps/payment/services -type f -name \"routes.go\" -exec head -40 {} +)",
-      "Bash(grep -E \"\\\\.\\(graphql|gql|go\\)$\")",
-      "Bash(grep -E \"\\\\.\\(yaml|yml|php\\)$\")",
-      "Bash(grep -l \"saveSavedSearch\" /Users/cpies/code/marketplace-graphql/graph/schema/*.graphqls)",
-      "Bash(grep -l \"ListingFilters\" /Users/cpies/code/marketplace-graphql/graph/schema/*.graphqls)",
-      "Bash(find '/Users/cpies/code/shaping/Research Repos/Legacy/m-ksl-myaccount-v2/components' -type f \\\\\\(-name *saved* -o -name *search* \\\\\\))",
-      "Bash(ls -d \"/Users/cpies/code/shaping/Research Repos/Legacy\"/m-ksl-*)",
-      "Bash(find /Users/cpies/code/marketplace-backend -type f \\\\\\(-name *.proto -o -name *favorite* \\\\\\))"
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(cd /*)",
+      "Bash(git *)",
+      "Bash(echo *)"
+
     ],
     "defaultMode": "plan"
   }

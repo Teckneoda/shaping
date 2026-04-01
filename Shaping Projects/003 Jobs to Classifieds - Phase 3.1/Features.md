@@ -33,7 +33,7 @@ Elasticsearch is synced automatically for all paths via MongoDB oplog connector.
 
 **Field transforms**:
 - [ ] Field mapping from legacy 88-field schema to new system (see planning-state.md for full gap table)
-- [ ] Category mapping from legacy numeric IDs (1-43) → new category/subCategory strings
+- [ ] Category mapping from legacy numeric IDs (1-45, 40 categories — IDs 4, 13, 25, 31, 34 unused) → new category/subCategory strings
 - [ ] Pay range conversion: legacy stores salary as integers (dollars) → new system stores in cents (`* 100`)
 
 **Execution**:

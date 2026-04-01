@@ -49,6 +49,7 @@
 - **Messaging content:** What exactly should the legacy platform messaging say? Needs PM approval.
 - **MyAccount "Jobs" filter:** After migration, the Jobs section filter in MyAccount favorites will show empty (migrated favorites appear under Classifieds). Is this acceptable during the transition, or should we update the filter logic?
 - **Favorite Employer migration:** Explicitly out of scope for MVP — but will it be addressed in a future phase?
+- **ES sync status:** `listing-http-favorites-rest` CRUD routes are still returning 501 (not implemented) as of 2026-04-01. Only `GET /favorites/listing-counts` is live. Need to confirm whether the oplog connector must be configured for `generalFavorites` → ES sync, or if full CRUD will be deployed before Phase 3.3 runs.
 
 ## Research Sources Consulted
 
@@ -84,3 +85,14 @@
 ### Prior Phases (Context)
 - Phase 3.1 (Shaping Project 003) — Listings migration, `jobListingMigrations` collection, field mapping
 - Phase 3.2 (Shaping Project 004) — Saved search migration, established pattern of routing Jobs through Classifieds path
+
+---
+
+## Session Log
+
+### 2026-04-01
+- Synced `marketplace-backend` to origin/main (pulled commits updating `listing-http-favorites-rest` go.mod/go.sum and routes.go formatting)
+- Confirmed CRUD routes in `listing-http-favorites-rest` still return 501 — only `GET /favorites/listing-counts` is implemented
+- Fetched Notion doc — status is "PKG: Shaping" with full shaping section filled in; content aligns with local docs
+- Added unanswered question about ES sync status given CRUD routes are still not implemented
+- No new scope changes or information found — planning docs are comprehensive and ready for build
