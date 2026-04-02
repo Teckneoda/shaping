@@ -1,0 +1,23 @@
+{
+  "repositories": [
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-backend"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-graphql"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "nest"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "m-ksl-classifieds-api"
+    }
+  ],
+  "notion_docs": [
+    "https://www.notion.so/deseret/Admin-Dev-only-categories-3352ac5cb23580b18ac2dfde8eb9839c?source=copy_link"
+  ]
+}
