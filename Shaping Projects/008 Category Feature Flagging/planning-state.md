@@ -76,7 +76,7 @@ Instead of adding `visibility` flags to MongoDB category documents (#9's approac
 
 | Dimension | #8 Feature Flagging | #9 Visibility Flags |
 |-----------|-------------------|-------------------|
-| **Services modified** | 2 (marketplace-graphql, search-http-rest) | 8 (Nest, CAPI, listing-http-rest, search-http-rest, listing-http-ai-analyze, marketplace-graphql, legacy sitemap, + optional CAPI migration) |
+| **Services modified** | 3 (marketplace-graphql, search-http-rest, listing-http-ai-analyze) | 8 (Nest, CAPI, listing-http-rest, search-http-rest, listing-http-ai-analyze, marketplace-graphql, legacy sitemap, + optional CAPI migration) |
 | **MongoDB changes** | None | New `visibility` field on category/subCategory docs |
 | **CAPI changes** | None | Yes — filter on `/category-tree`, `/category-seo`; add metadata to `/category-filters` |
 | **Nest UI changes** | None | New Visibility column + edit form in React frontend |
@@ -93,15 +93,15 @@ Instead of adding `visibility` flags to MongoDB category documents (#9's approac
 | **GraphQL filtering** | Small-Medium (add gate config + 3 filter points) | Medium (same 3 filter points + new `CategoryVisibility` type + struct changes) |
 | **Search filtering** | Small (env var + MustNot filter + memberID threading) | Small (same MustNot filter + hidden category cache from MongoDB) |
 | **listing-http-rest** | None | Small-Medium (visibility struct + `GetFilteredCategoryTree()`) |
-| **AI suggestions** | None (accept gap) | Small (per-request taxonomy filter) |
+| **AI suggestions** | Small (per-request taxonomy filter + env vars) | Small (per-request taxonomy filter) |
 | **Legacy sitemap** | Small (if still running) | Small (same work) |
 | **Data migration** | None | None (additive, defaults to visible) |
-| **Total relative effort** | **~2-3 units** | **~8-10 units** |
+| **Total relative effort** | **~3-4 units** | **~8-10 units** |
 
 ### Trade-offs
 
 **#8 Advantages**:
-- ~3-4x less code to write
+- ~2-3x less code to write
 - No touching production-critical CAPI PHP code
 - No MongoDB schema changes
 - Faster to implement and deploy
@@ -134,7 +134,7 @@ Instead of adding `visibility` flags to MongoDB category documents (#9's approac
 
 ### Resolved Decisions
 - **Hidden category list**: Hardcoded to `"Jobs"` — no need for Remote Config configurability
-- **AI suggestions**: Not in production, no need to handle
+- **AI suggestions**: May be in production — needs per-request taxonomy filtering (same pattern as #9, small effort)
 - **Direct CAPI consumers**: No direct consumers besides marketplace-graphql — CAPI filtering not needed
 
 ## Still Needs Research

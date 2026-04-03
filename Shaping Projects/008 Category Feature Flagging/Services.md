@@ -40,6 +40,20 @@
   - ES field is `category` (string), e.g., `"Jobs"`
   - Member ID available in handler but needs threading to query builder (small plumbing change)
 
+### 3. marketplace-backend — listing-http-ai-analyze (AI Category Suggestions)
+- **Repo**: `deseretdigital/marketplace-backend`
+- **Language**: Go
+- **Status**: **May be serving production traffic** — needs confirmation
+- **Changes**: Per-request filtering of cached taxonomy before building AI prompt
+- **Key files**:
+  - Handler that builds AI prompt — filter cached taxonomy to exclude Jobs categories before sending to AI
+  - `main.go` — Add `HIDDEN_CATEGORIES`, `HIDDEN_CATEGORY_ALLOWLIST_MEMBER_IDS` env vars (same pattern as search-http-rest)
+- **Notes**:
+  - Background taxonomy refresh (no request context) keeps full cache
+  - Filtering happens per-request in the handler, not in the cache
+  - Without this, AI could suggest Jobs categories to non-allowlisted users
+  - Same env var pattern as search-http-rest — small effort
+
 ## Services NOT Modified
 
 ### Nest — Category Manager Admin Tool
@@ -54,10 +68,6 @@
 ### marketplace-backend — listing-http-rest
 - **Reason**: Not yet serving production traffic for category endpoints. When it replaces CAPI, filtering will still happen in GraphQL.
 - **Impact**: None for now — can add filtering when it goes production
-
-### marketplace-backend — listing-http-ai-analyze
-- **Reason**: AI category suggestions could include Jobs for non-allowlisted users. This is a lower-priority gap.
-- **Impact**: Low — AI suggestions are advisory, user still selects from filtered dropdown (Feature 2 handles the dropdown)
 
 ### marketplace-frontend
 - **Reason**: All frontend surfaces consume GraphQL. Backend filtering propagates automatically.

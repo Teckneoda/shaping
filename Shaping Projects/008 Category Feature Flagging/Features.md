@@ -90,11 +90,20 @@ Same as #9's Feature 11 — the legacy sitemap queries Elasticsearch directly, b
 - OR: Read hidden categories from an environment variable / config file
 - This is the same work regardless of #8 vs #9
 
+## Feature 8: AI Category Suggestions Filtering — listing-http-ai-analyze
+
+Prevent the AI from suggesting Jobs categories to non-allowlisted users.
+
+**Implementation**:
+- `listing-http-ai-analyze` caches the full taxonomy via background refresh (no request context)
+- Per-request filtering in the handler: before building the AI prompt, filter the cached taxonomy to exclude Jobs categories
+- Check caller's member ID against the same allowlist used by search-http-rest (env var pattern)
+- Add `HIDDEN_CATEGORIES` and `HIDDEN_CATEGORY_ALLOWLIST_MEMBER_IDS` env vars (same as search-http-rest)
+
 ## Non-Goals / Out of Scope
 
 - MongoDB schema changes (no `visibility` field on category documents)
 - CAPI changes (filtering happens downstream in GraphQL)
 - Nest UI changes (no visibility toggles — managed via Remote Config / Firebase console)
 - General-purpose category visibility (this is targeted at specific categories, not a reusable system)
-- AI category suggestions filtering (listing-http-ai-analyze) — not in production, not needed
 - listing-http-rest category tree filtering (not yet serving production traffic)
