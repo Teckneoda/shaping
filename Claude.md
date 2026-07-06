@@ -34,6 +34,21 @@ Each project should contain the following files:
   - Living document tracking what has been identified, what still needs research, and unanswered questions
   - Updated each time a "shape" session runs
 
+## New / Archive Project Commands
+
+Creating, updating, and archiving projects is handled by [`scripts/project-manager.sh`](scripts/project-manager.sh):
+
+- **New project** (user asks to start a new shaping project): run `scripts/project-manager.sh new`
+- **Edit a project's repos/Notion docs**: run `scripts/project-manager.sh update`
+- **Archive a project** (e.g., "archive 9"): run `scripts/project-manager.sh archive`
+
+The script automatically:
+- Numbers new projects as the next in sequence, scanning **both** `Shaping Projects/` and `Shaping Projects/_archived/` so archived numbers are never reused.
+- Scaffolds `project.json`, `Features.md`, `Services.md`, and `planning-state.md` for new projects.
+- Moves projects into `_archived/` (preserving the full `NNN <Project Name>` folder name) when archiving.
+
+The script is **interactive** (arrow-key menus, prompts for project name, repos, and Notion docs). Run it so the user can interact with it directly in their terminal rather than trying to drive the menus yourself. The default GitHub org is `deseretdigital`.
+
 ## Shape Command
 
 When the user says **"shape N"** (e.g., "shape 4"), follow this procedure:
@@ -44,7 +59,7 @@ When the user says **"shape N"** (e.g., "shape 4"), follow this procedure:
 
 3. **Gather context from Notion**: For each URL in `notion_docs`, use the Notion MCP server (`mcp-notion` / `notion-fetch`) to retrieve the document content.
 
-4. **Sync local repos to origin/main**: Before researching, ensure each local repo is up to date. For each repo in `repositories` that exists locally under `/Users/cpies/code/AI-Agents/Research Repos/`:
+4. **Sync local repos to origin/main**: Before researching, ensure each local repo is up to date. For each repo in `repositories` that exists locally under `/Users/cpies/code/shaping/Research Repos/`:
    - `cd` into the repo directory
    - Run `git status` to check for uncommitted changes or non-main branch
    - Run `git pull origin main`
@@ -54,7 +69,7 @@ When the user says **"shape N"** (e.g., "shape 4"), follow this procedure:
 5. **Research repositories**: For each entry in `repositories`, use the GitHub CLI (`gh`) to research the repo:
    - `gh repo view {org}/{repo}` for repo overview
    - Search for relevant code, issues, PRs, and discussions related to the project's scope
-   - Read relevant source files from the local Research Repos directory at `/Users/cpies/code/AI-Agents/Research Repos/`
+   - Read relevant source files from the local Research Repos directory at `/Users/cpies/code/shaping/Research Repos/`
 
 6. **Enter planning mode**: Analyze all gathered context and work with the user to:
    - Identify features, services, APIs, data models, and migration steps
@@ -79,7 +94,7 @@ The user is indicating that `project.json` for that project has been modified �
 
 3. **Diff the references**: Compare the current `project.json` references against the "Research Sources Consulted" section of `planning-state.md` to identify what was added, removed, or changed.
 
-4. **Sync new/changed repos to origin/main**: For any new or changed repositories that exist locally under `/Users/cpies/code/AI-Agents/Research Repos/`, run the same sync procedure as the Shape Command (step 4) — check `git status`, run `git pull origin main`, and stop to notify the user if there are issues.
+4. **Sync new/changed repos to origin/main**: For any new or changed repositories that exist locally under `/Users/cpies/code/shaping/Research Repos/`, run the same sync procedure as the Shape Command (step 4) — check `git status`, run `git pull origin main`, and stop to notify the user if there are issues.
 
 5. **Fetch new/changed references**:
    - For any **new or changed Notion docs**: fetch them via the Notion MCP server and summarize what they contain.

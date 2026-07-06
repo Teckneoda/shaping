@@ -1,6 +1,6 @@
 # Jobs to Classifieds - Phase 3.1: Migrate Listings — Features
 
-> **Status**: FRAMED: OPS Approved | **Estimate**: 2 weeks web work
+> **Status**: PKG: Building (Notion, as of 2026-06-25) | **Estimate**: 1 week web work (reduced from 2 — category feature flag completed in cycle 2)
 > **Business Impact**: $1.2M annual revenue ($80K/mo self-serve + $20K/mo direct sales), 400K monthly page views, 1,300 active monthly listings, 15K+ uploaded resumes
 
 ## Problem Statement
@@ -59,9 +59,9 @@ Messaging content and timing will be determined before the build. The following 
 
 | Legacy Field | Decision | Details |
 |---|---|---|
-| `employerStatus` (ft/pt/ct/tm) | **Spec fields** | Map to existing sub-category specifications |
-| `educationLevel` (0-4) | **Spec fields** | Map to existing sub-category specifications |
-| `yearsOfExperience` (int) | **Spec fields** | Map to existing sub-category specifications |
+| `employerStatus` (ft/pt/ct/temp/sj/inter/week) | **Map (enum)** | Map to top-level `jobsEmploymentType` enum. 1:1 by label — see planning-state.md |
+| `educationLevel` (legacy int key) | **Map (enum)** | Map to top-level `jobsEducationLevel` enum. **Keys are NOT in 0→4 order** (0=Advanced Degree, 4=None) — key lookup, see planning-state.md |
+| `yearsOfExperience` (legacy int key) | **Map (enum)** | Map to top-level `jobsYearsExperience` enum. **Keys are NOT ordered** (0=1-2yrs, 5=None) — key lookup, see planning-state.md |
 | `companyName` | **Map** | Map to `BusinessName` |
 | `photo` | **Map** | Non-dealer accounts only: map to `photos[0]`. Dealer accounts use existing logo from Nest dealer record |
 | `responsibilities` | **Append** | Append to `Description` |

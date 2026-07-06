@@ -16,6 +16,7 @@
 4. **Phased cutover, no dual-write.** Build API/UI changes in parallel with Phase 3.1, run migration after Phase 3.1 is live, then decommission legacy
 5. **marketplace-graphql is the frontend entry point.** `saveSavedSearch` mutation gets a new Jobs case routing to CAPI
 6. **Alert workers stay.** Update Classifieds config with Jobs range fields, remove Jobs-specific matching class
+7. **Job spec fields are top-level listing fields (decided 2026-06-16).** `employerStatus`, `educationLevel`, `yearsOfExperience` map to top-level listing fields `jobsEmploymentType`, `jobsEducationLevel`, `jobsYearsExperience` (following the pay range field pattern) rather than sub-category specifications. The saved-search criteria field names in this phase follow the existing criteria convention — **open question**: should percolation/match/alert use the criteria names or the `jobs`-prefixed listing field names? **Company Perks is not being implemented** (dropped from filters, ES mappings, percolation, and alert config).
 
 ### Architecture: Jobs as Classifieds
 - Jobs saved searches stored in `generalSavedSearch` MongoDB collection (same as Classifieds)
@@ -43,7 +44,7 @@ marketplace-graphql saveSavedSearch(listingType: JOB)
 - Overlap matching: listing salary 40k-50k matches search salary 10k-45k (ranges overlap)
 
 ### MyAccount UI
-- `EditGeneral.tsx` gets conditional Jobs fields (pay range, pay type, employer status, education, experience, perks) shown when `marketType === "Job"` or Jobs category selected
+- `EditGeneral.tsx` gets conditional Jobs fields (pay range, pay type, employer status, education, experience) shown when `marketType === "Job"` or Jobs category selected. (Company Perks not implemented.)
 - `EditJob.tsx` already exists (446 lines) as reference for Jobs field patterns
 - `Criteria.tsx` updated with display labels for pay range fields
 - Jobs fields already defined in TypeScript types: `payRangeType`, `salaryFrom`, `salaryTo`, `jobType`, `educationLevel`, `yearsOfExperience`
@@ -83,3 +84,4 @@ marketplace-graphql saveSavedSearch(listingType: JOB)
 - 2026-03-31: Resolved all 7 open questions. Key decisions: no new marketplace-backend service (use CAPI), Jobs as Classifieds with marketType, phased cutover, remove unfinished Jobs percolation code, extend Classifieds pipeline with Jobs fields. Rewrote Features.md (8 features) and Services.md (7 services + cleanup) with implementation details.
 - 2026-03-31: Researched KSL API saved search persistence — confirmed CAPI hardcoded `vertical: "general"` is correct for Jobs-in-Classifieds, no KSL API changes needed. searchParams pass-through with minimal validation. KSL API publishes SavedSearchEvent v5 to PubSub. Marked mobile app impact as TODO conversation with app team.
 - 2026-04-01: Fixed F1 inconsistency in Features.md — updated to "No Changes Needed" matching Services.md and Notion doc. Resolved hourlyFrom/hourlyTo ES question: separate fields required (salary and hourly are distinct range objects per alert workers Config.php). Classifieds ES mapping needs all four fields (salaryFrom, salaryTo, hourlyFrom, hourlyTo) plus payRangeType qualifier.
+- 2026-06-16: Pivot — `employerStatus`/`educationLevel`/`yearsOfExperience` are now top-level listing fields (`jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience`), not sub-category specs. **Company Perks dropped — not being implemented**; removed from StringFilters, EditGeneral, ES mappings, match expected fields, and alert array-contains config (legacy `criteria_companyPerks` annotated as not migrated). Flagged open question: should saved-search percolation/match/alert reference the criteria field names or the `jobs`-prefixed listing field names?

@@ -4,6 +4,13 @@ Tracking document for all items that need research, answers, or decisions before
 
 **Status Legend:** ⬜ Open | 🟡 In Progress | ✅ Resolved
 
+> **2026-06-25 shape update.** Two answers below have **flipped** and several are now moot because the code already ships them. See `planning-state.md` for the full built-vs-gap analysis. Highlights:
+> - **CX Restore is now OUT OF SCOPE** (Notion). Q4.4 / §5.3 superseded — users self-restore via Activate → draft → checkout (`restore-to-draft` endpoint exists).
+> - **Deactivate / `Inactive` status is now in scope** (new), with a full lifecycle: Active → Inactive/Expired/Deleted → **Archive DB**.
+> - **Retention values now proposed** (pending Legal sign-off): Deleted 30d, Inactive 1yr, Expired 1yr, Stub 2wk, Archived 6mo.
+> - Most listing-service / search-service / GraphQL items below (1.x–4.x) are **already built** — remaining gaps are the 3 string-filter ES wiring, the Archive DB + lifecycle crons, web frontend, the external MyAccount app, and the React Native app.
+> - **New open questions:** Jobs Category vs marketType (Q1), Detail "update via GraphQL" vs read-only (Q2), Archive DB design (Q4), MyAccount repo location (Q5). Tracked in `planning-state.md`.
+
 ---
 
 ## 1. Specifications / Filters
@@ -12,19 +19,19 @@ The team has confirmed that replacing the subcategory-driven specs model with se
 
 | # | Question | Status | Owner | Answer |
 |---|----------|--------|-------|--------|
-| 1.1 | What specifications/filters need to exist for Jobs on the SRP? (salary range, hourly rate, job type — are these implemented as standard subcategory specs using the existing system?) | ✅ | Chris | Jobs fields (employmentType, educationLevel, yearsOfExperience, payRangeType, payFrom/payTo, companyPerks) are top-level listing fields but will be **mapped into the existing subcategory specs system** via Category Manager so they flow through the existing AvailableFilters pipeline. |
+| 1.1 | What specifications/filters need to exist for Jobs on the SRP? (salary range, hourly rate, job type — are these implemented as standard subcategory specs using the existing system?) | ✅ | Chris | All Jobs fields are **top-level listing fields**, named and exposed the same way as the pay range fields (`jobs`-prefixed). `jobsEmploymentType`, `jobsEducationLevel`, and `jobsYearsExperience` sit alongside `jobsPayRangeType`, `jobsPayFrom`/`jobsPayTo`, and `jobsApplicationUrl` — none are mapped into the subcategory specs system. Company Perks is **not being implemented**. |
 | 1.2 | How do Jobs specs get surfaced on the SRP within the current Category Manager / specs system? Does a Jobs subcategory already exist, or does one need to be created? | ✅ | Chris | Jobs category and subcategories **need to be created** in Category Manager as part of Phase 2. A **feature flag** is required in GraphQL to filter Jobs category out of production unless the user's member ID is in the team allowlist. |
-| 1.3 | What is the impact on `AvailableFilters` in the SRP GraphQL call? Do we just add Jobs-specific specs through the existing mechanism? | ✅ | Chris | Some fields move to specSubCat slots (flow through AvailableFilters automatically). Pay range fields stay top-level and need custom filter mapping. See field mapping table below. |
+| 1.3 | What is the impact on `AvailableFilters` in the SRP GraphQL call? Do we just add Jobs-specific specs through the existing mechanism? | ✅ | Chris | All Jobs fields are top-level and need **custom filter mapping** (same approach as the pay range fields) — none flow through the subcategory-spec AvailableFilters mechanism. See field mapping table below. |
 | 1.4 | Is the Figma SRP mockup still accurate given the specs descope, or does it need to be updated to reflect the existing specs approach? | ✅ | Design | **Needs update.** Figma was designed around the new semantic filters — needs revision to reflect the existing specs system. |
 
 ### Jobs Field Storage Decisions
 
 | Field | Storage | Notes |
 |---|---|---|
-| `jobsEmploymentType` | **specSubCat (string select)** | Full Time, Part Time, Contract, Temporary, Internship, Seasonal |
-| `jobsEducationLevel` | **specSubCat (string select)** | None, High School, 2 Year Degree, 4 Year Degree, Advanced Degree |
-| `jobsYearsOfExperience` | **specSubCat (string select)** | None, 1-2 Years, 3-4 Years, 5-7 Years, 8-10 Years, >10 Years |
-| `jobsCompanyPerks` | **specSubCat (multiple string slots)** | Each perk as a separate spec slot (boolean-like select). Work remote, Flexible schedule, etc. |
+| `jobsEmploymentType` | **Top-level** | string select: Full Time, Part Time, Contract, Temporary, Internship, Seasonal. Needs custom SRP filter mapping (like pay range). |
+| `jobsEducationLevel` | **Top-level** | string select: None, High School, 2 Year Degree, 4 Year Degree, Advanced Degree. Needs custom SRP filter mapping. |
+| `jobsYearsExperience` | **Top-level** | string select: None, 1-2 Years, 3-4 Years, 5-7 Years, 8-10 Years, >10 Years. Needs custom SRP filter mapping. |
+| ~~`jobsCompanyPerks`~~ | **Not implementing** | Company Perks dropped — not part of the build. |
 | `jobsPayRangeType` | **Top-level** | "hourly" or "salary". Controls interpretation of payFrom/payTo. |
 | `jobsPayFrom` / `jobsPayTo` | **Top-level** | int (cents). Range filter — needs custom filter mapping in SRP. |
 | `jobsApplicationUrl` | **Top-level** | External apply link. Not filterable — Detail Page only. |
@@ -37,7 +44,7 @@ The team has confirmed that replacing the subcategory-driven specs model with se
 
 | # | Question | Status | Owner | Answer |
 |---|----------|--------|-------|--------|
-| 2.1 | What Mongo fields need to sync to Elasticsearch for Jobs? Audit current Jobs data vs. what's already in ES. | ✅ | Engineering | specSubCat fields (employmentType, educationLevel, yearsOfExperience, companyPerks) should sync automatically via existing pipeline. Top-level fields (`jobsPayRangeType`, `jobsPayFrom`, `jobsPayTo`, `jobsApplicationUrl`) **need new ES mappings added** and Mongo connector updates. |
+| 2.1 | What Mongo fields need to sync to Elasticsearch for Jobs? Audit current Jobs data vs. what's already in ES. | ✅ | Engineering | All top-level Jobs fields (`jobsPayRangeType`, `jobsPayFrom`, `jobsPayTo`, `jobsApplicationUrl`, `jobsEmploymentType`, `jobsEducationLevel`, `jobsYearsExperience`) **need new ES mappings added** and Mongo connector updates. (Company Perks not implemented.) |
 | 2.2 | How does listing type filtering work in ES today? Confirm the index structure and whether a `listingType` field exists or needs to be added. | ✅ | Chris | Yes — ES has `marketType` field which maps to "listing type" in the UI. Adding "Job" as a new `marketType` value (decided in 1.1) enables same-index filtering. No structural changes needed. |
 | 2.3 | SRP display rules — who defines the frontend behavior? What does "list format" vs "grid format" look like? Is this covered in Figma? | ✅ | Frontend | **Frontend only.** Backend returns listings; frontend decides grid vs list based on selected categories. No backend display hints needed. |
 | 2.4 | Is moving SRP search logic from GraphQL to a dedicated service still in scope, or was that tied to the specs redesign? | ✅ | Engineering | **Already completed.** SRP search logic has been moved to a dedicated backend service. |
@@ -51,10 +58,10 @@ The team has confirmed that replacing the subcategory-driven specs model with se
 | # | Question | Status | Owner | Answer |
 |---|----------|--------|-------|--------|
 | 3.1 | What does the Phase 1 Listing Service already provide for detail page reads vs. what's missing for Jobs? | ✅ | Engineering | Listing Service GET endpoint exists but **needs expansion** to return Jobs-specific fields (pay range, employment type, application URL, etc.). GraphQL + frontend wiring also needed. |
-| 3.2 | What Jobs-specific fields need to appear on the detail page? (Reference: Jobs Listing Fields research doc) | ✅ | Chris | **Standard:** Title, Description, Company Name (businessName), Photos, Location, Contact Info. **Jobs-specific from specSubCat:** Employment Type, Education Level, Years of Experience, Company Perks. **Jobs-specific top-level:** Pay Range (type + from/to), Application URL. |
+| 3.2 | What Jobs-specific fields need to appear on the detail page? (Reference: Jobs Listing Fields research doc) | ✅ | Chris | **Standard:** Title, Description, Company Name (businessName), Photos, Location, Contact Info. **Jobs-specific top-level:** Pay Range (type + from/to), Application URL, Employment Type, Education Level, Years of Experience. (Company Perks not implemented.) |
 | 3.3 | What is the GraphQL endpoint structure for updating a listing? Does this build on existing Phase 1 work or require new mutations? | ✅ | Chris | **N/A for Detail Page.** Listings are not edited from the Detail Page — editing happens via the Post-A-Listing (PAL) form, which is **out of scope** for this project. Detail Page is read-only. |
 | 3.4 | Legacy compatibility — the doc mentions continuing to store contact info and verification status on listing documents near-term. What is the timeline/criteria for removing this? | ✅ | Chris | **Not applicable** to Phase 2. |
-| 3.5 | Are Detail Page mockups/designs needed, or does the unified detail page handle Jobs dynamically? | 🟡 | Design | **Partially dynamic.** Design input needed for Jobs top-level fields only: pay range display, Apply button (applicationUrl). specSubCat fields render through existing specs UI. |
+| 3.5 | Are Detail Page mockups/designs needed, or does the unified detail page handle Jobs dynamically? | 🟡 | Design | **Partially dynamic.** Design input needed for the top-level Jobs fields: pay range display, Apply button (applicationUrl), and Employment Type / Education Level / Years of Experience. All are top-level fields (no specSubCat rendering). |
 
 ---
 
@@ -64,8 +71,9 @@ The team has confirmed that replacing the subcategory-driven specs model with se
 |---|----------|--------|-------|--------|
 | 4.1 | What existing ES queries are being reused for viewing listings in MyAccount? Identify them. | 🟡 | Engineering | **Needs investigation.** Engineering needs to audit current MyAccount ES queries to understand what exists and what needs updating for Jobs listings. |
 | 4.2 | Soft Delete data model — what does it look like? (`deletedAt` timestamp? `status` field? Both?) | ✅ | Chris | **Both.** Use a status change (e.g., 'deleted') on the existing status field AND a `deletedAt` timestamp for auditing and purge scheduling. |
-| 4.3 | Soft Delete retention period — what is the retention period before final purge? **Requires Legal input.** | 🟡 | Legal | **Not started.** Legal has not been contacted yet. This needs to happen before build to define retention period and purge behavior. |
-| 4.4 | CX Restore tool — what is the endpoint contract? Has CX been consulted on their workflow needs? | 🟡 | CX | **Not started.** CX needs to be consulted to understand their restore workflow requirements before building the endpoint. |
+| 4.3 | Soft Delete retention period — what is the retention period before final purge? **Requires Legal input.** | 🟡 | Legal | **Values proposed (pending Legal sign-off):** Deleted 30d, Inactive 1yr, Expired 1yr, Stub 2wk → **Archive DB** (6-month retention) → permanent purge. Legal checkbox still unchecked. |
+| 4.4 | CX Restore tool — what is the endpoint contract? Has CX been consulted on their workflow needs? | ✅ | CX | **OUT OF SCOPE.** The CX/Nest restore tool is no longer part of the Jobs → Classifieds migration (Notion). Users self-restore via Activate → draft → checkout; `restore-to-draft` (`PUT /listing/{id}/draft`) already exists. |
+| 4.7 | **Deactivate workflow (NEW)** — how does deactivate + reactivate work? | ✅ | Chris | Active → `Inactive` via `PUT /listing/{id}/deactivate` (built). Reactivate = restore-to-draft → edit → checkout (re-pay subscriptions). Excluded from search; doesn't count to limits; billing stops. |
 | 4.5 | Does soft delete affect listing counts, search results, or billing? | ✅ | Chris | **Yes — full removal.** Soft-deleted listings are excluded from search (ES), don't count toward active listings, and billing/subscriptions stop. **Users can reactivate** within their limits, but must go through checkout flow again to pay for any canceled subscriptions. CX can also restore. |
 | 4.6 | Edit flow — what fields can a user edit on a Jobs listing from MyAccount? Same as PAL or a subset? | ✅ | Chris | **No field editing in MyAccount** — editing goes through PAL (out of scope). MyAccount actions: **view, mark as sold, mark as sale pending, delete (soft delete), renew, reactivate.** Reactivate uses existing request activation endpoint. The rest (mark sold, mark sale pending, delete, renew) **need new endpoints on the Listing Service.** |
 

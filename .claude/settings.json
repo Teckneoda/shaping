@@ -15,9 +15,20 @@
       "Bash(cd /*)",
       "Bash(git *)",
       "Bash(echo *)",
-      "Bash(tail *)"
-
+      "Bash(tail *)",
+      "mcp__claude_ai_Notion__notion-fetch",
+      "mcp__claude_ai_Notion__notion-update-page",
+      "Bash(gh repo *)",
+      "Bash(find Legacy -iname \"BaseOptions.php\")",
+      "Bash(ls /Users/cpies/code/m-ksl-jobs)",
+      "mcp__claude_ai_Notion__notion-get-comments",
+      "mcp__claude_ai_Notion__notion-get-users"
     ],
     "defaultMode": "plan"
+  },
+  "autoMode": {
+    "environment": [
+      "$defaults"
+    ]
   }
 }

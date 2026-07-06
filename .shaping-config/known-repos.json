@@ -1,5 +1,7 @@
 [
+  "m-ksl-classifieds-api",
   "marketplace-backend",
+  "marketplace-frontend",
   "marketplace-graphql",
   "nest"
 ]

@@ -55,7 +55,6 @@ Routes defined in `Bootstrap.php` (lines 183–386):
 
 - **Jobs category→Classifieds subcategory mapping**: Need complete list of legacy Jobs categories (40 categories, see Phase 3.1 Legacy Category Mapping) and their exact Classifieds subcategory string equivalents under the Jobs parent category
 - **URL mapping for categories**: The legacy URLMapper.php has custom URL slug logic — need to verify all category slug→name mappings match what the redirect service will expect
-- **Widget endpoints**: Embeddable iframe widgets (`/widget/:dim`) display featured jobs on partner/external sites. Need usage data to determine if any partners are actively embedding these — **manual investigation pending**
 
 ---
 
@@ -63,11 +62,11 @@ Routes defined in `Bootstrap.php` (lines 183–386):
 
 1. **Who manages DNS for `jobs.ksl.com`?** → Platform team. Will need Platform support to coordinate the traffic cutover.
 2. **Is there an employer→member mapping?** → Yes, employer IDs correlate directly to member IDs. Employer pages redirect to MFTS (SRP filtered by member ID).
-3. **Search filter mapping?** → `jobtype`, `experience`, `education` map to subcategory specification fields. `salaryfrom/to` and `hourlyfrom/to` map to top-level price fields (dollars→cents × 100). `companyPerks` dropped — not implementing. See Phase 3.1 field mapping for details.
+3. **Search filter mapping?** → `jobtype`, `experience`, `education` map to the top-level `jobsEmploymentType`, `jobsYearsExperience`, `jobsEducationLevel` fields. `salaryfrom/to` and `hourlyfrom/to` map to top-level price fields (dollars→cents × 100). `companyPerks` dropped — not implementing. See Phase 3.1 field mapping for details.
 4. **Are there external backlinks or SEO-critical pages beyond standard patterns?** → No, the identified patterns (detail, search, landing, employer) cover all important traffic.
 5. **Should the redirect service go live before or after Phases 3.1–3.3?** → After. Post-migration cutover only.
 6. **Feed endpoints?** → Handled in a separate package already in progress. Out of scope.
-7. **Widget endpoints?** → Unresolved. These are embeddable iframe widgets (4 IAB ad sizes) that display featured jobs on partner/external sites. Need to check usage data before deciding. Manual investigation pending.
+7. **Widget endpoints?** → Resolved. These embeddable iframe widgets (4 IAB ad sizes) are no longer used by any partners. Eliminated from scope — no redirect handling needed. Moved to Out of Scope in Features.md.
 
 ---
 
@@ -81,3 +80,9 @@ Routes defined in `Bootstrap.php` (lines 183–386):
   - `specs/007-listing-api-jobs-schema/` — Jobs listing schema spec (marketType: "Job", Jobs-specific fields)
 - **Legacy codebase: `m-ksl-jobs`** (`/Users/cpies/code/shaping/Research Repos/Legacy/m-ksl-jobs/`) — Route definitions in `Bootstrap.php`, URL mapping in `URLMapper.php`, controller implementations
 - **Shaping Projects 003–005** — Prior phases (3.1 Listings, 3.2 Saved Searches, 3.3 Favorites) for dependency context
+
+---
+
+## Changelog
+- 2026-06-30: Resolved widget endpoints question (#7) — widgets are no longer used by any partners and have been eliminated from scope. Removed from "Still Needs Research" and moved to "Out of Scope" in Features.md.
+- 2026-06-16: Pivot — search filter mapping for `jobtype`, `experience`, `education` now targets top-level listing fields `jobsEmploymentType`, `jobsYearsExperience`, `jobsEducationLevel` (following the pay range field pattern) instead of sub-category specification fields. Updated F3 in Features.md and resolved question #3.

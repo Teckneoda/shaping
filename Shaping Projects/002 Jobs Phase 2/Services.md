@@ -1,203 +1,136 @@
 # Jobs Phase 2 — Services
 
-Services that will be created or updated for Phase 2 (SRP, Detail Page, MyAccount).
+Services created or updated for Phase 2. **Legend:** ✅ Built · 🔨 Gap · ❓ Open · 🚫 Out of scope. File:line refs are against the synced research repos (2026-06-25).
 
 ---
 
 ## Architecture Overview
 
 ```
-Frontend (Next.js) / App (React Native)
-    ↓ GraphQL queries/mutations
-marketplace-graphql (GraphQL Gateway)
-    ↓ REST API calls
-marketplace-backend/apps/listing/services/listing-http-rest (Go REST API)
-    ↓ Data operations
-MongoDB → Mongo Connector → Elasticsearch
-                              Redis (cache)
+Web (Next.js, apps/ksl-marketplace)  ·  MyAccount app (myaccount.ksl.com — separate repo)  ·  App (React Native — separate repo)
+    ↓ GraphQL
+marketplace-graphql (gateway: feature gates, SRP filters, detail fields, lifecycle mutations)
+    ↓ REST
+marketplace-backend/apps/listing/services/
+    ├── listing-http-rest   (CRUD, GET detail, lifecycle action endpoints)
+    ├── search-http-rest     (dedicated SRP search service — ES query building)
+    ├── listing-mcs-netcore  (Mongo change streams → ES sync)
+    └── listing-cron-*        (auto-renew, soft-delete[skeleton], boosts, stats)
+MongoDB → (connector) → Elasticsearch ;  Archive DB = 🔨 net-new
 ```
 
 ---
 
 ## 1. listing-http-rest (Go REST API)
 
-**Location**: `marketplace-backend/apps/listing/services/listing-http-rest`
+**Location:** `marketplace-backend/apps/listing/services/listing-http-rest`
 
-### Updates Required
+### Mostly built (Phase 1)
+- ✅ Model: statuses incl. `Inactive`/`Expired`/`Deleted` (`internal/types/listing.go:31-40`); `MarketTypeJob` (`:51`); all 7 Jobs fields (`:1316-1323`); `DeletedAt` + `DeactivatedAt` (`:1326-1327`)
+- ✅ Lifecycle guards (`listing.go:125-166`)
+- ✅ `GET /listing/{id}` returns all Jobs fields + `listingType` (`internal/handler/get.go`, `internal/types/response.go`)
+- ✅ Action endpoints (`routes.go`): `PUT .../mark-sold`, `.../mark-sale-pending`, `DELETE /listing/{id}` (soft delete), `PUT .../deactivate`, `.../renew`, `POST .../request-activation`, `PUT .../draft` (restore-to-draft), `DELETE .../purge`
+- ✅ Renew = 30-day window + 14-day tail (`internal/domain/renew.go:19-21`) → 14-day interval already enforced
 
-#### 1.1 Listing Model / Data Layer
-- Add `deletedAt` (timestamp) field to the listing model
-- Add 'deleted' as a valid listing status
-- Add "Job" as a valid `marketType` value
-- Verify `jobsPayRangeType`, `jobsPayFrom`, `jobsPayTo`, `jobsApplicationUrl` fields exist on the model (added in Phase 1 — may need expansion for reads)
-
-#### 1.2 Listing GET Endpoint (Detail Page)
-- **Endpoint**: `GET /listings/{id}`
-- **Change**: Expand response to include Jobs-specific top-level fields:
-  - `jobsPayRangeType`
-  - `jobsPayFrom`
-  - `jobsPayTo`
-  - `jobsApplicationUrl`
-- specSubCat fields (employment type, education, experience, perks) should already be part of the listing response as specs
-
-#### 1.3 Search Service (SRP)
-- **Endpoint**: Search endpoint in the dedicated SRP search service (already extracted from GraphQL)
-- **Changes**:
-  - Support `marketType=Job` filtering
-  - Add custom filter mapping for pay range fields so `jobsPayFrom`/`jobsPayTo` can be used as range filters in SRP queries
-  - Ensure specSubCat-based filters are included in AvailableFilters when Jobs category/subcategory is selected
-
-#### 1.4 New MyAccount Action Endpoints
-These endpoints need to be created or verified on the Listing Service:
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/listings/{id}/mark-sold` | `PUT` | Mark listing as sold |
-| `/listings/{id}/mark-sale-pending` | `PUT` | Mark listing as sale pending |
-| `/listings/{id}/delete` | `DELETE` | Soft delete — sets status='deleted' + populates `deletedAt` |
-| `/listings/{id}/renew` | `PUT` | Renew/extend listing expiration |
-| `/listings/{id}/request-activation` | `PUT` | **Already exists** — reactivate a listing |
-| `/listings/{id}/restore` | `PUT` | CX-only restore of soft-deleted listing (contract TBD pending CX input) |
-
-#### 1.5 Soft Delete Behavior
-When a listing is soft-deleted via the delete endpoint:
-1. Set `status` to 'deleted'
-2. Populate `deletedAt` with current timestamp
-3. Remove from ES search index (or filter out via status)
-4. Do not count toward user's active listing limits
-5. Stop billing/subscriptions for the listing
-6. Retain photos and all listing data for potential restore
-
-When restored (by CX or user reactivation):
-- CX restore: direct status change back, photos intact
-- User reactivation: must go through checkout flow to re-pay for subscriptions, must be within listing limits
-
-Retention period before final hard purge: **pending Legal input**
+### Gaps
+- 🔨 **Soft-delete / archive lifecycle logic** — see `listing-cron-soft-delete` (§4) and Archive DB (§6); confirm ES exclusion on soft delete/deactivate.
+- ❓ Verify `markListingSold`/`makeListingAvailable` path for Jobs (GraphQL side is CAPI-only today).
 
 ---
 
-## 2. marketplace-graphql (GraphQL Gateway)
+## 2. search-http-rest (dedicated SRP search service)
 
-**Location**: `marketplace-graphql`
+**Location:** `marketplace-backend/apps/listing/services/search-http-rest`
 
-### Updates Required
-
-#### 2.1 Feature Flag — Jobs Category
-- Add feature flag that filters Jobs category from production responses
-- Allowlist based on member ID — only team members see Jobs category
-- Flag must be removable for launch
-
-#### 2.2 SRP Query Updates
-- Add "Job" to the `marketType` filter options returned to frontend
-- Pass through Jobs specSubCat filters via existing AvailableFilters pipeline
-- Add custom handling for pay range filter (top-level fields, not specSubCat)
-- Proxy all filter/search requests to the dedicated SRP search service
-
-#### 2.3 Detail Page Query Updates
-- Update listing detail query to pass through Jobs-specific top-level fields from the Listing Service:
-  - `jobsPayRangeType`, `jobsPayFrom`, `jobsPayTo`, `jobsApplicationUrl`
-
-#### 2.4 MyAccount Mutation Updates
-- Add/verify GraphQL mutations that proxy to the new Listing Service endpoints:
-  - `markListingAsSold`
-  - `markListingAsSalePending`
-  - `deleteListing` (soft delete)
-  - `renewListing`
-  - `restoreListing` (CX-only — contract TBD)
+- ✅ `marketType=Job` filtering (same-index).
+- ✅ Pay-range custom filter mapping (`internal/config/filter.go:223-250`) + overlap logic (`internal/store/elastic/query.go` `generateJobsPayRangeFilters`).
+- ✅ SRP response carries pay-range fields (`internal/api/classified-listing.go`).
+- 🔨 **ES model missing** `jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience` (`internal/store/elastic/model.go` only has applicationUrl + payRangeType + pay agg).
+- 🔨 **Filter config missing** the 3 string filters (`config/filter.go` only has payRangeType/From/To). GraphQL exposes the filter groups but nothing backs them in ES yet — close this loop (Open Q8).
 
 ---
 
-## 3. Elasticsearch
+## 3. marketplace-graphql (gateway)
 
-### Updates Required
+**Location:** `marketplace-graphql`
 
-#### 3.1 Index Mapping Changes
-Add mappings for top-level Jobs fields:
-
-| Field | ES Type | Notes |
-|-------|---------|-------|
-| `jobsPayRangeType` | `keyword` | "hourly" or "salary" |
-| `jobsPayFrom` | `integer` | Stored in cents |
-| `jobsPayTo` | `integer` | Stored in cents |
-| `jobsApplicationUrl` | `keyword` | Not used for filtering — included for detail reads |
-
-Add "Job" as a valid value for the existing `marketType` field.
-
-#### 3.2 Soft Delete Exclusion
-Ensure soft-deleted listings (status='deleted') are excluded from all search results. Either:
-- Remove from ES index on soft delete, re-index on restore
-- Or filter by status in all queries (existing pattern TBD)
+- ✅ Feature-flag infra w/ member-ID allowlist (`graph/queryresolvers/featureconfig.go`, `remoteconfig.go`); Jobs gates (`jobs_gate.go`).
+- ✅ `Job` as gated `marketType` (`classifieds-conditional-fields.go:59-61`).
+- ✅ Jobs SRP filter groups (`jobs_srp_filter_groups.go`).
+- ✅ Jobs detail fields in schema (`graph/schema/types.listings.graphqls:987-1013`).
+- ✅ Lifecycle mutations → listing-http-rest (`mutationresolvers/classifieds_listing_lifecycle.go`): `deactivateClassifiedsListing`, `renewClassifiedsListing`, `softDeleteClassifiedsListing`, `restoreClassifiedsListingToDraft`, `purgeClassifiedsListing`.
+- 🔨 If Jobs is a **category** (not just marketType): add category-level gating/creation (Open Q1).
+- ❓ `markListingSold`/`makeListingAvailable` are CAPI-only (`mutationresolvers/listing-status.go`) — wire listing-http-rest if Jobs needs it.
 
 ---
 
-## 4. MongoDB / Mongo Connector
+## 4. Lifecycle Crons
 
-### Updates Required
+**Location:** `marketplace-backend/apps/listing/services/listing-cron-*`
 
-#### 4.1 Listing Document Changes
-- Add `deletedAt` field (nullable timestamp) to listing documents
-- Verify 'deleted' is a valid status value in the schema
-
-#### 4.2 Mongo Connector Sync
-- Update connector to sync new top-level fields to ES: `jobsPayRangeType`, `jobsPayFrom`, `jobsPayTo`, `jobsApplicationUrl`
-- Verify specSubCat fields already sync via existing pipeline
+- ✅ Present: `listing-cron-auto-renew`, `listing-cron-boosts`, `listing-cron-stats`.
+- 🔨 `listing-cron-soft-delete` — **scaffolded but not implemented**: has `internal/client`, `internal/types` (candidate, summary, config; ~600 LOC) but `app.go` run loop is empty (15 lines). Build the candidate-query + status-transition + archive-move logic.
+- 🔨 Crons required (Notion): Deleted→Archive @30d; Inactive→Archive @1yr; Expired→Archive @1yr (only listings ≥30d in that status); Stub→Archive @2wk.
+- 🔨 Auto-**Expire** process — confirm whether it lives in `listing-cron-auto-renew`.
+- ❓ Archived→hard purge @6mo (existing `purge` endpoint vs separate job).
 
 ---
 
-## 5. Category Manager (Admin)
+## 5. Elasticsearch / Mongo Connector
 
-### Updates Required
-
-- Create Jobs category
-- Create Jobs subcategories (matching legacy Jobs categories)
-- Configure specifications on each subcategory:
-  - Employment Type (string select)
-  - Education Level (string select)
-  - Years of Experience (string select)
-  - Company Perks (multiple string select slots, one per perk)
-- Publish to production (behind feature flag in GraphQL)
+- ✅ Indexed Jobs fields: applicationUrl, payRangeType, payFrom, payTo; `marketType=Job`.
+- 🔨 Add mappings: `jobsEmploymentType`, `jobsEducationLevel`, `jobsYearsExperience`.
+- 🔨 `listing-mcs-netcore` (Mongo change streams → ES): sync the 3 string fields.
+- 🔨 Ensure soft-deleted / deactivated / expired listings excluded from search (remove-on-transition or filter-by-status — confirm existing pattern).
 
 ---
 
-## 6. Frontend — Web (Next.js)
+## 6. Archive DB 🔨 (net-new)
 
-**Requires frontend developer (not yet assigned)**
-
-### Updates Required
-
-#### 6.1 SRP
-- Add "Jobs" as a `marketType` filter option
-- Render Jobs specSubCat filters when Jobs is selected
-- Custom pay range filter UI (hourly/salary toggle + range)
-- Grid vs list display rules (frontend-only logic)
-
-#### 6.2 Detail Page
-- Render Jobs top-level fields: pay range, Apply button
-- specSubCat fields render through existing specs UI
-
-#### 6.3 MyAccount
-- Display Jobs listings
-- Support actions: view, mark as sold, mark as sale pending, delete, renew, reactivate
-- No inline editing — editing via PAL (out of scope)
+- 🔨 No archive datastore/collection or `archive` concept exists in the codebase today.
+- 🔨 Design: target store (separate collection vs separate DB), write path (cron move), read/restore path, 6-month retention then purge.
+- ❓ Q4 — ownership + design decision needed before build.
 
 ---
 
-## 7. App (React Native) — 2-week estimate
-
-**Capacity not confirmed with App team**
-
-### Updates Required
-
-- Jobs tab: auto-select Jobs category, show subcategory list (same as Services)
-- Remove Jobs from global search
-- Detail Page: render pay range + Apply button for Jobs listings
-- PAL: **scope TBD** — confirm whether hard-coded Jobs fields in app PAL are included
+## 7. Category Manager (Admin)
+- ❓ Confirm Jobs as Category w/ ~40 industry subcategories (Q1).
+- 🔨 If so: create category + subcategories; no specs needed (top-level fields); publish behind flag.
 
 ---
 
-## Services NOT Changed in Phase 2
+## 8. Frontend — Web (Next.js, `apps/ksl-marketplace`)
 
-- `listing-applications` — Quick Apply is Phase 4
-- `listing-feed-parser` / `listing-feed-subscriber` — Feed ingestion unchanged
-- `listing-cron-boosts` / `listing-cron-stats` — No changes needed
-- Saved Search services — Phase 3
+**Requires frontend developer (not assigned)**
+
+- ✅ SRP: Jobs pay-range card, visibility utils, pay-range formatting (`app/components/Filters/Cards/JobsPayRange.tsx`, `utils/jobs-listing-type.ts`, `utils/jobs-pay-range.ts`).
+- ✅ Detail schema has Jobs fields + `jobsApplicationMethod: ksl|url` (`services/listing/schema/classifieds.ts:113-148`).
+- 🔨 SRP: wire term filters once ES backs them; finalize Jobs listing-type option; (NTH) list view.
+- 🔨 Detail: build Jobs display section + two-variant Apply button (`app/listing/[id]/config/classifieds-config.tsx`, `ActionButtons.tsx`).
+
+---
+
+## 9. MyAccount app (`deseretdigital/m-ksl-myaccount-v2`)
+
+**Stack:** Next.js 15 + MobX + SWR; calls own `/api/v1/listings/...` REST routes (not GraphQL directly). Default branch `master`. Hosted at myaccount.ksl.com/listings.
+
+- ✅ **Classifieds lifecycle UI already built** behind `classifiedsLifecycleGateOpen` (`stores/listings/ListingsFilterStore.ts`, `components/Listing/Manage/GeneralManage.tsx`): Deactivate, soft Delete, Activate (restore-to-draft → checkout, `GeneralActivateModal`), Delete-No-Undo purge (`GeneralPurgeModal`), Mark Sold/Sale Pending, Renew, and status dropdown w/ Inactive/Expired/Deleted (gated).
+- ✅ Lifecycle REST endpoints wired: `deactivate`, `DELETE` (soft), `restore-draft`, `purge`, `renew`, `sold` (`requests/general-*.ts`).
+- ✅ **Q9 resolved → General path.** Migrated Jobs are typed as **Classifieds (marketType `Job`)** so `components/Listings.tsx:34-50` routes them to `GeneralListing`/`GeneralManage`, inheriting the full gated lifecycle. Data-contract decision in the migration — not a UI rewrite. Legacy `JobManage` (which already has Activate/Deactivate/Renew/Delete/Applications but no purge / mark-sold / mark-sale-pending / subscription-cancel) is retained for non-migrated Jobs.
+- 🔨 Remaining (General path): render Jobs-specific card fields (pay range, employment type) within `GeneralListing`; status dropdown default "All" → "Active" (`ListingsFilterStore.ts:352,460`); add purge banner; verify modal copy vs Notion. `JobApplicationsModal` = Phase 4.
+
+---
+
+## 10. App (React Native — separate repo, not in research set)
+- 🔨 Jobs tab (auto-select category + subcategories); remove Jobs from global search.
+- 🔨 Detail page Jobs fields + Apply button.
+- 🔨 PAL job fields (hard-coded like Cars) — now in scope (Q6).
+
+---
+
+## Services NOT changed in Phase 2
+- `listing-applications` (Quick Apply — Phase 4)
+- `listing-feed-parser` / `listing-feed-subscriber` (feed ingestion)
+- `listing-cron-boosts` / `listing-cron-stats`
+- Saved Search services (Phase 3)
+- 🚫 Nest CX restore tool (out of scope)

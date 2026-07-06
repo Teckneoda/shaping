@@ -1,0 +1,23 @@
+{
+  "repositories": [
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-backend"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-frontend"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-graphql"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "m-ksl-classifieds-api"
+    }
+  ],
+  "notion_docs": [
+    "https://app.notion.com/p/deseret/Detail-Page-Listing-Service-Needs-37c2ac5cb23580e5874ae70f4d505b97"
+  ]
+}

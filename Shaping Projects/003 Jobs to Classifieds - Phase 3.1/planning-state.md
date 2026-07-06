@@ -1,6 +1,6 @@
 # Jobs to Classifieds — Phase 3.1: Migrate Listings — Planning State
 
-**Last updated**: 2026-04-01
+**Last updated**: 2026-06-25
 
 ---
 
@@ -58,13 +58,66 @@
 | `abuse` | **Skip** | Not migrated |
 | `inprogress` | **Skip** | Not migrated |
 
+### Job Spec Fields → Top-Level (decided 2026-06-16; IMPLEMENTATION VERIFIED 2026-06-25)
+- **Pivot**: `employerStatus`, `educationLevel`, and `yearsOfExperience` were previously planned to map to existing sub-category specifications. They are now **top-level Jobs fields** — `jobsEmploymentType`, `jobsEducationLevel`, `jobsYearsExperience` — following the existing pay range field naming pattern (`JobsPayRangeType`/`JobsPayFrom`/`JobsPayTo`).
+- ✅ **Model change is DONE** (verified in code 2026-06-25): all three fields exist as `*string` on `ClassifiedListing` ([listing.go:1321-1323](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/types/listing.go#L1321-L1323)), wired through `request.go`/`response.go`, `domain/update.go`, and `domain/validation.go`.
+- ✅ **ES mappings + Mongo connector also DONE**: `feeds-ps-transformer` and `feeds-ps-syncer` both reference the three new fields. This was previously flagged as a Phase 2 / Phase 3.2 follow-up — it is no longer outstanding for these fields.
+- ⚠️ **Fields are validated ENUMS, not free-text** ([validation.go:31-33](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/domain/validation.go#L31-L33)). Migration must translate legacy values to the exact tokens. See the three mapping tables below.
+- **companyPerks**: not being implemented (dropped — consistent with prior decision).
+
+### Enum Mapping Tables for the Three Top-Level Jobs Fields (identified 2026-06-25)
+
+**CRITICAL**: The new fields are constrained enums and the legacy education/experience integer codes are **arbitrary keys, NOT in semantic order**. A naive numeric or ordinal map would corrupt data. Migration must do a key-based lookup. Legacy source: [BaseOptions.php:144-152, 266-273, 332-338](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site/application/libs/BaseOptions/BaseOptions.php#L144-L338).
+
+**`employerStatus` → `jobsEmploymentType`** (legacy code → new enum; 1:1 by label):
+
+| Legacy code | Legacy label | New enum value |
+|---|---|---|
+| `ft` | Full-time | `full-time` |
+| `pt` | Part-time | `part-time` |
+| `ct` | Contract | `contract` |
+| `temp` | Temporary | `temporary` |
+| `sj` | Seasonal | `seasonal` |
+| `inter` | Internships | `internships` |
+| `week` | Weekend Only | `weekend-only` |
+
+> Note: earlier docs listed the codes as "ft/pt/ct/tm" — that was wrong. Actual codes are `ft/pt/ct/temp/sj/inter/week`, and all 7 map cleanly.
+
+**`educationLevel` → `jobsEducationLevel`** (legacy int key → new enum). **Keys are out of order:**
+
+| Legacy key | Legacy label | New enum value |
+|---|---|---|
+| `4` | None | `none` |
+| `3` | High School | `high-school` |
+| `2` | 2-year Degree | `2-year-degree` |
+| `1` | 4-year Degree | `4-year-degree` |
+| `0` | Advanced Degree | `advanced-degree` |
+
+**`yearsOfExperience` → `jobsYearsExperience`** (legacy int key → new enum). **Keys are out of order:**
+
+| Legacy key | Legacy label | New enum value |
+|---|---|---|
+| `5` | None | `none` |
+| `0` | 1-2 years | `1-2-years` |
+| `4` | 3-4 years | `3-4-years` |
+| `1` | 5-7 years | `5-7-years` |
+| `2` | 8-10 years | `8-10-years` |
+| `3` | >10 years | `10-plus-years` |
+
+### Destination Collection Name (clarified 2026-06-25)
+- The direct-MongoDB-write path (expired/soft-deleted listings) targets the **`general` collection** — constant `generalCollection = "general"` ([store/mongo.go:15](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/store/mongo.go#L15)). `ClassifiedListing` is the Go document model; the collection it lives in is named `general`. Prior docs imprecisely called it "the ClassifiedListing collection."
+
+### Project Status & Build Plan (updated 2026-06-25)
+- Notion project status is now **PKG: Building** (was FRAMED: OPS Approved). Web estimate reduced to **1 week** (category feature flag "Internal-Only categories" completed in cycle 2).
+- A **Build Plan doc** exists ([BUILD: Jobs to Classifieds - Phase 3.1](https://app.notion.com/p/3332ac5cb2358039ba72c22a7abe78d0)) but is still a blank template: Build Status "Not Ready", Shaped Status "Needs Shaping". No technical content there yet — the SHAPING section of the main project doc remains the source of truth.
+
 ### Field Mapping Decisions
 
 | Legacy Field | Decision | Target |
 |---|---|---|
-| `employerStatus` | Sub-category spec fields | Existing specifications |
-| `educationLevel` | Sub-category spec fields | Existing specifications |
-| `yearsOfExperience` | Sub-category spec fields | Existing specifications |
+| `employerStatus` | Map | Top-level `jobsEmploymentType` field |
+| `educationLevel` | Map | Top-level `jobsEducationLevel` field |
+| `yearsOfExperience` | Map | Top-level `jobsYearsExperience` field |
 | `companyName` | Map | `BusinessName` |
 | `companyLogo` | Map | Photo array (first image) |
 | `responsibilities` | Append | `Description` |
@@ -99,7 +152,7 @@
 ### New System (marketplace-backend) — Jobs Support
 
 - **listing-http-rest** has full Jobs support:
-  - `MarketType: Job` with fields: `JobsApplicationURL`, `JobsPayRangeType`, `JobsPayFrom`, `JobsPayTo`
+  - `MarketType: Job` with fields: `JobsApplicationURL`, `JobsPayRangeType`, `JobsPayFrom`, `JobsPayTo`, plus the three new enum fields `JobsEmploymentType`, `JobsEducationLevel`, `JobsYearsExperience` (added since last shape — verified 2026-06-25)
   - Jobs activation policy (no price required; validates title, description, category, subCategory, city, state, name, contactMethod)
   - Lifecycle: delete, deactivate, renew (fully implemented), mark-sold/mark-sale-pending (blocked for Jobs)
   - Status: Stub -> PendingActivation -> Active -> Inactive/Sold/Expired/Deleted
@@ -159,14 +212,14 @@
 | `displayTime` | date | DisplayTime | Mapped |
 | `expireTime` | date | ExpireTime | Mapped |
 | `postTime` | date | — | May map to DisplayTime |
-| `employerStatus` | string | Sub-category spec fields | **Decided** |
+| `employerStatus` | string code | `jobsEmploymentType` (top-level enum) | **Done in model** — enum translation (see table above) |
 | `companyName` | string | BusinessName | **Decided** |
 | `companyLogo` | string | Photo array (first image) | **Decided** |
 | `responsibilities` | string | Append to Description | **Decided** |
 | `qualifications` | string | Append to Description | **Decided** |
 | `requirements` | string | Append to Description | **Decided** |
-| `educationLevel` | int (0-4) | Sub-category spec fields | **Decided** |
-| `yearsOfExperience` | int | Sub-category spec fields | **Decided** |
+| `educationLevel` | int key (unordered) | `jobsEducationLevel` (top-level enum) | **Done in model** — key lookup, NOT 0-4 order (see table above) |
+| `yearsOfExperience` | int key (unordered) | `jobsYearsExperience` (top-level enum) | **Done in model** — key lookup (see table above) |
 | `contactNotes` | string | Append to Description | **Decided** |
 | `companyPerks` | string | — | **Dropped** |
 | `contract` | string | — | **Dropped** |
@@ -218,6 +271,7 @@
 5. ~~**Migration script authentication**~~ — **Resolved**: Worker authenticates as service caller via Member API service-sessions endpoint (service JWT with `role: "service"`, `IsPrivileged = true`). Note: auto-csl uses a different auth path (CAPI client with nonce-based signing), but Jobs migration calls listing-http-rest directly. Interservice key stored in Google Secret Manager.
 6. ~~**Batch ID list support**~~ — **Resolved**: Follow `auto-csl` pattern. HTTP entry point accepts `{ "listingIds": [...], "reimport": false }`. Each ID published as a separate PubSub message to a migration topic. Worker subscription processes each listing individually. `reimport` flag serves as the overwrite flag.
 7. ~~**Activation endpoint choice**~~ — **Resolved (2026-04-01)**: Migration uses `RequestActivation` only (not `Activate`). `Activate` is reserved for the fraud-validator service. `RequestActivation` triggers fraud-validator, which auto-activates after ~5 min. Email verification check is bypassed for service callers (`IsPrivileged=true` in `requireVerifiedEmail()`).
+8. **Employer logo storage & destination** — Where are employer logos currently stored in the legacy Jobs system (e.g., `companyLogo`/`photo` field on the `jobs` record, the `jobsEmployers` collection, a CDN/file path, or the Nest dealer record), and where should they be migrated to in Classifieds? Need to confirm the source of truth for each account type and the target (e.g., listing `photos[]` vs. dealer logo on the Nest dealer record) and any image-services upload step required.
 
 ---
 
@@ -246,3 +300,16 @@
 | `apps/listing/services/listing-http-rest/internal/handler/update.go` | Handler (updated 2026-04-01) | Now requires primary read before update. Pre/post-persistence sidecar chains added. |
 | `apps/auto-csl/services/auto-csl-ps-processor/domain/listing.go` | Auto-CSL domain | Uses CAPI `PUT /listings/{id}` with `classifiedStatus: Active` — different from listing-http-rest direct calls |
 | `deseretdigital/marketplace-backend` (local, synced to origin/main 2026-04-01) | Repository | Pulled activation handler updates, update handler changes, profile firestore config |
+| `deseretdigital/marketplace-backend` (local, synced to origin/main 2026-06-25) | Repository | Pull brought only go.mod/go.sum dependency bumps across auto-csl/dealer/games/messages — no functional listing-http-rest changes |
+| `apps/listing/services/listing-http-rest/internal/types/listing.go` (lines 1316-1323) | Model | Three new top-level Jobs fields (`JobsEmploymentType`, `JobsYearsExperience`, `JobsEducationLevel`) now present as `*string` — model change is DONE |
+| `apps/listing/services/listing-http-rest/internal/domain/validation.go` (lines 31-33, 194-206) | Validation | Confirms the three fields are validated ENUMS with fixed allowed values |
+| `apps/listing/services/listing-http-rest/internal/store/mongo.go` (line 15) | Store | Destination collection constant `generalCollection = "general"` |
+| `apps/feeds/services/feeds-ps-transformer` + `feeds-ps-syncer` | Feed/ES sync | Both reference the three new jobs fields — ES mapping + connector follow-up is DONE |
+| `Legacy/m-ksl-jobs/.../BaseOptions/BaseOptions.php` (lines 144-152, 266-273, 332-338) | Legacy options | Exact legacy code/key→label tables for employerStatus, yearsOfExperience, educationLevel — source for enum mapping tables |
+| Notion: BUILD doc (3332ac5cb2358039ba72c22a7abe78d0) | Notion page | Build Plan doc — still blank template ("Not Ready" / "Needs Shaping"); no technical content yet |
+
+---
+
+## Changelog
+
+- **2026-06-25**: Re-shaped. Synced marketplace-backend to origin/main (dependency-only changes). Re-fetched Notion project doc (now **PKG: Building**, 1-week estimate, feature flag done in cycle 2) and its Build Plan doc (blank template). **Verified the three top-level Jobs fields are already implemented** as `*string` enums in listing-http-rest + feeds ES sync (resolves the main model/ES "changes needed" items). **Captured exact enum mapping tables** for `jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience` from legacy `BaseOptions.php` — corrected the earlier wrong "ft/pt/ct/tm" and "(0-4)" notes; legacy education/experience keys are unordered and require key-based lookup. **Clarified destination collection is `general`** (not "ClassifiedListing collection").

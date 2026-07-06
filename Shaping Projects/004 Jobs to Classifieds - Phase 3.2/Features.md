@@ -20,8 +20,8 @@
 **Requirements:**
 - Add `ListingTypeJob` case to the `saveSavedSearch` resolver (currently only supports CAR and CLASSIFIED)
 - Add `JobsFilterConfig` to [config.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-graphql/services/config/config.go) defining valid Jobs filter names:
-  - **StringFilters:** `keyword`, `city`, `state`, `employerStatus`, `payRangeType`, `displayTime`, `companyPerks`, `marketType`
-  - **IntFilters:** `category`, `educationLevel`, `yearsOfExperience`, `zip`
+  - **StringFilters:** `keyword`, `city`, `state`, `employerStatus`, `payRangeType`, `displayTime`, `marketType`
+  - **IntFilters:** `category`, `educationLevel`, `yearsOfExperience`, `zip` (`employerStatus`/`educationLevel`/`yearsOfExperience` correspond to top-level listing fields `jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience`)
   - **RangeFilters:** `salary` → `salaryFrom`/`salaryTo`, `hourly` → `hourlyFrom`/`hourlyTo`
   - **DistanceFilter:** `zip` + `miles`
 - Add `MapJobsSavedSearchParams()` helper in [legacy-savedsearch-helper.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-graphql/graph/mutationresolvers/legacy-savedsearch-helper.go)
@@ -53,7 +53,7 @@
 
 **Requirements:**
 - **EditGeneral.tsx** — Show Jobs-specific fields when `marketType === "Job"` or a Jobs category is selected:
-  - **Show:** `payRangeType` toggle (Salary/Hourly), `salaryFrom`/`salaryTo` or `hourlyFrom`/`hourlyTo`, `employerStatus`, `educationLevel`, `yearsOfExperience`, `companyPerks`
+  - **Show:** `payRangeType` toggle (Salary/Hourly), `salaryFrom`/`salaryTo` or `hourlyFrom`/`hourlyTo`, `employerStatus`, `educationLevel`, `yearsOfExperience`
   - **Hide:** Classifieds-only fields (`newUsed`, `sellerType`, `specSubCat*` fields)
 - **Criteria.tsx** — Add display labels and formatting for pay range fields in the list view
   - Add to `SPECIAL_LABELS` map and `FIELD_PRIORITY` constants
@@ -77,17 +77,15 @@
 - **ES mapping** — Add to [mappings/classifieds.json](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-percolation/mappings/classifieds.json):
   - `salaryFrom` (float), `salaryTo` (float), `hourlyFrom` (float), `hourlyTo` (float)
   - `payRangeType` (keyword)
-  - `employerStatus` (keyword), `educationLevel` (integer), `yearsOfExperience` (integer)
-  - `companyPerks` (text)
+  - `employerStatus` (keyword), `educationLevel` (integer), `yearsOfExperience` (integer) — correspond to top-level listing fields `jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience`
 - **Percolation service** — Update [services/classifieds.go](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-percolation/services/classifieds.go):
   - Add pay range fields to `ClassifiedSavedSearch` struct
   - Add overlap range matching in `getQueryFilters()` for salary/hourly (listing range overlaps search range = match)
 - **Match service** — Update [verticalexpectedfields/fields.go](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-match-service/verticalexpectedfields/fields.go):
-  - Add `salaryFrom`, `salaryTo`, `hourlyFrom`, `hourlyTo`, `payRangeType`, `employerStatus`, `educationLevel`, `yearsOfExperience`, `companyPerks` to Classifieds expected fields
+  - Add `salaryFrom`, `salaryTo`, `hourlyFrom`, `hourlyTo`, `payRangeType`, `employerStatus`, `educationLevel`, `yearsOfExperience` to Classifieds expected fields
 - **Alert workers** — Update [Config.php](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-alert-workers/src/Library/SavedSearch/Config.php):
   - Add pay range fields to Classifieds config as range-fields with two-field overlap logic
-  - Add `employerStatus`, `educationLevel`, `yearsOfExperience` as exact-match fields
-  - Add `companyPerks` as array-contains field
+  - Add `employerStatus`, `educationLevel`, `yearsOfExperience` as exact-match fields (top-level listing fields `jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience`)
 - **Remove unfinished Jobs-specific code** from percolation, match service, and alert workers (never completed, being replaced by Classifieds flow)
 
 ---
@@ -129,7 +127,7 @@
 | `criteria_educationLevel` | int | Education requirement |
 | `criteria_yearsOfExperience` | int | Experience requirement |
 | `criteria_employerStatus` | string | Employment type |
-| `criteria_companyPerks` | string | Benefits/perks |
+| `criteria_companyPerks` | string | Benefits/perks — **not migrated** (Company Perks not being implemented) |
 | `criteria_displayTime` | string | Posting recency |
 
 **Legacy Reference:**

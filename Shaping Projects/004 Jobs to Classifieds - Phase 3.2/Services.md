@@ -41,8 +41,7 @@
 - **Add to Classifieds ES mapping** ([mappings/classifieds.json](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-percolation/mappings/classifieds.json)):
   - `salaryFrom`, `salaryTo`, `hourlyFrom`, `hourlyTo` (float)
   - `payRangeType` (keyword)
-  - `employerStatus` (keyword), `educationLevel` (integer), `yearsOfExperience` (integer)
-  - `companyPerks` (text)
+  - `employerStatus` (keyword), `educationLevel` (integer), `yearsOfExperience` (integer) — these correspond to the top-level listing fields `jobsEmploymentType`, `jobsEducationLevel`, `jobsYearsExperience` (see Phase 2 / Phase 3.1). Field names here follow the existing saved-search criteria convention; confirm whether percolation should use the criteria names or the `jobs`-prefixed listing names.
 - **Update ClassifiedSavedSearch struct** in [services/classifieds.go](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-percolation/services/classifieds.go) with new fields
 - **Add query filters** for pay range overlap matching (port logic from `services/jobs.go`)
 - **Remove** Jobs-specific code:
@@ -59,7 +58,7 @@
 **Changes:**
 - Add to Classifieds expected fields in [verticalexpectedfields/fields.go](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-match-service/verticalexpectedfields/fields.go):
   - `salaryFrom`, `salaryTo`, `hourlyFrom`, `hourlyTo`, `payRangeType`
-  - `employerStatus`, `educationLevel`, `yearsOfExperience`, `companyPerks`
+  - `employerStatus`, `educationLevel`, `yearsOfExperience` (top-level listing fields `jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience`)
 - Update query document creation in [queryDoc.go](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-match-service/queryDoc.go) to extract these fields from Jobs listings
 - **Remove** Jobs-specific expected fields and query doc handling (replaced by Classifieds flow)
 
@@ -71,8 +70,7 @@
 
 **Changes in [Config.php](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-alert-workers/src/Library/SavedSearch/Config.php):**
 - Add to Classifieds `range-fields`: `salary` (salaryFrom/salaryTo) and `hourly` (hourlyFrom/hourlyTo) with two-field overlap logic
-- Add to Classifieds `exact-match-fields`: `employerStatus`, `educationLevel`, `yearsOfExperience`, `payRangeType`
-- Add to Classifieds `array-contains-fields`: `companyPerks` (type: "any")
+- Add to Classifieds `exact-match-fields`: `employerStatus`, `educationLevel`, `yearsOfExperience`, `payRangeType` (the first three correspond to top-level listing fields `jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience`)
 - **Remove** Jobs-specific config and matching classes:
   - [SearchMatchJobsClass.php](file:///Users/cpies/code/shaping/Research%20Repos/saved-search-alert-workers/src/Library/SavedSearch/SearchMatchJobsClass.php) — Delete
   - Jobs section in Config.php — Remove

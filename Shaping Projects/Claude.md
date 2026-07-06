@@ -5,7 +5,7 @@
 When researching legacy code or existing implementations for shaping projects, look in the **Research Repos** folder located at:
 
 ```
-/Users/cpies/code/AI-Agents/Research Repos/
+/Users/cpies/code/shaping/Research Repos/
 ```
 
 ### Key Directories
@@ -47,7 +47,7 @@ Use markdown links with the `file://` protocol to create clickable references:
 
 **Example:**
 ```markdown
-**Legacy Repository**: [`m-ksl-classifieds-api`](file:///Users/cpies/code/AI-Agents/Research%20Repos/Legacy/m-ksl-classifieds-api)
+**Legacy Repository**: [`m-ksl-classifieds-api`](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api)
 ```
 
 ### 2. Line-Specific References
@@ -60,7 +60,7 @@ When referencing specific code sections, use line number anchors:
 
 **Example:**
 ```markdown
-**Legacy Reference**: [routes.yaml:3-26](file:///Users/cpies/code/AI-Agents/Research%20Repos/Legacy/m-ksl-classifieds-api/config/routes.yaml#L3-L26)
+**Legacy Reference**: [routes.yaml:3-26](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api/config/routes.yaml#L3-L26)
 ```
 
 ### 3. Endpoint Documentation Format
@@ -121,5 +121,5 @@ Always use:
 **Example:**
 ```markdown
 Located in `src/Controller/` relative to repository root
-Absolute path: `/Users/cpies/code/AI-Agents/Research Repos/Legacy/m-ksl-classifieds-api/src/Controller/`
+Absolute path: `/Users/cpies/code/shaping/Research Repos/Legacy/m-ksl-classifieds-api/src/Controller/`
 ```

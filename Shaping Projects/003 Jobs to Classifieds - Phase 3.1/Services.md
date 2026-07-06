@@ -14,8 +14,14 @@
 - Visibility: Inactive listings only visible to owner or admin/service callers
 
 **Changes needed**:
-- No model changes required — all legacy fields are handled via existing fields:
-  - `employerStatus`, `educationLevel`, `yearsOfExperience` → sub-category specifications
+- ✅ **DONE (verified in code 2026-06-25)** — The three new top-level Jobs fields are already implemented as `*string` on `ClassifiedListing` ([listing.go:1321-1323](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/types/listing.go#L1321-L1323)): `JobsEmploymentType`, `JobsYearsExperience`, `JobsEducationLevel`. Also wired through request/response types, `domain/update.go`, and `domain/validation.go`. **ES mappings + Mongo connector are also done** — `feeds-ps-transformer` and `feeds-ps-syncer` both reference the new fields. The "Phase 2 ES/connector follow-up" is no longer outstanding for these fields.
+- ⚠️ **The three fields are validated ENUMS, not free strings** — migration must translate legacy values to these exact tokens ([validation.go:31-33](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/domain/validation.go#L31-L33)):
+  - `jobsEmploymentType`: `full-time`, `part-time`, `contract`, `temporary`, `seasonal`, `internships`, `weekend-only`
+  - `jobsEducationLevel`: `none`, `high-school`, `2-year-degree`, `4-year-degree`, `advanced-degree`
+  - `jobsYearsExperience`: `none`, `1-2-years`, `3-4-years`, `5-7-years`, `8-10-years`, `10-plus-years`
+  - **The legacy education/experience integer codes are arbitrary keys (NOT in 0→4 semantic order).** See the exact mapping tables in planning-state.md. A naive numeric map would corrupt data.
+- Remaining legacy fields are handled via existing fields:
+  - `employerStatus` → `jobsEmploymentType`, `educationLevel` → `jobsEducationLevel`, `yearsOfExperience` → `jobsYearsExperience` (new top-level fields above)
   - `companyName` → `BusinessName`
   - `companyLogo` → photo array (first image)
   - `responsibilities`, `qualifications`, `requirements`, `contactNotes` → appended to `Description`
@@ -58,7 +64,7 @@
 
 **Migration flow — Expired/soft-deleted listings** (direct MongoDB path):
 1. Read legacy listing from MongoDB `jobs` collection
-2. Transform fields and write directly to `ClassifiedListing` collection with correct status (`Expired` or `Deleted`) and timestamps (`expireTime`, `deletedAt`)
+2. Transform fields and write directly to the **`general` collection** (constant `generalCollection = "general"` in [store/mongo.go:15](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/store/mongo.go#L15); `ClassifiedListing` is the document model, the collection name is `general`) with correct status (`Expired` or `Deleted`) and timestamps (`expireTime`, `deletedAt`)
 3. Generate new ID (must not collide with existing classifieds IDs)
 4. Add history object indicating import
 5. Log migration in `jobListingMigrations` collection
@@ -77,7 +83,7 @@
 - Field transforms:
   - Pay conversion: legacy dollars (int) → cents (int, `* 100`)
   - Category conversion: legacy numeric IDs (1-45, 40 categories) → new string-based category/subCategory
-  - `employerStatus`, `educationLevel`, `yearsOfExperience` → sub-category spec fields
+  - `employerStatus` → `jobsEmploymentType`, `educationLevel` → `jobsEducationLevel`, `yearsOfExperience` → `jobsYearsExperience` (top-level enum fields — **key-based translation, see exact tables in planning-state.md**)
   - `companyName` → `BusinessName`
   - `companyLogo` → photo array (first image)
   - `responsibilities`, `qualifications`, `requirements`, `contactNotes` → append to `Description`
@@ -115,7 +121,7 @@ Content and timing TBD before build.
 
 ## External Dependencies
 
-- **MongoDB**: Source (legacy `jobs` collection) and destination (new `ClassifiedListing`)
+- **MongoDB**: Source (legacy `jobs` collection) and destination (new `general` collection, holding `ClassifiedListing` documents)
 - **Solr** (legacy): Current search index — will not be updated post-migration
 - **Elasticsearch** (new): Synced automatically via MongoDB oplog connector — no manual re-indexing needed
 - **Cloudinary**: Image/logo URL migration for company logos

@@ -49,9 +49,9 @@ Redirect legacy Jobs search URLs (with category, location, and filter parameters
   - `category` → Classifieds subcategory under Jobs (40 legacy categories, see Phase 3.1 Legacy Category Mapping)
   - `state`, `city`, `zip`, `miles` → pass through as-is
   - `keywords` → `keyword` parameter
-  - `jobtype` (ft/pt/ct/tm) → subcategory specification field (per Phase 3.1 `employerStatus` mapping)
-  - `experience` → subcategory specification field (per Phase 3.1 `yearsOfExperience` mapping)
-  - `education` → subcategory specification field (per Phase 3.1 `educationLevel` mapping)
+  - `jobtype` (ft/pt/ct/tm) → top-level `jobsEmploymentType` field (per Phase 3.1 `employerStatus` mapping)
+  - `experience` → top-level `jobsYearsExperience` field (per Phase 3.1 `yearsOfExperience` mapping)
+  - `education` → top-level `jobsEducationLevel` field (per Phase 3.1 `educationLevel` mapping)
   - `salaryfrom`/`salaryto` → top-level price fields (legacy stores dollars, Classifieds stores cents × 100)
   - `hourlyfrom`/`hourlyto` → top-level price fields (same dollar→cents conversion)
   - `posted` → `postedTime` parameter
@@ -103,12 +103,9 @@ Provide a JSON API endpoint (similar to the Services redirect's `/services-redir
 - **Response**: `{ "canonicalUrl": "...", "originalUrl": "..." }`
 - **Use case**: Frontend or other services can look up the new URL programmatically
 
-## Unresolved — Needs Manual Investigation
-
-- **Widget endpoints** (`/widget/:dim`) — Embeddable iframe widgets (4 IAB ad sizes: 300x600, 300x250, 160x600, 720x90) that display featured job listings on partner/external websites. Need to determine if any partners are actively embedding these before deciding whether to redirect, serve a deprecation notice, or drop. Checking usage data.
-
 ## Out of Scope
 
+- **Widget endpoints** (`/widget/:dim`) — Embeddable iframe widgets (4 IAB ad sizes: 300x600, 300x250, 160x600, 720x90) that displayed featured job listings on partner/external sites. No longer used by any partners — eliminated from scope; no redirect handling needed.
 - Feed/API endpoints (`/feed/ziprecruiter`, `/feed/recruitology`) — handled in a separate package already in progress
 - GraphQL proxy routes — internal only
 - Legacy admin/moderation URLs
