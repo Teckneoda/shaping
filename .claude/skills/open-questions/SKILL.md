@@ -20,5 +20,6 @@ Find and present the still-open **numbered** questions from a project's **Unansw
 
 ## Notes
 - Read-only: never modify `planning-state.md`, `Features.md`, or `Services.md` here.
+- If a surfaced question is too terse to understand and the user asks for more detail on it ("tell me more about Q4", "what does that mean"), hand off to `explain-question` (same Q-number contract).
 - When the user answers one of the surfaced questions, route to `resolve-question` (same Q-number contract).
 - Keep each project's presentation tight — the point is to let the user focus on one project's open items without cross-project noise.
