@@ -9,13 +9,16 @@ Trigger: **"shape N"**, **"research N"**, **"Research #N"** (project number), or
 
 ## 1. Resolve the project
 
-**If given a project number:** find the directory under `Shaping Projects/` whose name starts with the zero-padded number (e.g. `004`). If it's under `Shaping Projects/_archived/`, confirm with the user before proceeding. Then go to step 2.
+Both "by number" and "by Notion URL" resolution are deterministic lookups handled by one shared script — run it first (don't hand-parse the id or scan `project.json` files yourself):
+```
+scripts/resolve-project.sh <number|notion-url>
+```
+- **Prints a folder path (exit 0):** that's the project to shape. If it also prints `ARCHIVED` on stderr, the folder is under `_archived/` — **confirm with the user before proceeding**. Then go to step 2.
+- **Exits non-zero (no match):**
+  - Given a **number** → tell the user no such project exists.
+  - Given a **Notion URL** → nothing references it yet; **create a new project** (step 1a), then continue.
 
-**If given a Notion URL:** determine whether a project for it already exists.
-1. Extract the Notion **page ID** from the input URL — the 32-char hex id at the end of the path (strip the title slug; it may be dashed or undashed).
-2. Scan every `Shaping Projects/**/project.json` (include `_archived/`) and compare against each `notion_docs` entry's **`id`** field. (`notion_docs` is an array of `{url, id, title}` objects — match on `id`, which is already normalized; fall back to extracting the id from the entry's `url` if `id` is missing.)
-3. **If a project references it:** that's the project to shape — go to step 2.
-4. **If nothing references it:** create a new project (step 1a), then continue.
+(The script extracts the 32-char page id from the URL — correctly ignoring the `?v=` view id, which is also 32 hex — and matches it against every `notion_docs[].id`, falling back to the entry's `url`.)
 
 ### 1a. Create a new project (no existing reference)
 1. Fetch the doc with `mcp__claude_ai_Notion__notion-fetch` to get its **title** and enough content to scope it.
@@ -36,11 +39,11 @@ Read all four from the project directory: `project.json`, `Features.md`, `Servic
 `project.json` has `repositories` (array of `{org, repo}`) and `notion_docs` (array of `{url, id, title}` objects).
 
 ## 3. Sync local repos to origin/main
-For each repo in `repositories` that exists locally under `/Users/cpies/code/shaping/Research Repos/` (also check the nested `Legacy/` subdir):
-- `git status`, then `git pull origin <default-branch>` (detect main vs master).
-- **If the pull fails, the tree is dirty, or it's on a non-main branch: STOP.** Report which repo, what branch, and what the user needs to do (stash / switch / resolve). Do not research that repo until they confirm.
-
-The `sync-repos` skill implements this loop — you may invoke it for the sync step.
+Run the shared sync script — scoped to this project's repos by passing their folder names:
+```
+scripts/sync-repos.sh <repo-name> <repo-name> ...   # names from project.json .repositories[].repo
+```
+It fast-forwards each clean repo and reports `SKIPPED`/`ERROR` for any that are dirty or on a non-default branch. **If any relevant repo comes back `SKIPPED` or `ERROR`: STOP.** Report which repo, its branch/state, and what the user needs to do (stash / switch / resolve). Do not research that repo until they confirm. (This is the same script the `sync-repos` skill runs.)
 
 ## 4. Gather Notion context
 For each entry in `notion_docs`, fetch by its `url` (or `id`) with `mcp__claude_ai_Notion__notion-fetch`. Also check `mcp__claude_ai_Notion__notion-get-comments` for open questions/comments (resolve authors via `notion-get-users`).

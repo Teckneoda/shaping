@@ -5,23 +5,26 @@ description: Pull the latest default branch for every repo under Research Repos 
 
 # Sync Research Repos
 
-Pull latest for all local research checkouts.
+Pulling latest is a **fully deterministic** operation — detect the default branch, check for a dirty tree / wrong branch, fast-forward if clean. There is no judgment to make per repo, so it lives in a script; your job is only to run it and report the result.
 
-## Roots
-- `/Users/cpies/code/shaping/Research Repos/`
-- `/Users/cpies/code/shaping/Research Repos/Legacy/` (nested)
+## Run it
 
-Iterate every immediate subdirectory that contains a `.git`. Skip non-git dirs.
+```
+scripts/sync-repos.sh              # all repos under Research Repos/ and Research Repos/Legacy/
+scripts/sync-repos.sh <name> ...   # only the named repo folder(s)
+```
 
-## Per repo
-1. Detect the default branch (may be `main` or `master`): `git -C "$repo" symbolic-ref refs/remotes/origin/HEAD` or fall back to checking which exists.
-2. Check `git status`.
-3. If clean **and** on the default branch: `git pull origin <default>`.
-4. **If dirty or on a non-main/master branch: DO NOT pull.** Collect it for the report.
+Each line is tab-separated `<status>\t<repo>\t<detail>`, where status is:
+- `PULLED` — fast-forwarded (detail = new-commit count)
+- `UPTODATE` — already current
+- `SKIPPED` — **dirty tree** or **on a non-default branch** (not touched)
+- `ERROR` — no origin default branch, or the pull failed
 
 ## Report
-Summarize: which repos pulled cleanly (with new-commit counts if useful), and which were **skipped** and why (dirty tree / on branch `X`). For skipped repos, tell the user their options (stash, commit, switch branch) — do not auto-resolve.
+
+Summarize which repos pulled cleanly and which were `SKIPPED`/`ERROR` and why. For skipped repos, give the user their options (stash, commit, switch branch) — **do not auto-resolve**. The script never forces, so nothing is lost by reporting and stopping.
 
 ## Notes
-- Use `-c commit.gpgsign=false` for any commit in this repo tree (user preference). Not needed for pulls.
-- This is the same sync procedure `shape` uses in its step 3; `shape` may invoke this skill.
+- The script is the same sync step `shape` uses (its step 3) — `shape` runs this exact script.
+- It fast-forwards only (`--ff-only`); it never merges or rebases.
+- Commits in this repo tree use `-c commit.gpgsign=false` (see `commit-push`), but pulls need no signing.

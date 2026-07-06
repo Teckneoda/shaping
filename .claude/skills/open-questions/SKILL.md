@@ -12,7 +12,9 @@ Find and present the still-open **numbered** questions from a project's **Unansw
 - **No project supplied**: sweep **all active** projects under `Shaping Projects/` (skip `_archived/`), but present **one project at a time** — never dump every project's questions at once. Go in project-number order; after each, ask whether to continue to the next project or stop.
 
 ## Steps
-1. **Resolve scope** per the rules above. For a sweep, list the active project directories first (numeric order).
+1. **Resolve scope** per the rules above, using the shared scripts (don't hand-roll folder discovery):
+   - **Single project:** `scripts/resolve-project.sh <number>` → the folder to read.
+   - **Sweep:** `scripts/list-projects.sh` → active projects in numeric order (col 2 = folder); walk them one at a time.
 2. For each in-scope project, read `planning-state.md` and locate the **Unanswered Questions** section.
 3. **Extract only the numbered open questions** (`Q6`, `1.`/`2.`, or `| Q6 | … |` table rows — formats vary by project). Skip anything already marked resolved/closed. Do **not** pull in inline TODO / TBD / "confirm" / ⚠️ / ❓ markers scattered through the docs — numbered Unanswered Questions only.
 4. **Present them for that one project**: the project name, then each open Q with its number and a concise restatement (preserve the original Q number so it lines up with `resolve-question`). If a question carries an owner/blocker column, include it. If the section is empty or missing, say so plainly.

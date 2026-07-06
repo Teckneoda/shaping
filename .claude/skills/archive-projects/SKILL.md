@@ -9,14 +9,11 @@ Move finished/stale projects out of the active `Shaping Projects/` list into `Sh
 
 ## 1. Gather active projects with context
 
-List active projects (immediate subdirs of `Shaping Projects/`, excluding `_archived`):
+Gathering the candidate list is deterministic — run the shared script instead of hand-rolling `ls` + `git log` + `head`:
 ```
-ls -d "/Users/cpies/code/shaping/Shaping Projects"/*/ | grep -v '_archived'
+scripts/list-projects.sh
 ```
-For each, gather signal so the user can judge what's "old" — do this in one batched pass:
-- **Last activity**: most recent commit touching the folder —
-  `git -C "/Users/cpies/code/shaping" log -1 --format='%ad' --date=short -- "Shaping Projects/<folder>"`
-- **Status hint**: the first non-empty content lines of `planning-state.md` (e.g. "Identified So Far" filled in vs. "No research completed yet"), which suggests whether it shipped, stalled, or never started.
+It prints one tab-separated row per active project: `<num>\t<folder>\t<last-activity date>\t<status hint>` (status hint = first content line of `planning-state.md`). Your judgment is only *which* of these are "old" enough to archive — the data-gathering is the script's job.
 
 ## 2. Prompt which to archive
 
@@ -28,7 +25,7 @@ Present a compact numbered list — folder name, last-activity date, and a one-l
 
 ## 3. Archive each chosen project
 
-Resolve each selection to its folder (match by leading zero-padded number, e.g. `008`). For each confirmed project, move it preserving the folder name:
+Resolve each selection to its folder with the shared script (`scripts/resolve-project.sh <number>` → prints the folder path; it also warns `ARCHIVED` on stderr if it's already archived). For each confirmed project, move it preserving the folder name:
 ```
 mkdir -p "/Users/cpies/code/shaping/Shaping Projects/_archived"
 mv "/Users/cpies/code/shaping/Shaping Projects/<NNN Name>" "/Users/cpies/code/shaping/Shaping Projects/_archived/<NNN Name>"
@@ -39,13 +36,19 @@ This mirrors `cmd_archive` in [`scripts/project-manager.sh`](../../scripts/proje
 
 ## 4. Commit and push to GitHub
 
-Invoke the **`commit-push`** skill to sync the archive moves up to the remote. Pass a message listing the archived project(s), e.g. `Archive shaping project(s): 008 Category Feature Flagging, 009 Category Manager`. `commit-push` handles the repo conventions (stages the moves as renames, commits with GPG signing off, pushes, and stops/reports if the push is rejected).
+Sync the archive moves up to the remote with the **shared commit script** (the same one `commit-push` wraps — so conventions live in one place, and this skill doesn't depend on the model re-invoking the gated `commit-push` skill):
+```
+scripts/git-commit-push.sh -m "Archive shaping project(s): 008 Category Feature Flagging, 009 Category Manager"
+```
+It stages moves as renames (`git add -A`), commits with GPG signing off + the co-author trailer, and pushes. If it exits `4` (**push rejected**), STOP and report the exact error it printed — do not force. This push is safe to run here because it happens only *after* the user confirmed the specific set in step 2.
 
 ## 5. Report
 
 Confirm what moved (`<NNN Name>` → `_archived/`), what was left active, and the pushed commit (hash + message, from `commit-push`). Note that archived numbers stay reserved.
 
 ## Related
-- `commit-push` — the final GitHub-sync step (step 4).
+- `scripts/list-projects.sh` — candidate gathering (step 1).
+- `scripts/resolve-project.sh` — number → folder (step 3).
+- `scripts/git-commit-push.sh` — the shared commit/push primitive (step 4); `commit-push` wraps the same script for standalone use.
 - `scripts/project-manager.sh archive` — the canonical single-project interactive archive; this skill batches the same operation.
 - `shape` — the reverse workflow (starting/researching a project).

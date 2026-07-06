@@ -11,7 +11,7 @@ Decide **which tier(s)** of the marketplace codebase to research for a topic, th
 
 Each Shaping Project's `project.json` holds the `repositories` that apply to **that** shaped package. Treat it as the source of truth for scope:
 
-- **Always research the repos it calls out.** When given a project number, read `project.json` first and include every repo in `repositories` as a candidate.
+- **Always research the repos it calls out.** When given a project number, resolve its folder with `scripts/resolve-project.sh <number>`, read that folder's `project.json` first, and include every repo in `repositories` as a candidate.
 - **Keep it up to date.** If research surfaces a repo that clearly belongs to this package but isn't listed, add it to `repositories` (`{org, repo}`, org defaults to `deseretdigital`) — or run `scripts/project-manager.sh update` so the user can confirm. If a listed repo turns out irrelevant, flag it for removal. Report any change you make.
 
 ## The two tiers

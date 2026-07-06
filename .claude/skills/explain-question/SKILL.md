@@ -12,7 +12,7 @@ The user just saw a terse numbered question (usually via `open-questions`) and w
 - **Do NOT fan out into the Research Repos / codebase.** No `gh`, no repo file exploration, no `research-repos`. If the docs and Notion genuinely can't explain it, say so and suggest a `shape` / `research-repos` pass rather than guessing.
 
 ## Steps
-1. **Resolve the project + Q number.** Use context if obvious (e.g. `open-questions` just surfaced them); otherwise ask which project.
+1. **Resolve the project + Q number.** Use context if obvious (e.g. `open-questions` just surfaced them); otherwise ask which project, then get its folder with `scripts/resolve-project.sh <number>`.
 2. Read `planning-state.md` and locate the referenced **Q#** under "Unanswered Questions" — capture its exact wording, owner/blocker, and any refs or cross-referenced Q's.
 3. **Gather supporting context** from that project's `Features.md`, `Services.md`, and — via the Notion MCP server (`mcp__claude_ai_Notion__notion-fetch`) — the entries in `notion_docs`, focusing on the parts touching this question. Follow the specific refs the question cites.
 4. **Explain it**, tightly:

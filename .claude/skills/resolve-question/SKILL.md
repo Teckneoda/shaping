@@ -8,7 +8,7 @@ description: Close out a numbered open question in a Shaping Project's planning-
 The user answers one or more numbered questions from a project's **Unanswered Questions** section. Sometimes several at once ("Q17 embed. Q16 <url>").
 
 ## Steps
-1. **Resolve the project.** If the current context makes it obvious, use that; otherwise ask which project number.
+1. **Resolve the project.** If the current context makes it obvious, use that; otherwise ask which project number, then resolve its folder deterministically with `scripts/resolve-project.sh <number>` (don't hand-build the `NNN` folder name).
 2. Read `planning-state.md` and locate the referenced **Q#** under "Unanswered Questions".
 3. **Apply the answer** to the substantive docs — `Features.md` and/or `Services.md` — wherever that question's outcome changes the plan.
 4. **Close the question** in `planning-state.md`: mark it resolved (with the answer) or move it out of "Unanswered Questions". If the answer opens new questions, add them (renumbered/appended).
