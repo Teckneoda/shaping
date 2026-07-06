@@ -8,7 +8,7 @@ description: Sync a Shaping Project's docs to/from its Notion page, preserving N
 Two directions. Default to **push** unless the user says "check for updates/questions" or otherwise implies pulling Notion → local.
 
 ## Resolve target
-Read the project's `project.json` for `notion_docs` URLs. Fetch with `mcp__claude_ai_Notion__notion-fetch`.
+Read the project's `project.json`. `notion_docs` is an array of `{url, id, title}` objects — fetch each by its `url` (or `id`) with `mcp__claude_ai_Notion__notion-fetch`.
 (The MCP server is `claude_ai_Notion`; tool prefix `mcp__claude_ai_Notion__`. CLAUDE.md's older `mcp-notion` name is stale.)
 
 ## Golden rules (apply both directions)

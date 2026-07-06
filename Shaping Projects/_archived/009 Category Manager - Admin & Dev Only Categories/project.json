@@ -18,6 +18,10 @@
     }
   ],
   "notion_docs": [
-    "https://www.notion.so/deseret/Admin-Dev-only-categories-3352ac5cb23580b18ac2dfde8eb9839c?source=copy_link"
+    {
+      "url": "https://www.notion.so/deseret/Admin-Dev-only-categories-3352ac5cb23580b18ac2dfde8eb9839c?source=copy_link",
+      "id": "3352ac5cb23580b18ac2dfde8eb9839c",
+      "title": "Internal-Only Categories"
+    }
   ]
 }

@@ -10,6 +10,10 @@
     }
   ],
   "notion_docs": [
-    "https://www.notion.so/3372ac5cb23581bcbaa0d28ad8b7e5f0"
+    {
+      "url": "https://www.notion.so/3372ac5cb23581bcbaa0d28ad8b7e5f0",
+      "id": "3372ac5cb23581bcbaa0d28ad8b7e5f0",
+      "title": "Category Feature Flagging (Alternative to Admin/Dev Only Categories)"
+    }
   ]
 }

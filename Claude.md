@@ -29,7 +29,7 @@ Each project should contain the following files:
 - Services.md
   - Services that will be created or updated
 - project.json
-  - Configuration file with `repositories` (array of {org, repo} objects) and `notion_docs` (array of Notion URLs)
+  - Configuration file with `repositories` (array of {org, repo} objects) and `notion_docs` (array of {url, id, title} objects, where `id` is the Notion page's 32-char hex id)
 - planning-state.md
   - Living document tracking what has been identified, what still needs research, and unanswered questions
   - Updated each time a "shape" session runs
@@ -57,7 +57,7 @@ When the user says **"shape N"** (e.g., "shape 4"), follow this procedure:
 
 2. **Read project state**: Read `project.json`, `Features.md`, `Services.md`, and `planning-state.md` from that project directory.
 
-3. **Gather context from Notion**: For each URL in `notion_docs`, use the Notion MCP server (`mcp-notion` / `notion-fetch`) to retrieve the document content.
+3. **Gather context from Notion**: For each entry in `notion_docs`, use the Notion MCP server (`mcp__claude_ai_Notion__notion-fetch`) to retrieve the document content by its `url` or `id`.
 
 4. **Sync local repos to origin/main**: Before researching, ensure each local repo is up to date. For each repo in `repositories` that exists locally under `/Users/cpies/code/shaping/Research Repos/`:
    - `cd` into the repo directory

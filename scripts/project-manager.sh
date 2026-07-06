@@ -262,13 +262,34 @@ write_project_json() {
   fi
 
   python3 -c "
-import json
+import json, re
 org = '$ORG'
 repos = $repos_json
 notions = $notions_json
+
+def extract_id(url):
+    path = url.split('?', 1)[0]
+    m = re.findall(r'[0-9a-fA-F]{32}', path)
+    return m[-1] if m else None
+
+def slug_title(url):
+    # Fallback title from the URL slug (dash-separated words before the id).
+    path = url.split('?', 1)[0].rstrip('/').split('/')[-1]
+    path = re.sub(r'-?[0-9a-fA-F]{32}\$', '', path)
+    return path.replace('-', ' ').strip()
+
+# notions may already be objects (re-writing an existing project) or raw URL strings.
+notion_docs = []
+for n in notions:
+    if isinstance(n, dict):
+        url = n.get('url', '')
+        notion_docs.append({'url': url, 'id': n.get('id') or extract_id(url), 'title': n.get('title') or slug_title(url)})
+    else:
+        notion_docs.append({'url': n, 'id': extract_id(n), 'title': slug_title(n)})
+
 data = {
     'repositories': [{'org': org, 'repo': r} for r in repos],
-    'notion_docs': notions
+    'notion_docs': notion_docs
 }
 with open('$outfile', 'w') as f:
     json.dump(data, f, indent=2)
@@ -450,7 +471,9 @@ with open('$project_json') as f:
     data = json.load(f)
 lines = []
 for doc in data.get('notion_docs', []):
-    lines.append('- [Notion: {name}]({url})'.format(name='$project_name', url=doc))
+    url = doc['url'] if isinstance(doc, dict) else doc
+    name = (doc.get('title') if isinstance(doc, dict) else '') or '$project_name'
+    lines.append('- [Notion: {name}]({url})'.format(name=name, url=url))
 for repo in data.get('repositories', []):
     lines.append('- [{org}/{repo}](https://github.com/{org}/{repo})'.format(**repo))
 print('\n'.join(lines) if lines else '- _None yet._')
@@ -583,7 +606,7 @@ for r in data.get('repositories', []):
 import json
 with open('$project_json') as f: data = json.load(f)
 for n in data.get('notion_docs', []):
-    print(n)
+    print(n['url'] if isinstance(n, dict) else n)
 ")
 
   # Build repo options: known repos, with current ones pre-selected
