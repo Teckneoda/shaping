@@ -19,6 +19,19 @@
 - **Re-run**: Overwrite flag allows re-importing and overwriting previously migrated data; without flag, skips already-migrated records
 - **Skipped statuses**: `moderate`, `abuse`, `inprogress` — not migrated
 
+### Favorites Migration — Folded In from Phase 3.3 (decided 2026-07-08)
+- **Scope change**: The favorites migration (formerly standalone Shaping Project 005 / Phase 3.3) is now part of this project. Favorites migrate **inline, per listing**, inside the same migration worker.
+- **Why inline works**: The worker knows the legacy→new ID mapping the instant it migrates a listing (create-stub assigns the ID on the API path; the direct-write path generates it). So it can migrate that listing's favorites immediately — **no separate post-pass and no full-table `jobListingMigrations` lookup**. The original 3.3 design was a standalone single-pass script that ran *after* all listings and looked up every `savedId` in `jobListingMigrations`; that lookup is unnecessary here.
+- **Per-listing flow**: after a listing is migrated and its mapping recorded → query `jobsFavoriteJobs` where `savedId == legacyListingId` → transform each favorite → insert into `generalFavorites`.
+- **Field transform**: `memberId` string→int (skip if non-numeric or <= 0); `savedId`→`adId` = the new listing ID just assigned; generate `favoriteId = "{memberId}-{adId}"`; `notifyOnPriceDrop` and `notifyOnExpire` both `{ email: false, push: false }`; preserve `createTime`.
+- **All notification prefs `false`**: legacy Jobs favorites never had price-drop or expiring-soon features. The only goal is that users see their favorited listings — no alerts fire for migrated favorites.
+- **Idempotency**: skip if `favoriteId` already exists in `generalFavorites`.
+- **Skipped listings**: favorites for moderate/abuse/inprogress listings are naturally never migrated (the listing doesn't exist in the new system).
+- **Overwrite/reimport flag for favorites**: nice-to-have, NOT required. (The overwrite flag remains required for listing data.)
+- **ES sync — RESOLVED**: `listing-http-favorites-rest` is **in production**, so favorites are read directly from MongoDB. **No ES sync step is required** for migrated favorites. (This closes the former Phase 3.3 open question about the oplog connector.)
+- **Favorite Employer**: out of scope (buggy on legacy; users can Saved Search from the Employer profile instead).
+- **Downstream services unchanged**: CAPI, listing-http-favorites-rest, search-http-rest, listing-ps-price-drop, and MyAccount all serve `generalFavorites` as-is — see Services.md.
+
 ### RenewListing — Fully Implemented (resolved 2026-03-31)
 - `PUT /listing/{id}/renew` now returns 200 with renewed listing data
 - Publishes raw listing and activated listing lifecycle events
@@ -236,7 +249,7 @@
 | `moderator` | string | — | Moderation — not migrated |
 | `moderatedTime` | date | — | Moderation — not migrated |
 | `abuse` | array | — | Moderation — not migrated |
-| `favoriteCount` | — | — | Separate service (Phase 3.2) |
+| `favoriteCount` | — | — | Derived downstream from `generalFavorites`; not migrated as a field. Favorites themselves migrate inline (see Favorites Migration decision above) |
 | Billing fields (7) | various | — | Not migrated |
 
 ---
@@ -273,6 +286,12 @@
 7. ~~**Activation endpoint choice**~~ — **Resolved (2026-04-01)**: Migration uses `RequestActivation` only (not `Activate`). `Activate` is reserved for the fraud-validator service. `RequestActivation` triggers fraud-validator, which auto-activates after ~5 min. Email verification check is bypassed for service callers (`IsPrivileged=true` in `requireVerifiedEmail()`).
 8. **Employer logo storage & destination** — Where are employer logos currently stored in the legacy Jobs system (e.g., `companyLogo`/`photo` field on the `jobs` record, the `jobsEmployers` collection, a CDN/file path, or the Nest dealer record), and where should they be migrated to in Classifieds? Need to confirm the source of truth for each account type and the target (e.g., listing `photos[]` vs. dealer logo on the Nest dealer record) and any image-services upload step required.
 
+9. ~~**Favorites ES sync**~~ — **Resolved (2026-07-08)**: `listing-http-favorites-rest` is in production; favorites are read directly from MongoDB, so no oplog→ES sync step is needed for migrated favorites.
+
+10. **MyAccount "Jobs" favorites filter** — Post-migration the Jobs section filter in MyAccount favorites shows empty (migrated favorites appear under Classifieds). Acceptable during transition, or update the filter logic now? (Cleanup currently deferred to a later phase.)
+
+11. **Favorite Employer migration** — Explicitly out of scope for MVP.
+
 ---
 
 ## Research Sources Consulted
@@ -307,9 +326,16 @@
 | `apps/feeds/services/feeds-ps-transformer` + `feeds-ps-syncer` | Feed/ES sync | Both reference the three new jobs fields — ES mapping + connector follow-up is DONE |
 | `Legacy/m-ksl-jobs/.../BaseOptions/BaseOptions.php` (lines 144-152, 266-273, 332-338) | Legacy options | Exact legacy code/key→label tables for employerStatus, yearsOfExperience, educationLevel — source for enum mapping tables |
 | Notion: BUILD doc (3332ac5cb2358039ba72c22a7abe78d0) | Notion page | Build Plan doc — still blank template ("Not Ready" / "Needs Shaping"); no technical content yet |
+| Notion: Phase 3.3 Migrate favorites (3262ac5cb235806fae8ce777c37287b3) | Notion page | Favorites framing doc (folded in 2026-07-08) — problem statement, `jobsFavoriteJobs`→`generalFavorites` mapping, all-alerts-off decision, Favorite Employer out of scope |
+| `Legacy/m-ksl-jobs` — FavoriteController.php, MyFavoritesFieldObject.php | Legacy code | Jobs favorites API (add/remove/get) and GraphQL `myFavorites` query — source model for `jobsFavoriteJobs` |
+| `Legacy/m-ksl-classifieds-api` — ListingFavoriteController.php, FavoriteHelper.php, GeneralFavoritesCollection.php (L169-205) | Legacy code | CAPI favorites CRUD + target `generalFavorites` schema |
+| `Legacy/m-ksl-myaccount-v2` — favorites API, transform.ts, favorites.ts, FavoriteFilterStore.ts | Legacy code | Multi-vertical favorites display; migrated favorites surface under Classifieds; Jobs filter section |
+| `marketplace-backend` — listing-http-favorites-rest (in production), search-http-rest, listing-ps-price-drop (favorites.go / favorite.go) | Service code | Downstream favorites consumers — all serve `generalFavorites` as-is; no changes needed |
+| `marketplace-graphql` — legacy-favoritelisting.go (add ~L99 / remove ~L187) | Service code | Live favorite-action routing (`ListingTypeJob` vs `ListingTypeClassified`) — live-cutover concern, separate from this one-time data migration |
 
 ---
 
 ## Changelog
 
+- **2026-07-08**: **Folded in Phase 3.3 (favorites migration)** — combined former Shaping Project 005 into this package. Favorites now migrate **inline, per listing** inside the migration worker (no standalone script, no `jobListingMigrations` lookup pass — the new `adId` is the ID just assigned to the listing). Added the favorites decision block, `jobsFavoriteJobs`→`generalFavorites` field mapping (§5 in Features.md), downstream services analysis (Services.md), and favorites research sources. Confirmed `listing-http-favorites-rest` is **in production**, resolving the former Phase 3.3 ES-sync question — no ES sync step needed. Overwrite/reimport of favorites is a nice-to-have (overwrite remains required for listing data). Retitled to "Migrate Listings & Favorites". Project 005 archived.
 - **2026-06-25**: Re-shaped. Synced marketplace-backend to origin/main (dependency-only changes). Re-fetched Notion project doc (now **PKG: Building**, 1-week estimate, feature flag done in cycle 2) and its Build Plan doc (blank template). **Verified the three top-level Jobs fields are already implemented** as `*string` enums in listing-http-rest + feeds ES sync (resolves the main model/ES "changes needed" items). **Captured exact enum mapping tables** for `jobsEmploymentType`/`jobsEducationLevel`/`jobsYearsExperience` from legacy `BaseOptions.php` — corrected the earlier wrong "ft/pt/ct/tm" and "(0-4)" notes; legacy education/experience keys are unordered and require key-based lookup. **Clarified destination collection is `general`** (not "ClassifiedListing collection").

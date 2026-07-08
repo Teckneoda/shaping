@@ -1,11 +1,13 @@
-# Jobs to Classifieds - Phase 3.1: Migrate Listings — Features
+# Jobs to Classifieds - Phase 3.1: Migrate Listings & Favorites — Features
 
-> **Status**: PKG: Building (Notion, as of 2026-06-25) | **Estimate**: 1 week web work (reduced from 2 — category feature flag completed in cycle 2)
+> **Status**: PKG: Building (Notion, as of 2026-06-25) | **Estimate**: 1 week web work (reduced from 2 — category feature flag completed in cycle 2). Favorites folded in from former Phase 3.3 (see [changelog](planning-state.md) 2026-07-07).
 > **Business Impact**: $1.2M annual revenue ($80K/mo self-serve + $20K/mo direct sales), 400K monthly page views, 1,300 active monthly listings, 15K+ uploaded resumes
 
 ## Problem Statement
 
-Legacy Jobs listings still live on the old platform, preventing full retirement. Without a safe, repeatable migration of **both active and inactive** job inventory into Classifieds Jobs category, we risk downtime, broken links, and inconsistent experiences. This also blocks saved searches, alerts, and favorites (those features depend on listings existing in the new system).
+Legacy Jobs listings still live on the old platform, preventing full retirement. Without a safe, repeatable migration of **both active and inactive** job inventory into Classifieds Jobs category, we risk downtime, broken links, and inconsistent experiences. This also blocks saved searches and alerts (those features depend on listings existing in the new system).
+
+Legacy Favorites (stored in `jobsFavoriteJobs`) are likewise at risk of being lost due to platform and data-model differences. Losing Favorites breaks a core saved-items workflow for engaged users. **This project migrates favorites in the same pass as listings** — the migration worker carries each listing's favorites across at the moment it migrates the listing, so no separate post-migration script is required (this was previously scoped as standalone Phase 3.3).
 
 ## Core Features
 
@@ -41,6 +43,23 @@ Elasticsearch is synced automatically for all paths via MongoDB oplog connector.
 - [ ] Accept a list of legacy listing IDs to migrate a specific batch (supports targeted re-runs and incremental migration)
 - [ ] Validation and error handling for malformed legacy data
 - [ ] Authenticate as service caller to listing-http-rest for privileged access
+
+**Favorites migration (inline, per listing)**:
+
+The migration worker carries each listing's favorites across **in the same unit of work** as the listing itself. Because the worker knows the legacy→new ID mapping the instant it migrates a listing (create-stub assigns the ID, or the direct-write path generates it), it can migrate that listing's favorites immediately — no separate post-pass and no full-table `jobListingMigrations` lookup required.
+
+Per listing, after the listing is successfully migrated and its mapping recorded:
+- [ ] Query `jobsFavoriteJobs` for all favorites whose `savedId` == this legacy listing ID
+- [ ] For each favorite, transform legacy `jobsFavoriteJobs` fields → `generalFavorites` (see mapping table in §5)
+- [ ] Set **all** notification/alert prefs to `false` — legacy Jobs favorites have no price-drop or expiring-soon features; the only goal is that users see their favorited listings, with no alerts triggered
+- [ ] Generate `favoriteId` as `"{memberId}-{adId}"` composite key
+- [ ] Skip if `memberId` is not numeric or <= 0
+- [ ] Idempotency: skip if `favoriteId` already exists in `generalFavorites`
+- [ ] Insert into `generalFavorites`
+- [ ] Favorites for **skipped** listings (moderate/abuse/inprogress) are naturally never migrated — you cannot favorite a listing that does not exist in the new system
+- [ ] Log favorites results alongside listing results: favorites processed, migrated, skipped (non-numeric member), skipped (duplicate), errors
+- [ ] **Elasticsearch sync**: `listing-http-favorites-rest` is in production, so favorites are read directly from MongoDB — **no ES sync step is required** for migrated favorites.
+- [ ] **(NTH)** Under the overwrite/reimport flag, a listing's favorites are re-evaluated alongside it (idempotency check prevents duplicates)
 
 ### 2. Feature Flag — Hide Jobs Category & Jobs marketType (marketplace-graphql)
 > **Moved out of scope** — Category feature flagging is being built as a separate, prerequisite project. This project assumes the feature flag system is already in place.
@@ -81,6 +100,19 @@ Messaging content and timing will be determined before the build. The following 
 | `relocation` | **Drop** | No longer used |
 | `investment` | **Drop** | No longer used |
 
+### 5. Favorites Field Mapping (`jobsFavoriteJobs` → `generalFavorites`)
+
+| Legacy (`jobsFavoriteJobs`) | Target (`generalFavorites`) | Transform |
+|---|---|---|
+| `memberId` (string) | `memberId` (int) | `parseInt()`; skip if non-numeric or <= 0 |
+| `savedId` (string) | `adId` (int) | The new listing ID for the listing being migrated (known in-hand — no lookup pass needed) |
+| (generated) | `favoriteId` (string) | `"{memberId}-{adId}"` composite key |
+| (absent) | `notifyOnPriceDrop` | `{ email: false, push: false }` |
+| (absent) | `notifyOnExpire` | `{ email: false, push: false }` |
+| `createTime` (UTCDateTime) | `createTime` (UTCDateTime) | Preserve original |
+
+**Reference for target schema:** [GeneralFavoritesCollection.php:169-205](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api/src/Db/Mongo/GeneralFavoritesCollection.php#L169-L205)
+
 ## Timing Dependencies
 
 > **Critical**: Migrating listings should align with when favorites/saved searches are actually visible in Classifieds, to avoid alerting users about listings they cannot see.
@@ -91,7 +123,9 @@ Messaging content and timing will be determined before the build. The following 
 
 ## Out of Scope (Future Phases)
 - Saved searches & alerts migration (Phase 3.2+)
-- Favorites migration (Phase 3.2+)
+- **Favorite Employer** — buggy on legacy Jobs, explicitly excluded per Notion doc. Users can still do a Saved Search from the Employer profile page. (Note: favorited *listings* ARE in scope — see §1.)
+- **Price-drop & expiring-soon notifications** — Jobs never had these; all migrated favorites carry notification prefs set to `false`. Users can opt in via the Classifieds UI later.
+- **MyAccount UI changes** — migrated favorites appear under the "Classifieds" section automatically; the empty "Jobs" filter cleanup is a later phase.
 - Frontend re-pointing from legacy to new APIs (Phase 4+)
 - Google Jobs feed compatibility
 - Legacy platform decommission

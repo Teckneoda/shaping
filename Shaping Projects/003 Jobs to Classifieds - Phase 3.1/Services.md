@@ -89,6 +89,11 @@
   - `responsibilities`, `qualifications`, `requirements`, `contactNotes` → append to `Description`
 - Re-runnable with **overwrite flag** to re-import and overwrite previously migrated data; without flag, skips already-migrated records
 - Validation and error handling for malformed records
+- **Favorites (inline, per listing)**: after each listing is migrated and its mapping recorded, query `jobsFavoriteJobs` for favorites with `savedId` == this legacy listing ID, transform each into `generalFavorites` (`memberId` string→int, generate `favoriteId = "{memberId}-{adId}"`, all notification prefs `false`, preserve `createTime`), idempotency-check on `favoriteId`, and insert. No separate favorites script and no `jobListingMigrations` lookup pass — the new `adId` is the ID just assigned to the listing. Favorites for skipped listings are never migrated. Favorites re-migration under the overwrite flag is a nice-to-have, not required.
+
+**Collections touched (favorites)**: source `jobsFavoriteJobs`, destination `generalFavorites` (same collection Classifieds uses).
+
+**Elasticsearch sync for favorites:** `listing-http-favorites-rest` is in production, so favorites are read directly from MongoDB — **no ES sync step is required** for migrated favorites.
 
 ## Legacy Platform Messaging
 **Repo**: Legacy Jobs platform (m-ksl-jobs)
@@ -100,7 +105,39 @@
 - Jobs Post-a-listing page
 - MyAccount (when filtered to Jobs)
 
-Content and timing TBD before build.
+Content and timing TBD before build. Also covers the legacy favorites surfaces (MyAccount favorites page when filtered to Jobs, and the Jobs detail page favorite-button area).
+
+## Services That Do NOT Need Changes (Favorites)
+
+Migrated favorites land in `generalFavorites` — the same collection Classifieds already uses — so the existing favorites stack serves them with no code changes.
+
+### CAPI — m-ksl-classifieds-api
+Full CRUD on `generalFavorites` via `POST/PUT/DELETE /listings/{listingId}/favorites`. Validates the listing exists in the `general` collection — migrated Jobs listings are there (from this project). No changes needed.
+
+**Reference:** [ListingFavoriteController.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api/src/Controller/ListingFavoriteController.php), [FavoriteHelper.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api/src/Helper/FavoriteHelper.php)
+
+### listing-http-favorites-rest (marketplace-backend)
+**In production.** Serves favorites from `generalFavorites` (CLASSIFIED vertical) directly from MongoDB. Migrated Jobs favorites land there and are served/counted automatically. Because this service is live, migrated favorites need **no ES sync step**. No changes needed.
+
+**Reference:** [domain/favorites.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-favorites-rest/internal/domain/favorites.go)
+
+### search-http-rest (marketplace-backend)
+Favorites enrichment for search results. Migrated favorites carry `vertical: "classifieds"` and are served by the existing Classified mapping. No changes needed.
+
+**Reference:** [domain/favorites.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/search-http-rest/internal/domain/favorites.go)
+
+### listing-ps-price-drop (marketplace-backend)
+Reads `generalFavorites` for price-drop notifications. Migrated favorites default to `notifyOnPriceDrop: { email: false, push: false }` — they won't trigger notifications unless the user opts in post-migration. No changes needed.
+
+**Reference:** [store/favorite.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-ps-price-drop/internal/store/favorite.go)
+
+### MyAccount — m-ksl-myaccount-v2
+Migrated favorites appear under the "Classifieds" section (they're in `generalFavorites`). Users selecting "All" or "Classifieds" see their migrated Jobs favorites. The "Jobs" section filter shows empty post-migration — acceptable during transition; cleanup is a later phase.
+
+**Reference:** [favorites/[vertical]/[id].ts](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-myaccount-v2/pages/api/v1/favorites/%5Bvertical%5D/%5Bid%5D.ts)
+
+### marketplace-graphql — live favorite routing (context, not part of this migration)
+`marketplace-graphql` has `FavoriteListing`/`UnfavoriteListing`/`UpdateFavoriteListing` mutations. `ListingTypeJob` cases currently route to the legacy KSL API; `ListingTypeClassified` cases route to CAPI (the target path). Re-pointing Jobs favorite *actions* to the Classifieds path is a live-cutover concern (3 switch cases in `graph/mutationresolvers/legacy-favoritelisting.go`, ~lines 99 add / 187 remove), tracked separately from the one-time data migration in this project.
 
 ## Legacy Services (Reference Only)
 
@@ -113,6 +150,17 @@ Content and timing TBD before build.
 - **Categories**: Numeric IDs (1-43)
 - **Supporting collections**: jobsFavoriteJobs, jobsSavedSearch, jobsMatchedAlerts, jobsApplication, jobsQuickApply, jobsEmployers, jobsTransactions
 
+**Legacy Favorites (source for the inline favorites migration)**:
+- **Collection**: `jobsFavoriteJobs` — fields: `memberId` (string), `savedId` (string, = legacy listing ID), `createTime` (UTCDateTime)
+- **No notification preferences** — no price-drop, no expiring-soon alerts (unlike Classifieds favorites)
+- **API**: [FavoriteController.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site-api/api/controllers/FavoriteController.php) — POST `/favorite/favorite`, POST `/favorite/removefavorite`
+- **GraphQL**: [MyFavoritesFieldObject.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site-api/namespaces/APIGraphQL/FieldObject/MyFavoritesFieldObject.php) — `myFavorites` query
+- **"Favorite Employer"** exists but is buggy and OUT OF SCOPE
+
+**Classifieds Favorites (target)**:
+- **Collection**: `generalFavorites` — fields: `favoriteId` (string, `"{memberId}-{adId}"`), `adId` (int), `memberId` (int), `notifyOnPriceDrop` (object), `notifyOnExpire` (object), `createTime` (UTCDateTime)
+- **Schema reference**: [GeneralFavoritesCollection.php:169-205](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-classifieds-api/src/Db/Mongo/GeneralFavoritesCollection.php#L169-L205)
+
 ### Member Listings API (Spec 009 — Draft)
 **Repo**: `deseretdigital/marketplace-backend`
 **Path**: `apps/listing/services/listing-http-rest/` (new `GET /listing` endpoint)
@@ -121,7 +169,7 @@ Content and timing TBD before build.
 
 ## External Dependencies
 
-- **MongoDB**: Source (legacy `jobs` collection) and destination (new `general` collection, holding `ClassifiedListing` documents)
+- **MongoDB**: Source (legacy `jobs` + `jobsFavoriteJobs` collections) and destination (new `general` collection holding `ClassifiedListing` documents, and `generalFavorites` for migrated favorites)
 - **Solr** (legacy): Current search index — will not be updated post-migration
 - **Elasticsearch** (new): Synced automatically via MongoDB oplog connector — no manual re-indexing needed
 - **Cloudinary**: Image/logo URL migration for company logos

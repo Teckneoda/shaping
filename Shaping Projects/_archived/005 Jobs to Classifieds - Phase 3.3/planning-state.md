@@ -1,3 +1,5 @@
+> ⚠️ **MERGED & ARCHIVED (2026-07-08)** — This package was folded into **003 Jobs to Classifieds - Phase 3.1 (Migrate Listings & Favorites)**. Favorites now migrate inline, per listing, inside the 3.1 migration worker. See `003 .../planning-state.md` (Favorites Migration decision + 2026-07-08 changelog) for the current source of truth.
+
 # Planning State — Jobs to Classifieds - Phase 3.3
 
 ## Identified So Far
