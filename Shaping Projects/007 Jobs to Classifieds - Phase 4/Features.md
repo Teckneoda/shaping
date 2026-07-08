@@ -142,22 +142,21 @@ Notify employers via email when job applications are submitted, and provide an a
 
 ---
 
-## Feature 5: Applicant Confirmation Notification
+## Feature 5: Applicant Confirmation Notification — ❌ OUT OF SCOPE (DECIDED 2026-07-08)
 
-### Description
-Notify the applicant that their job application was successfully submitted.
+### Decision
+**No confirmation email is sent to the applicant / sender.** Instead, the applicant gets an on-screen **"Thank you for applying" confirmation modal** immediately after a successful submission (see Feature 7, screen 5). This matches the Notion shaped package (*"🚫 No email confirmations — just a modal when the user submits applications"*).
 
-### Requirements
-- Email sent to applicant's email address after successful application submission
-- Email content includes:
-  - Job title
-  - Company name
-  - Job location (city, state)
-  - Job posted date
-- Subject: "Your application for [Job Title] is on its way!"
+The legacy applicant/sender confirmation email is **not being migrated**.
 
-### Legacy Reference
-- **Confirmation Email Template**: [senderConfirmation.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site-api/api/template/emailTemplates/application/senderConfirmation.php)
+### What this replaces
+- ~~Email sent to applicant's email address after successful application submission~~
+- ~~Email content: job title, company name, job location (city, state), job posted date~~
+- ~~Subject: "Your application for [Job Title] is on its way!"~~
+- ~~Mailgun template `jobs-application-confirmation`~~ (no longer needed — see Services.md)
+
+### Legacy Reference (not reimplemented)
+- **Confirmation Email Template**: [senderConfirmation.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site-api/api/template/emailTemplates/application/senderConfirmation.php) — retained only as a record of legacy behavior.
 
 ---
 
@@ -201,7 +200,7 @@ The Jobs application UI splits across **two destinations** — get this right, i
 | 2 | **Resume / cover letter upload control** — drag/drop + browse, allowed types, 4MB limit messaging, error states (wrong type, too large, **virus detected**) | apply.js file-size + extension validation | Apply form + Quick Apply | `sell/post-a-listing/components/Photo/Photos.tsx` (react-dropzone + `addPhoto` server action) |
 | 3 | **Pre-fill from Quick Apply** — auto-fill fields + attach saved resume; remove resume ("X") then **"Use From Quick Apply"** to re-attach | QuickApply pre-fill in ApplyController + QuickApply.tsx saved-resume display | Apply form | QuickApply.tsx saved-resume display/remove/re-attach interaction |
 | 4 | **"Update Quick Apply info" checkbox + confirmation modal** (**DECIDED 2026-06-30** — checkbox on the Apply Now form; see Feature 3) | Notion screenshots ("Update Quick Apply info" modal) | Apply form | Cascade `Modal` + checkbox |
-| 5 | **Application submitted confirmation** — "Thank you for applying…", confirmation email notice, job/company/contact summary | [thanks.phtml](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site/application/views/scripts/apply/thanks.phtml) | Apply flow success state | Server-action success → confirmation view |
+| 5 | **Application submitted confirmation** — "Thank you for applying…", job/company/contact summary. **This modal is the applicant's only confirmation — no email is sent (Feature 5).** | [thanks.phtml](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site/application/views/scripts/apply/thanks.phtml) | Apply flow success state | Server-action success → confirmation view |
 | 6 | **Apply error screen** — validation/processing errors, back link | [error.phtml](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site/application/views/scripts/apply/error.phtml) | Apply flow error state | Inline error + Zod messages |
 | 7 | **MyAccount Quick Apply section** — same fields as Apply Now minus cover letter, saved-resume link, remove ("X") + "Save Info" | [QuickApply.tsx](file:///Users/cpies/code/shaping/Research%20Repos/m-ksl-myaccount-v2/components/Profile/QuickApply.tsx) (~638 lines), mounted at `/profile#quick-apply-info` | **MyAccount app (already exists)** — NOT marketplace-frontend | **Re-point backend** to new `application-http-rest` Quick Apply endpoints + update saved-resume download link (Q3c). No UI rebuild. |
 | 8 | **Employer Applications view** — applicant list: name, date, email, experience, zip, education + resume/cover letter download links; empty/loading/error states | [JobApplicationsModal.tsx](file:///Users/cpies/code/shaping/Research%20Repos/m-ksl-myaccount-v2/components/Listing/Manage/Modals/JobApplicationsModal.tsx) (~186 lines) | **MyAccount app (already exists)** — NOT marketplace-frontend | **Re-point backend** to new applications endpoint + new resume download mechanism (Q3b). **NTH**: standalone page instead of modal. |

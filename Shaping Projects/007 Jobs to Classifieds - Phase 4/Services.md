@@ -76,7 +76,7 @@ REST API service for job applications and Quick Apply profiles.
 #### Internal Dependencies
 - `virus-scan-http-rest` — scan files and reject/delete infected ones. Scan timing depends on the upload approach (Q18): **in-request before store** (Option C, legacy model) or **post-upload** (signed-URL Options A/B)
 - File storage: **GCS bucket** (jobs application files) — authorized-proxy download (decided); upload approach TBD (Q18); see Features.md Feature 2
-- Email service — send employer notifications and applicant confirmations
+- Email service — send employer notifications (applicant/sender confirmation email is **out of scope** — DECIDED 2026-07-08; applicant gets an on-screen modal only)
 
 ---
 
@@ -220,9 +220,10 @@ topic.Publish(ctx, &pubsub.Message{Data: data})
 - [send_email.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-ps-price-drop/internal/client/send_email.go) — price drop notifications (template: `"classifieds price drop notification"`)
 - [publisher.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/pubsub/publisher.go) — publisher initialization pattern
 
-**Two new Mailgun templates needed**:
+**One new Mailgun template needed**:
 1. **Employer notification** (e.g., `"jobs-application-employer-notification"`): applicant details + resume/cover letter attachments
-2. **Applicant confirmation** (e.g., `"jobs-application-confirmation"`): job title, company, location, posted date
+
+> ~~2. **Applicant confirmation** (`"jobs-application-confirmation"`): job title, company, location, posted date~~ — **DROPPED (DECIDED 2026-07-08)**: no applicant/sender confirmation email; the applicant gets an on-screen confirmation modal instead (see Features.md Feature 5).
 
 **Attachments — RESOLVED (supported)**: The `emailsv1.EmailMessage` protobuf **does support file attachments**. It has a `repeated Attachment attachments = 7` field, where each `Attachment` is:
 ```proto

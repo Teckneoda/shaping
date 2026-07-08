@@ -17,7 +17,7 @@ Vertical slices of work, in Shape Up terms: each slice is one **thing** that cut
 ```
 Slice 1 (Apply Now core spine)    ── foundation for everything below
    ├── Slice 2 (Employer email)
-   ├── Slice 3 (Applicant confirmation email)
+   ├── Slice 3 (Applicant confirmation email)  ── ❌ REMOVED (out of scope 2026-07-08)
    ├── Slice 4 (Rate limiting)
    └── Slice 5 (Authorized resume download)  ── shared by 6 + 7
 Slice 6 (Quick Apply profile: backend + MyAccount re-point)  ── needs 5
@@ -85,18 +85,11 @@ Slice 11 (Mobile app integration) ── needs 1 + 6 (+ external repo, separate 
 
 ---
 
-## Slice 3 — Applicant confirmation email
+## Slice 3 — Applicant confirmation email — ❌ REMOVED (OUT OF SCOPE, DECIDED 2026-07-08)
 
-**Goal:** After a successful application, the applicant gets a confirmation email.
+**No applicant/sender confirmation email is sent.** The applicant's only confirmation is the on-screen **"Thank you for applying" modal** delivered by the Slice 1 success state (Feature 7, screen 5). No second `emailsv1.EmailMessage`, no `jobs-application-confirmation` Mailgun template.
 
-**Repos:** marketplace-backend (+ Mailgun template config).
-
-**Backend requirements**
-- On successful `POST /application`, publish a second `emailsv1.EmailMessage` to the applicant's email. Template-only (no attachments → simpler than Slice 2).
-- New Mailgun template `jobs-application-confirmation` with job title, company name, location (city/state), posted date.
-- Subject: `Your application for [Job Title] is on its way!`. Spec: [senderConfirmation.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site-api/api/template/emailTemplates/application/senderConfirmation.php).
-
-**Done when:** Applicant receives the confirmation email after submitting.
+_Slice number retained to avoid renumbering downstream slices/cross-references. Original scope (for the record): publish a template-only confirmation email to the applicant with job title, company, location, posted date; subject "Your application for [Job Title] is on its way!" — legacy spec [senderConfirmation.php](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site-api/api/template/emailTemplates/application/senderConfirmation.php)._
 
 ---
 
@@ -257,7 +250,7 @@ Engineering effort per slice in **work weeks** (5-day weeks; one engineer on tha
 |-------|-------|-----------------------|
 | 1 — Apply Now core submission (spine) | backend, graphql, frontend | 1–1.4 |
 | 2 — Employer notification email | backend | 0.4–0.6 |
-| 3 — Applicant confirmation email | backend | 0.2 |
+| ~~3 — Applicant confirmation email~~ | ~~backend~~ | **removed (out of scope)** |
 | 4 — Application rate limiting | backend | 0.2–0.4 |
 | 5 — Authorized resume download | backend (+graphql) | 0.4–0.6 |
 | 6 — Quick Apply profile + MyAccount re-point | backend, graphql, myaccount | 0.6–0.8 |
@@ -265,10 +258,10 @@ Engineering effort per slice in **work weeks** (5-day weeks; one engineer on tha
 | 8 — Opt-in update Quick Apply on submit | frontend, graphql | 0.2–0.4 |
 | 9 — Employer Applications view re-point | backend, graphql, myaccount | 0.4–0.6 |
 | 10 — Legacy data migration | backend / legacy-bridge | 0.6–1 |
-| **Web/backend subtotal (1–10)** | | **~4.2–6.4 weeks** |
+| **Web/backend subtotal (1–10, excl. removed Slice 3)** | | **~4.0–6.2 weeks** |
 | 11 — Mobile app integration | app team (parallel) | ~1 |
 
-**Overall estimate:** ~**4.2–6.4 engineer-weeks** of web/backend effort (slices 1–10). With backend + frontend engineers working in parallel down the dependency order, that lands at roughly **3 calendar weeks of web work** — consistent with the shaped 3-week web appetite — plus **~1 week of app work** (slice 11) by the app team in parallel. **Total appetite: ~3 weeks web + ~1 week app.**
+**Overall estimate:** ~**4.0–6.2 engineer-weeks** of web/backend effort (slices 1–10, with Slice 3 removed as out of scope). With backend + frontend engineers working in parallel down the dependency order, that lands at roughly **3 calendar weeks of web work** — consistent with the shaped 3-week web appetite — plus **~1 week of app work** (slice 11) by the app team in parallel. **Total appetite: ~3 weeks web + ~1 week app.**
 
 ## Appetite reference (from Notion)
 
