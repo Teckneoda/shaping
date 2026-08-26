@@ -1,0 +1,76 @@
+# PAL Image Uploads Still Tied to Legacy CAPI — Services
+
+## Summary table
+
+| # | Service / Component | Repo | Change | Size |
+|---|---|---|---|---|
+| 1 | marketplace-graphql | marketplace-graphql | New `beginListingPhotoUpload` / commit / edit mutations + `services/listing-photos` client | M |
+| 2 | listing-http-rest | marketplace-backend | **Vertical-aware** photo endpoints (`PhotoService` registry: CLASSIFIED→Mongo, CAR→ksl-api client) — the intermediary; **bulk of the project** | L |
+| 3 | image-http-rest | marketplace-backend | Source-by-reference input (+ nice-to-have fixes) | M |
+| 4 | Staging bucket (NEW) | marketplace-backend `.tf` | Private bucket, POST CORS, lifecycle, IAM | S |
+| 5 | `carPhotoService` | marketplace-backend (inside listing-http-rest) | CAR impl: **direct write to Mongo `classifieds.auto`** + `Public_CarsListingEvent` publish — no separate service, no ksl-api calls | M–L |
+| 6 | ksl-api (legacy) | Legacy/ksl-api | **No changes** (hard constraint: no new endpoints); `storeListingImage` keeps serving old apps as-is | — |
+| 7 | marketplace-frontend | marketplace-frontend | Server-action swap behind gate; absorbs the Cars photo-editor branch | M |
+| 8 | m-ksl-classifieds-api (legacy) | Legacy/m-ksl-classifieds-api | Upload/edit endpoints become shims; later retire photo controllers | S–M |
+| 9 | feeds-ps-syncer | marketplace-backend | **Unchanged in v1** — but the F8 endpoint contract is binding now; later one-line dispatcher swap | — |
+
+---
+
+## 1. marketplace-graphql — new mutations + client
+
+**Created:**
+- `beginListingPhotoUpload` mutation (returns a signed upload URL; name matches the `begin*Upload` convention) → `{url, fields: JSON!, storageKey}`; `@hasRole(role: "MEMBER", useLowSecurity: true)`. Template: [mutation.job-apply-upload.graphqls](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-graphql/graph/schema/mutation.job-apply-upload.graphqls), resolver [job-apply-upload.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-graphql/graph/mutationresolvers/job-apply-upload.go). A **new mutation** — `beginProfileImageUpload` can't be reused (profile-pipeline backend/bucket + side effects, `mimeType`-only input that can't be extended additively, no `storageKey` in its response; see Features F1).
+- Commit mutation (`storageKey` + position → synchronous `{url, width, height, renditions}`); the resolver stays a thin proxy to listing-http-rest for **both** verticals, passing `listingType` through — the CAR/CLASSIFIED divergence lives inside listing-http-rest (§2/§5), not in GraphQL.
+- Edit mutation (photo identity + edited bytes' storageKey → new URL) — Classifieds only.
+- New client package `services/listing-photos/` following repo conventions: cookie forwarding [forwardAuthCookies](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-graphql/services/listing-rest/client.go#L750-L777), `applyServiceAuth` (ddm-jwt), sentinel errors + `ClientError`, spans `marketplace-graphql-<Client>-<Method>`.
+
+**Constraints:** GraphQL layer proxies only (it never generates signed policies itself; no business logic — repo CLAUDE.md); `@hasRole` enforces MEMBER only, admin/on-behalf-of needs explicit checks (pattern: [resolveLifecycleMemberIDArg](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-graphql/graph/mutationresolvers/classifieds_listing_lifecycle.go#L119-L128)). Additive-only schema changes (mobile can't be force-updated). Decide routing-gate behavior (Q1) — note **`fields.Photos` is currently a silent no-op on the listing-rest path** ([listing_mapping.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-graphql/graph/mutationresolvers/listing_mapping.go#L23-L138) never maps Photos); a dedicated commit mutation fixes this hole. Repo uses spec-kit — this lands as `specs/003-*` with a `contracts/*.graphqls`.
+
+## 2. listing-http-rest — the intermediary (bulk of the work)
+
+**Created:** get-signed-URL endpoint (generates the signed POST policy), commit endpoint (staged-ref or multipart bytes → image-http-rest → photo doc write), per-photo delete, delete-all, edit-in-place. Reorder exists ([update.go:296-299](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/domain/update.go#L296-L299), `reorderPhotos` :394-419).
+
+**Structure — the vertical seam (Features F4):** new `internal/photo` package with a `PhotoService` interface (AddPhoto/EditPhoto/DeletePhoto/DeleteAllPhotos, ownership per impl) dispatched by a `Registry{map[Vertical]PhotoService}` — the in-service [policy.Registry](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/policy/policy.go#L19-L36) idiom, mirroring dealer-http-rest's [VerticalUpdater](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/dealer/containers/dealer-http-rest/domain/vertical_updater.go#L10-L13). `classifiedPhotoService` uses the existing Mongo store + ImageClient; `carPhotoService` is §5. The seam sits between handler and domain — deliberately NOT behind `domain.ListingDomain` or the sidecar `Chain`, which are hard-typed on `*types.ClassifiedListing`. Vertical is an explicit request field (typed enum per [asset-http-rest](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/media/services/asset-http-rest/internal/types/asset.go#L15-L90)), never inferred.
+
+**Reused in place:** bouncer middleware + ownership policy + `requireVerifiedEmail`; `ImageClient` (extend beyond DeleteImage — [image.go:34-71](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/client/image.go#L34-L71)); cleanup-sidecar shape ([mediacleanup.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/sidecar/mediacleanup.go), [purgecleanup.go](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/sidecar/purgecleanup.go)); `Photo` type already models the full legacy doc ([listing.go:796-814](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/types/listing.go#L796-L814)).
+
+**New responsibilities:** per-vertical (Classifieds) rendition-list ownership; write-back failure reconciliation (image processed but listing write fails → orphaned image record); commit idempotency keyed on staged object name.
+
+## 3. image-http-rest — source-by-reference
+
+**Updated:** `POST /image` gains a `{bucket, object}` source form alongside multipart (multipart permanent). Read primitive exists ([storage.go:162-194](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/services/media/shared-image-packages/storage/storage.go#L162-L194)); needs cross-bucket IAM (`objectViewer` on the staging bucket, per the jobs pattern). Edit calls supply original by reference + edited bytes/ref as `renditionsImage`. Nice-to-have fixes listed in Features.md. Optional (Q11): sync-only-the-displayed-rendition split (generate `classified/adPic1` synchronously, defer the rest via the existing add-renditions endpoint — which then needs the service-JWT fix).
+
+## 4. Staging bucket (NEW infra)
+
+Private GCS bucket + TF: uniform bucket-level access, POST/PUT/OPTIONS CORS with explicit ksl.com origins, `ConditionContentLengthRange` in policies, custom-time lifecycle delete (hours — orphans are the normal case), abort-incomplete-multipart. Optional OBJECT_FINALIZE → Pub/Sub notification if any async attach is used. Full template: [listing-jobs-http-rest/.tf/google-storage.tf](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-jobs-http-rest/.tf/google-storage.tf) and [.tf/pubsub.tf](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-jobs-http-rest/.tf/pubsub.tf). Staged bytes are attacker-controlled: never public, never served directly, content validated on read.
+
+## 5. `carPhotoService` — the CAR impl inside listing-http-rest (direct write to `classifieds.auto`)
+
+The CAR implementation of the §2 registry (resolves Q5), fully native per the hard constraint — full operation list in Features F6. Highlights:
+- **Ownership + existence natively**: `findOne` on `classifieds.auto` — same cluster/DB/client the service already holds ([boosts maps cars→`auto`](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-cron-boosts/app.go#L64-L69); read precedent in prod: auto-renew, favorites). New: a **write grant** on `auto` for `listing-http-rest_mongo_json` (Q16).
+- **image-http-rest by reference** with the Cars rendition list ([rendition-recipes.go:58-116](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/media/services/image-http-rest/domain/renditions/rendition-recipes.go#L58-L116)); legacy-exact params: `vertical:'classifieds'`, Backlot `objectId` = auctionId string, `preMd5` of raw bytes.
+- **Write-back**: `$push` the 10-field cars photo doc (+ `backlot.photoOrder`) via `findOneAndUpdate` ×3; replace-at-index = **one atomic pull+push** (change-stream/ES blanking hazard); legacy-S3 deletions queue to `classifieds.photosToDelete`; `autoChangeLog` history insert.
+- **Publish `Public_CarsListingEvent`** (full `cars.v4.Listing` from post-update doc; feeds BigQuery + Google Shopping, NOT ES). New work: the listing→proto mapping layer + publisher IAM on the externally-owned topic (Q17). Publisher plumbing itself is ~10 lines on the existing [pubsub publisher](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-http-rest/internal/pubsub/publisher.go).
+- **ES is hands-off**: the [m-ksl-cars-api change-stream connector](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-cars-api/connector/src/change-identifier.js#L36-L41) owns `cars-listings`; never write it directly.
+- No ksl-api client needed for the photo path. Delete/reorder remain on existing ksl-api endpoints via GraphQL (can migrate later).
+- **Fallback recorded (not recommended)**: internally posting bytes to ksl-api's existing `storeListingImage` — meets the constraint's letter, keeps PHP side effects, but keeps cars uploads in ksl-api and provides no real edit.
+
+Async alternative recorded (template: [listing-ps-update-video-url](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/listing/services/listing-ps-update-video-url/app.go#L86-L146)) but rejected for the interactive path: no synchronous feedback for the sell form.
+
+## 6. ksl-api (legacy) — no changes
+
+**Hard constraint: no new ksl-api endpoints — and none are needed.** The Cars write-back is native in §5 (its legacy behavior is preserved by replicating the [storeListingImage side-effect map :2445-2645](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/ksl-api/public_html/classifieds/cars/api/controllers/ListingController.php#L2445-L2645)). `storeListingImage` stays alive **unchanged** for old mobile apps — it already calls image-http-rest, and the native writer coexists safely under Mongo single-document atomicity. Existing `deleteImage` / `editListingJSON` keep serving delete/reorder via GraphQL. Quick win independent of the main build (a list edit, not a new endpoint): add `classified/adPic1` to the General rendition list ([ListingController.php:36-48](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/ksl-api/public_html/classifieds/general/api/controllers/ListingController.php#L36-L48)).
+
+## 7. marketplace-frontend — server-action swap
+
+**Updated:** [addPhoto.ts](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-frontend/apps/ksl-marketplace/app/sell/%5B%5B...id%5D%5D/actions/addPhoto.ts) and [updatePhoto.ts](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-frontend/apps/ksl-marketplace/app/sell/%5B%5B...id%5D%5D/actions/updatePhoto.ts) → get signed URL / direct GCS upload / commit via GraphQL, behind the rollout gate. Upload mechanics reuse the existing signed-POST helpers ([useUploadSlot.ts](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-frontend/apps/ksl-marketplace/app/listing/%5Bid%5D/components/Contact/useUploadSlot.ts), [VideoUploader.tsx](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-frontend/apps/ksl-marketplace/app/sell/post-a-listing/components/Video/VideoUploader.tsx)). Normalize the photo actions onto `authenticatedRequest` + Zod (DR-004) while touching them. Retires the legacy `/auth/` token exchange + nonce helpers for photos ([legacy-api-helpers.ts](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-frontend/apps/ksl-marketplace/app/sell/%5B%5B...id%5D%5D/utils/legacy-api-helpers.ts)).
+
+**Cars photo editor (in flight):** the unmerged branch `feature-pal-use-new-photo-editor-sc-392495` enables the editor for Cars behind `CAR_pal_photo_editor` and fakes replace-in-place client-side (`replaceCarPhoto()` = add → delete → reorder, duplicate left behind on partial failure). Once the new edit mutation exists, that fake should be replaced with the real atomic edit for CAR — coordinate merge order with sc-392495 (Q14).
+
+## 8. m-ksl-classifieds-api (legacy) — shim then retire
+
+**Updated:** `uploadListingPhoto`/`editListingPhoto` become shims onto the new path (bytes already in hand → multipart to image-http-rest or the new listing endpoints). Photo controllers/helpers retire when old-app traffic allows. This also ends the four copy-pasted helper implementations (find/reorder/cleanup/validate) across Capi, ksl-api General, and ksl-api Cars.
+
+## 9. feeds-ps-syncer — unchanged in v1, contract binding now
+
+Photos continue via Capi upload (which becomes a shim). The migration is **already designed on the feeds side** — its specs and code label Capi photo upload and the ksl-api `DeleteAllPhotos` client as one-line-swap bridges awaiting a Listing Service photo endpoint ([upstream.go:9-13](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/feeds/services/feeds-ps-syncer/internal/routing/upstream.go#L9-L13), [photo_diff.go:12-19](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/feeds/services/feeds-ps-syncer/internal/domain/photo_diff.go#L12-L19), [specs/010 plan.md:201](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/specs/010-feed-system-p1-skeleton/plan.md#L201)). What binds THIS project is the **F8 endpoint contract** (bytes + `originalFilePath` round-trip, first=primary ordering, `photo[].id`+`originalFilePath` read-back, per-photo delete + delete-all, 4xx/5xx split, ddm-jwt auth). The swap itself is later feeds work; it retires feeds' `CapiAuth` + `internal/kslapi/` and lets the destructive nuke-and-reupload path become a targeted diff. Source-URL ingestion stays a separate measure-first decision (Q6, fetch-vs-upload failure-classification cost: [photos.go:130-142](file:///Users/cpies/code/shaping/Research%20Repos/marketplace-backend/apps/feeds/services/feeds-ps-syncer/internal/domain/photos.go#L130-L142)). Feeds is Classifieds-only — it will never exercise the CAR leg.

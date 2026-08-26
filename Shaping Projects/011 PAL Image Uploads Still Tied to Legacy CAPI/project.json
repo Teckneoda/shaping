@@ -1,0 +1,31 @@
+{
+  "repositories": [
+    {
+      "org": "deseretdigital",
+      "repo": "m-ksl-classifieds-api"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-backend"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-frontend"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-graphql"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "ksl-api"
+    }
+  ],
+  "notion_docs": [
+    {
+      "url": "https://app.notion.com/p/deseret/PAL-Image-Uploads-Still-Tied-to-Legacy-CAPI-3b42ac5cb23580e9b553c96099d70f1c",
+      "id": "3b42ac5cb23580e9b553c96099d70f1c",
+      "title": "PAL Image Uploads Still Tied to Legacy CAPI"
+    }
+  ]
+}
