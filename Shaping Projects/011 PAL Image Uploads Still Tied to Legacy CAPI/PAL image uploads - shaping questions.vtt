@@ -1,0 +1,2090 @@
+WEBVTT
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/6-0
+00:00:03.315 --> 00:00:05.195
+<v Spencer Dickson>A2 KSL API.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/8-0
+00:00:06.875 --> 00:00:15.985
+<v Spencer Dickson>And then KSL API just acts kind of as a
+wrapper or a proxy around the new back</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/8-1
+00:00:15.985 --> 00:00:19.675
+<v Spencer Dickson>end image service. I don't have.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/9-0
+00:00:20.955 --> 00:00:24.638
+<v Spencer Dickson>memorized all the renditions that CARS
+asks for.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/9-1
+00:00:24.638 --> 00:00:27.195
+<v Spencer Dickson>I know it's going to ask for some.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/10-0
+00:00:30.075 --> 00:00:35.307
+<v Spencer Dickson>And there may be a very small amount of
+business logic that happens in KSL API,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/10-1
+00:00:35.307 --> 00:00:40.475
+<v Spencer Dickson>but I don't think there's much anymore.
+I think it's primarily just a wrapper.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/11-0
+00:00:42.355 --> 00:00:45.195
+<v Rebekah Fowles>I'm pretty sure it's the same with Cappy
+as well.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/13-0
+00:00:46.435 --> 00:00:50.524
+<v Rebekah Fowles>We go directly to CAPI,
+and then all the business logic,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/13-1
+00:00:50.524 --> 00:00:53.035
+<v Rebekah Fowles>it's just the wrapper for the news.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/14-0
+00:00:53.915 --> 00:00:54.555
+<v Rebekah Fowles>The new one.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/15-0
+00:00:56.955 --> 00:00:57.515
+<v Christopher Pies>Okay.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/16-0
+00:00:57.115 --> 00:01:00.155
+<v Spencer Dickson>Right, so if the back end could...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/17-0
+00:01:01.435 --> 00:01:03.515
+<v Spencer Dickson>provide a signed URL.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/18-0
+00:01:04.675 --> 00:01:09.627
+<v Spencer Dickson>then I don't think it would take much,
+if any, work on KSL API for cars.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/18-1
+00:01:09.627 --> 00:01:15.258
+<v Spencer Dickson>I think it would more just be telling the
+front end to use that method rather than</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/18-2
+00:01:15.258 --> 00:01:19.057
+<v Spencer Dickson>posting to KSL API.
+I think the front end work would be</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/18-3
+00:01:19.057 --> 00:01:20.075
+<v Spencer Dickson>pretty minimal.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/22-0
+00:01:22.315 --> 00:01:28.250
+<v Rebekah Fowles>But we would like to do that because we
+are breaking our ADR of not touching the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/19-0
+00:01:22.875 --> 00:01:23.035
+<v Spencer Dickson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/20-0
+00:01:23.035 --> 00:01:23.275
+<v Christopher Pies>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/22-1
+00:01:28.250 --> 00:01:31.620
+<v Rebekah Fowles>APIs directly because of these image
+uploads.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/22-2
+00:01:31.620 --> 00:01:37.775
+<v Rebekah Fowles>We are touching KSL API and KAPI directly
+both for image uploading because we don't</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/22-3
+00:01:37.775 --> 00:01:38.875
+<v Rebekah Fowles>have site URLs.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/21-0
+00:01:41.115 --> 00:01:41.515
+<v Christopher Pies>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/23-0
+00:01:43.195 --> 00:01:44.075
+<v Christopher Pies>Okay, so...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/26-0
+00:01:45.275 --> 00:01:51.251
+<v Christopher Pies>If I understand the problem correctly,
+is we want on cars and classifieds to use</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/26-1
+00:01:51.251 --> 00:01:52.875
+<v Christopher Pies>the signed URL option.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/27-0
+00:01:53.955 --> 00:01:56.825
+<v Christopher Pies>And so you reach out,
+you get assigned to URL,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/27-1
+00:01:56.825 --> 00:02:00.918
+<v Christopher Pies>and then the front end is going to upload
+directly to that bucket.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/27-2
+00:02:00.918 --> 00:02:05.499
+<v Christopher Pies>I don't know how much you guys were
+thinking through that problem when you</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/27-3
+00:02:05.499 --> 00:02:09.835
+<v Christopher Pies>guys were working on the PAL.
+Is there any particularities on how that</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/27-4
+00:02:09.835 --> 00:02:13.195
+<v Christopher Pies>upload process should work from you guys'
+perspective?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/28-0
+00:02:14.795 --> 00:02:19.084
+<v Rebekah Fowles>Do we upload directly to the bucket or do
+we send the signed URL through GraphQL,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/28-1
+00:02:19.084 --> 00:02:21.595
+<v Rebekah Fowles>which is supposed to upload that to the
+bucket?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/29-0
+00:02:20.715 --> 00:02:22.903
+<v Christopher Pies>No,
+so there is an actual ADR to where when</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/29-1
+00:02:22.903 --> 00:02:26.732
+<v Christopher Pies>it comes to like signed URL stuff,
+getting the signed URL can go through the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/29-2
+00:02:26.732 --> 00:02:29.169
+<v Christopher Pies>GraphQL,
+but uploading directly to the bucket is</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/29-3
+00:02:29.169 --> 00:02:29.915
+<v Christopher Pies>how those work.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/31-0
+00:02:30.635 --> 00:02:35.955
+<v Rebekah Fowles>Was that how we do it on like videos and
+profiles and stuff? Okay, cool. Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/30-0
+00:02:32.795 --> 00:02:34.475
+<v Christopher Pies>The profile strength, yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/32-0
+00:02:34.715 --> 00:02:38.475
+<v Abe Fawson>Yeah, videos, videos work that way.
+Profile images work that way.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/33-0
+00:02:42.075 --> 00:02:45.335
+<v Christopher Pies>Yeah, so my thoughts are is, yeah,
+so we get that signed URL,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/33-1
+00:02:45.335 --> 00:02:47.755
+<v Christopher Pies>we get that bucket,
+we upload directly to it.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/34-0
+00:02:49.035 --> 00:02:53.595
+<v Christopher Pies>Ben the, I think on the profile side,
+don't we get like a...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/35-0
+00:02:54.835 --> 00:02:57.835
+<v Christopher Pies>A PubSub message from itself saying.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/36-0
+00:02:55.515 --> 00:02:58.475
+<v Abe Fawson>There's a, yeah, pubs up events happen.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/38-0
+00:02:59.675 --> 00:03:03.662
+<v Abe Fawson>So yeah,
+as soon as the file is finished uploading,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/38-1
+00:03:03.662 --> 00:03:10.180
+<v Abe Fawson>the bucket sends out a pub-sub event that
+we can listen for. And then we pick it up,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/38-2
+00:03:10.180 --> 00:03:14.857
+<v Abe Fawson>grab the image and process the image,
+and let the front end.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/38-3
+00:03:14.857 --> 00:03:19.075
+<v Abe Fawson>And then we do right now just pull from
+the front end.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/40-0
+00:03:19.275 --> 00:03:22.373
+<v Abe Fawson>asking, is this done? Is this done?
+Is it done?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/40-1
+00:03:22.373 --> 00:03:27.278
+<v Abe Fawson>But we can do GraphQL subscriptions and
+do a, like a web socket or I guess,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/40-2
+00:03:27.278 --> 00:03:31.796
+<v Abe Fawson>I'm not sure what it's called,
+where the front end gets notified when</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/40-3
+00:03:31.796 --> 00:03:36.315
+<v Abe Fawson>it's done. And so instead of polling,
+it gets immediate notification.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/39-0
+00:03:36.715 --> 00:03:37.355
+<v Spencer Dickson>Be nice.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/41-0
+00:03:38.715 --> 00:03:40.155
+<v Christopher Pies>Okay, so if the...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/42-0
+00:03:41.755 --> 00:03:47.275
+<v Christopher Pies>Image service could set up a socket,
+or you said GraphQL would set up a socket?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/44-0
+00:03:48.155 --> 00:03:51.159
+<v Abe Fawson>Yeah,
+because the front end communicates with</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/44-1
+00:03:51.159 --> 00:03:54.230
+<v Abe Fawson>GraphQL,
+so I'm not sure exactly how to do it.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/43-0
+00:03:51.595 --> 00:03:51.915
+<v Christopher Pies>In.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/44-2
+00:03:54.230 --> 00:03:59.064
+<v Abe Fawson>We talked about doing it again for the
+jobs apply stuff that we just did,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/44-3
+00:03:59.064 --> 00:04:03.832
+<v Abe Fawson>but we decided it was too complicated to
+try to fit it in our, you know,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/44-4
+00:04:03.832 --> 00:04:06.315
+<v Abe Fawson>trying to do this jobs apply thing in.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/45-0
+00:04:06.475 --> 00:04:10.715
+<v Abe Fawson>extremely short timeline. So yeah,
+I think it would be great, but...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/46-0
+00:04:11.435 --> 00:04:14.235
+<v Abe Fawson>We haven't figured out the particulars of
+how to make it work.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/47-0
+00:04:15.955 --> 00:04:16.235
+<v Christopher Pies>Okay.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/48-0
+00:04:19.275 --> 00:04:22.382
+<v Christopher Pies>Okay,
+so another question I have when it comes</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/48-1
+00:04:22.382 --> 00:04:25.755
+<v Christopher Pies>to images,
+currently they get uploaded and then...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/49-0
+00:04:27.475 --> 00:04:32.456
+<v Christopher Pies>When does the front end then know what to
+render on the PAL and what do they show</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/49-1
+00:04:32.456 --> 00:04:37.195
+<v Christopher Pies>the user? I'm not familiar with that part.
+Hopefully my question makes sense.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/50-0
+00:04:39.235 --> 00:04:39.955
+<v Spencer Dickson>And.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/52-0
+00:04:39.275 --> 00:04:40.955
+<v Rebekah Fowles>I think it grabs it from the listing.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/51-0
+00:04:39.555 --> 00:04:40.395
+<v Abe Fawson>They can render that.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/56-0
+00:04:43.275 --> 00:04:50.764
+<v Spencer Dickson>Well, yeah, right as the user uploads it,
+JavaScript reads the file and displays A</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/53-0
+00:04:43.915 --> 00:04:44.395
+<v Abe Fawson>Now.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/56-1
+00:04:50.764 --> 00:04:55.455
+<v Spencer Dickson>thumbnail.
+And then it goes and does its uploading.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/54-0
+00:04:51.115 --> 00:04:51.755
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/55-0
+00:04:53.115 --> 00:04:53.595
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/56-2
+00:04:55.455 --> 00:05:03.035
+<v Spencer Dickson>And that's what's going to be there until,
+like, there's a page refresh or someone.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/57-0
+00:05:03.275 --> 00:05:07.722
+<v Spencer Dickson>Leaves and comes back,
+and then we'll just read the images off</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/57-1
+00:05:07.722 --> 00:05:09.275
+<v Spencer Dickson>of the listing itself.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/60-0
+00:05:10.315 --> 00:05:14.235
+<v Christopher Pies>Okay, so when this will upload,
+it'll upload the photos.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/60-1
+00:05:14.235 --> 00:05:19.668
+<v Christopher Pies>The back end will then apply the photos
+in the proper order in which they were</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/60-2
+00:05:19.668 --> 00:05:22.970
+<v Christopher Pies>sent.
+So we need like an index of this is photo</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/60-3
+00:05:22.970 --> 00:05:25.515
+<v Christopher Pies>#2 or whatever, right? And then we...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/58-0
+00:05:24.555 --> 00:05:25.275
+<v Abe Fawson>No.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/59-0
+00:05:25.035 --> 00:05:25.515
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/61-0
+00:05:26.795 --> 00:05:27.355
+<v Christopher Pies>Got it.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/63-0
+00:05:27.195 --> 00:05:29.989
+<v Abe Fawson>Now we might need to pass in an order
+number.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/63-1
+00:05:29.989 --> 00:05:34.485
+<v Abe Fawson>I'm not sure if we're just because they
+might upload at different speeds.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/63-2
+00:05:34.485 --> 00:05:37.584
+<v Abe Fawson>You know,
+the first photo might be bigger than the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/62-0
+00:05:36.555 --> 00:05:36.875
+<v Christopher Pies>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/63-3
+00:05:37.584 --> 00:05:40.865
+<v Abe Fawson>other photos,
+and so the other photos get there first</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/63-4
+00:05:40.865 --> 00:05:44.875
+<v Abe Fawson>before the first photo.
+So we probably need to specify the order.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/64-0
+00:05:45.675 --> 00:05:46.555
+<v Abe Fawson>Somewhere.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/65-0
+00:05:46.635 --> 00:05:49.755
+<v Christopher Pies>Yeah, as part of the metadata on the URL.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/67-0
+00:05:48.715 --> 00:05:52.475
+<v Abe Fawson>As, yeah, yeah,
+we could do that in the metadata.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/66-0
+00:05:51.195 --> 00:05:51.675
+<v Christopher Pies>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/68-0
+00:05:54.395 --> 00:05:56.555
+<v Christopher Pies>Okay, and then...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/69-0
+00:05:58.395 --> 00:05:59.675
+<v Christopher Pies>So those will load.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/70-0
+00:06:00.795 --> 00:06:03.611
+<v Christopher Pies>And then,
+so once the front end finishes those</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/70-1
+00:06:03.611 --> 00:06:08.525
+<v Christopher Pies>uploads, does it just display the, like,
+great, cool, this is uploaded, shows it,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/70-2
+00:06:08.525 --> 00:06:12.480
+<v Christopher Pies>and then at that point,
+you can like drag and reorder the photos,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/70-3
+00:06:12.480 --> 00:06:16.555
+<v Christopher Pies>and then it just submits a backend
+request of photo reorder, right?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/71-0
+00:06:18.875 --> 00:06:23.755
+<v Spencer Dickson>And that photo order,
+I want to say goes through GraphQL now.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/72-0
+00:06:23.995 --> 00:06:25.435
+<v Rebekah Fowles>I also want to say that.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/73-0
+00:06:26.115 --> 00:06:27.515
+<v Spencer Dickson>It didn't used to.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/74-0
+00:06:26.635 --> 00:06:28.315
+<v Christopher Pies>Yeah, it should go through GraphQL.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/76-0
+00:06:29.515 --> 00:06:33.789
+<v Abe Fawson>I think pretty much everything from
+Marketplace front end goes through</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/75-0
+00:06:29.635 --> 00:06:29.755
+<v Christopher Pies>Um...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/76-1
+00:06:33.789 --> 00:06:35.595
+<v Abe Fawson>GraphQL, except image uploads.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/77-0
+00:06:35.195 --> 00:06:36.795
+<v Rebekah Fowles>The image upload? Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/78-0
+00:06:38.555 --> 00:06:42.395
+<v Christopher Pies>Um,
+and then does does the photo reordering?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/79-0
+00:06:43.435 --> 00:06:47.577
+<v Christopher Pies>Is that like blocked from the user being
+able to do something until the photos are</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/79-1
+00:06:47.577 --> 00:06:51.621
+<v Christopher Pies>finished uploading and the front end can
+verify that all the photos are actually</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/79-2
+00:06:51.621 --> 00:06:55.115
+<v Christopher Pies>successfully on the listing document in
+the database in the back end?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/81-0
+00:06:56.635 --> 00:06:59.362
+<v Christopher Pies>Or is there like some potential race
+conditions that everybody need to be</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/80-0
+00:06:56.795 --> 00:06:57.195
+<v Spencer Dickson>Um...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/81-1
+00:06:59.362 --> 00:06:59.915
+<v Christopher Pies>concerned with?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/82-0
+00:07:00.395 --> 00:07:07.752
+<v Spencer Dickson>I'm pretty sure the forum version of the
+postal listing page doesn't look at that</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/82-1
+00:07:07.752 --> 00:07:14.570
+<v Spencer Dickson>because it's at the top and we figure
+they'll be on the forum for a minute.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/82-2
+00:07:14.570 --> 00:07:19.595
+<v Spencer Dickson>That may be kind of an oversight,
+but the stepper does.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/83-0
+00:07:19.835 --> 00:07:25.521
+<v Spencer Dickson>look and it will prevent moving on to the
+next step until uploads are finished.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/83-1
+00:07:25.521 --> 00:07:28.861
+<v Spencer Dickson>It's not doing a verification on the back
+end.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/83-2
+00:07:28.861 --> 00:07:34.902
+<v Spencer Dickson>It's just it knows something's in flight.
+And as soon as it's not in flight anymore,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/83-3
+00:07:34.902 --> 00:07:37.035
+<v Spencer Dickson>then it lets the user move on.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/84-0
+00:07:38.395 --> 00:07:43.435
+<v Christopher Pies>Okay, so I guess as soon as,
+so the in-flight is, it's still uploading.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/85-0
+00:07:43.875 --> 00:07:44.315
+<v Spencer Dickson>Yes.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/87-0
+00:07:44.355 --> 00:07:45.835
+<v Christopher Pies>And then once it's done uploading.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/86-0
+00:07:45.075 --> 00:07:45.755
+<v Abe Fawson>Aren't they?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/88-0
+00:07:46.715 --> 00:07:52.315
+<v Abe Fawson>Yeah, aren't they separate components too,
+like the uploader and just the image</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/88-1
+00:07:52.315 --> 00:07:53.995
+<v Abe Fawson>thumbnails that you can?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/89-0
+00:07:55.195 --> 00:07:56.075
+<v Abe Fawson>Reorganize.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/90-0
+00:07:57.435 --> 00:07:57.835
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/91-0
+00:07:57.515 --> 00:08:01.061
+<v Abe Fawson>So you can't even,
+probably can't even drag and drop the,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/91-1
+00:08:01.061 --> 00:08:05.281
+<v Abe Fawson>or drag around the uploader,
+the photos as they're uploading because</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/91-2
+00:08:05.281 --> 00:08:09.195
+<v Abe Fawson>it's not even the right component that
+has that ability, right?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/92-0
+00:08:09.475 --> 00:08:11.815
+<v Spencer Dickson>Yeah,
+they have to finish uploading before</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/92-1
+00:08:11.815 --> 00:08:12.795
+<v Spencer Dickson>they're draggable.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/93-0
+00:08:13.835 --> 00:08:14.235
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/94-0
+00:08:13.915 --> 00:08:15.755
+<v Christopher Pies>Okay, then.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/95-0
+00:08:15.115 --> 00:08:17.871
+<v Rebekah Fowles>I think that's the case as well in the
+form version.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/95-1
+00:08:17.871 --> 00:08:20.367
+<v Rebekah Fowles>I don't think we can get race conditions
+there.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/95-2
+00:08:20.367 --> 00:08:22.395
+<v Rebekah Fowles>I think we probably accounted for that.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/98-0
+00:08:23.675 --> 00:08:26.067
+<v Christopher Pies>Well,
+there could be a race condition if it</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/98-1
+00:08:26.067 --> 00:08:29.056
+<v Christopher Pies>finishes uploading,
+but then once the bucket sends the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/98-2
+00:08:29.056 --> 00:08:31.775
+<v Christopher Pies>pub-sub message,
+then delivers it to the service,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/96-0
+00:08:31.355 --> 00:08:32.555
+<v Rebekah Fowles>Oh, in that.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/98-3
+00:08:31.775 --> 00:08:35.145
+<v Christopher Pies>the service that was just attaching it to
+the listing itself,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/98-4
+00:08:35.145 --> 00:08:39.494
+<v Christopher Pies>there's probably some time frame in which
+a user could drag and reorder a photo</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/97-0
+00:08:37.835 --> 00:08:38.155
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/98-5
+00:08:39.494 --> 00:08:41.995
+<v Christopher Pies>before it's actually attached to the
+listing.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/99-0
+00:08:42.475 --> 00:08:44.955
+<v Rebekah Fowles>In a new service, yeah, that could happen.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/100-0
+00:08:43.755 --> 00:08:46.608
+<v Abe Fawson>Usually,
+usually the front end doesn't know,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/100-1
+00:08:46.608 --> 00:08:50.603
+<v Abe Fawson>like with the video,
+the video goes through all the checks and</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/100-2
+00:08:50.603 --> 00:08:54.155
+<v Abe Fawson>everything before we tell the front end
+that it's done.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/102-0
+00:08:55.675 --> 00:08:56.475
+<v Abe Fawson>Isn't that right?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/101-0
+00:08:55.915 --> 00:08:56.395
+<v Christopher Pies>Okay.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/103-0
+00:08:57.275 --> 00:08:57.595
+<v Spencer Dickson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/104-0
+00:08:57.675 --> 00:08:58.475
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/105-0
+00:08:57.675 --> 00:08:59.235
+<v Abe Fawson>And so we could do this.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/108-0
+00:08:57.915 --> 00:09:02.580
+<v Christopher Pies>So it has to go through the whole entire
+back end process before the front end is,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/106-0
+00:09:00.955 --> 00:09:04.155
+<v Abe Fawson>Yeah, before the front end says it's done.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/108-1
+00:09:02.580 --> 00:09:06.345
+<v Christopher Pies>so complete for the front end is we can
+pull the back end and say,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/108-2
+00:09:06.345 --> 00:09:10.279
+<v Christopher Pies>is this photo done yet? Yes or no?
+And done means it's been uploaded,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/108-3
+00:09:10.279 --> 00:09:13.595
+<v Christopher Pies>it's been scanned,
+it's been processed and attached to the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/107-0
+00:09:12.155 --> 00:09:13.475
+<v Abe Fawson>Processed and.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/108-4
+00:09:13.595 --> 00:09:16.125
+<v Christopher Pies>listing,
+and now it's like there's an actual</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/108-5
+00:09:16.125 --> 00:09:17.755
+<v Christopher Pies>object on the listing itself.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/109-0
+00:09:17.835 --> 00:09:18.155
+<v Christopher Pies>Right.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/110-0
+00:09:19.915 --> 00:09:20.475
+<v Christopher Pies>K.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/111-0
+00:09:21.515 --> 00:09:23.195
+<v Abe Fawson>That would be my assumption.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/112-0
+00:09:24.315 --> 00:09:28.795
+<v Spencer Dickson>Are we doing a lot of extra processing on
+these photos like we are for videos?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/113-0
+00:09:29.355 --> 00:09:30.875
+<v Abe Fawson>Thumbnails and...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/114-0
+00:09:32.115 --> 00:09:34.366
+<v Abe Fawson>are not thumbnails,
+but just all the crops,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/114-1
+00:09:34.366 --> 00:09:35.595
+<v Abe Fawson>all the different sizes.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/115-0
+00:09:35.355 --> 00:09:36.875
+<v Rebekah Fowles>All the filters, yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/117-0
+00:09:36.555 --> 00:09:40.475
+<v Spencer Dickson>Yeah, we one concern we we make.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/116-0
+00:09:36.955 --> 00:09:37.755
+<v Abe Fawson>Filters.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/118-0
+00:09:41.515 --> 00:09:47.515
+<v Spencer Dickson>We assume that users are moving on while
+the video is processing.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/119-0
+00:09:49.915 --> 00:09:53.275
+<v Spencer Dickson>It can take 2 minutes, perhaps.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/120-0
+00:09:56.395 --> 00:10:01.478
+<v Spencer Dickson>We don't assume that with photos now.
+I don't know how common it is for users</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/120-1
+00:10:01.478 --> 00:10:05.063
+<v Spencer Dickson>to reorder them,
+but if it's going to take a couple of</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/120-2
+00:10:05.063 --> 00:10:07.996
+<v Spencer Dickson>minutes,
+that's going to be a pretty painful</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/120-3
+00:10:07.996 --> 00:10:11.254
+<v Spencer Dickson>exercise for people on the stepper in
+particular,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/120-4
+00:10:11.254 --> 00:10:15.035
+<v Spencer Dickson>because that's the only thing they can do
+on the stepper.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/122-0
+00:10:17.355 --> 00:10:22.719
+<v Spencer Dickson>We can let the user move on while it's
+processing, just like we do for videos.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/122-1
+00:10:22.719 --> 00:10:25.911
+<v Spencer Dickson>But as far as if they want to look and
+review,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/122-2
+00:10:25.911 --> 00:10:29.035
+<v Spencer Dickson>look at and review the order of their
+photos,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/122-3
+00:10:29.035 --> 00:10:34.128
+<v Spencer Dickson>they're going to have to come back if we
+have to wait for a bunch of extra</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/122-4
+00:10:34.128 --> 00:10:34.875
+<v Spencer Dickson>processing.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/121-0
+00:10:34.875 --> 00:10:36.475
+<v Abe Fawson>Can we...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/123-0
+00:10:35.115 --> 00:10:37.562
+<v Christopher Pies>Ohh,
+I'm wondering if some of the extra</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/124-0
+00:10:36.395 --> 00:10:38.635
+<v Rebekah Fowles>And we have to, they have to be totally.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/123-1
+00:10:37.562 --> 00:10:38.235
+<v Christopher Pies>processing.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/126-0
+00:10:39.395 --> 00:10:43.770
+<v Christopher Pies>I'm wondering if some of that extra
+processing can just happen asynchronously</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/126-1
+00:10:43.770 --> 00:10:47.809
+<v Christopher Pies>in the background where it's like we
+attached the main photo with like,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/126-2
+00:10:47.809 --> 00:10:51.736
+<v Christopher Pies>you know, the main copy of it,
+the one that they directly uploaded to</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/126-3
+00:10:51.736 --> 00:10:55.214
+<v Christopher Pies>the listing and say, it's done.
+And so you can now go render,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/126-4
+00:10:55.214 --> 00:10:58.075
+<v Christopher Pies>reorder these and all these other types
+of things.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/127-0
+00:10:58.475 --> 00:11:03.725
+<v Christopher Pies>But then some background asynchronous
+processing goes and does all those extra</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/127-1
+00:11:03.725 --> 00:11:06.915
+<v Christopher Pies>renditions,
+and then I can just look for the...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/128-0
+00:11:08.235 --> 00:11:11.460
+<v Christopher Pies>proper index instead of assuming the
+index and just attach it to the right</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/128-1
+00:11:11.460 --> 00:11:11.675
+<v Christopher Pies>spot.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/130-0
+00:11:13.835 --> 00:11:18.751
+<v Abe Fawson>Another question. So with the stepper,
+I'm assuming they can go back and forth,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/129-0
+00:11:14.075 --> 00:11:15.115
+<v Rebekah Fowles>That could be nice.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/130-1
+00:11:18.751 --> 00:11:21.640
+<v Abe Fawson>right? And be like, oh,
+actually I need to go.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/130-2
+00:11:21.640 --> 00:11:26.065
+<v Abe Fawson>Can we like have like little,
+some little image uploader modal going on</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/130-3
+00:11:26.065 --> 00:11:28.892
+<v Abe Fawson>that's just saying, hey,
+let them go forward,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/130-4
+00:11:28.892 --> 00:11:32.395
+<v Abe Fawson>but let them know that their images are
+still uploading?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/132-0
+00:11:33.595 --> 00:11:38.693
+<v Abe Fawson>that's visible and it lets them know when
+it's done and they can click it and go</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/132-1
+00:11:38.693 --> 00:11:42.155
+<v Abe Fawson>back and reorder images. I don't know,
+just wondering.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/133-0
+00:11:42.395 --> 00:11:47.128
+<v Spencer Dickson>We could, we don't.
+Right now they just live on the one step</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/133-1
+00:11:47.128 --> 00:11:51.784
+<v Spencer Dickson>and we just don't let them move on until
+the upload's done.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/133-2
+00:11:51.784 --> 00:11:57.915
+<v Spencer Dickson>But I don't see any reason we couldn't if
+we get some product buy-off on that.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/134-0
+00:11:59.275 --> 00:12:05.089
+<v Rebekah Fowles>Another reason to potentially go back to
+that image step for you guys with the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/134-1
+00:12:05.089 --> 00:12:08.990
+<v Rebekah Fowles>with the stepper PAL is if we do
+implement a editor,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/134-2
+00:12:08.990 --> 00:12:12.302
+<v Rebekah Fowles>if that is interesting to your users at
+all,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/134-3
+00:12:12.302 --> 00:12:17.675
+<v Rebekah Fowles>they might want to go back and post
+process after they've been uploaded.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/135-0
+00:12:19.035 --> 00:12:20.715
+<v Spencer Dickson>What does the Editor allow them to do?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/136-0
+00:12:21.515 --> 00:12:22.395
+<v Rebekah Fowles>Rotate and crop.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/137-0
+00:12:25.275 --> 00:12:25.915
+<v Spencer Dickson>I mean...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/139-0
+00:12:27.195 --> 00:12:28.875
+<v Spencer Dickson>Maybe, I don't know.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/140-0
+00:12:33.115 --> 00:12:36.800
+<v Spencer Dickson>I don't know what,
+if classified users are more likely to</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/140-1
+00:12:36.800 --> 00:12:39.723
+<v Spencer Dickson>want to do that than Car users,
+I don't know.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/140-2
+00:12:39.723 --> 00:12:42.075
+<v Spencer Dickson>I'm sure they would like the feature.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/142-0
+00:12:41.715 --> 00:12:47.432
+<v Rebekah Fowles>Apparently it was a big services thing.
+Apparently they liked using that for</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/141-0
+00:12:44.715 --> 00:12:45.275
+<v Spencer Dickson>Ohh.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/142-1
+00:12:47.432 --> 00:12:52.036
+<v Rebekah Fowles>businesses like using it on their
+services. I don't know why,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/142-2
+00:12:52.036 --> 00:12:54.635
+<v Rebekah Fowles>but that's why it exists basically.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/143-0
+00:12:52.955 --> 00:12:57.193
+<v Christopher Pies>Well, I think, yeah,
+I think some of those problems might be</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/143-1
+00:12:57.193 --> 00:13:00.945
+<v Christopher Pies>future tweets and stuff like that that we
+want to do.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/143-2
+00:13:00.945 --> 00:13:06.226
+<v Christopher Pies>I'm thinking that the only thing we're
+trying to solve is just the back end</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/143-3
+00:13:06.226 --> 00:13:10.395
+<v Christopher Pies>portion of making it available to upload
+the assigned URLs.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/144-0
+00:13:11.115 --> 00:13:17.004
+<v Rebekah Fowles>Abe, do you happen to know if our editor,
+if that also has to go directly through</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/144-1
+00:13:17.004 --> 00:13:17.435
+<v Rebekah Fowles>Cappy?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/145-0
+00:13:19.675 --> 00:13:20.795
+<v Abe Fawson>Not anymore.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/146-0
+00:13:21.355 --> 00:13:24.235
+<v Rebekah Fowles>Not anymore for their GraphQL.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/147-0
+00:13:22.075 --> 00:13:26.261
+<v Abe Fawson>I mean, because it, yeah,
+the way the editor worked before,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/147-1
+00:13:26.261 --> 00:13:31.983
+<v Abe Fawson>we were sending all of the editor data so
+that they could go back to the original</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/147-2
+00:13:31.983 --> 00:13:37.285
+<v Abe Fawson>state if they decide to edit the image
+again. We're not saving any of that.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/147-3
+00:13:37.285 --> 00:13:40.635
+<v Abe Fawson>We're just saving the new version of the
+image.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/148-0
+00:13:41.195 --> 00:13:44.473
+<v Abe Fawson>And so,
+that's all we would send through the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/149-0
+00:13:44.315 --> 00:13:48.155
+<v Rebekah Fowles>But does it, if it goes, if it re-uploads.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/148-1
+00:13:44.473 --> 00:13:45.275
+<v Abe Fawson>signed URL.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/150-0
+00:13:49.115 --> 00:13:51.595
+<v Rebekah Fowles>Then the Editor does still need to.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/151-0
+00:13:52.635 --> 00:13:55.979
+<v Rebekah Fowles>Oh, but okay,
+but because we're not saving the data,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/151-1
+00:13:55.979 --> 00:13:57.115
+<v Rebekah Fowles>it doesn't matter.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/152-0
+00:13:57.835 --> 00:13:58.635
+<v Abe Fawson>It doesn't matter.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/153-0
+00:13:58.355 --> 00:14:03.115
+<v Rebekah Fowles>Because it's just a it's just a re-upload
+at that point. OK, yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/155-0
+00:14:05.675 --> 00:14:10.612
+<v Christopher Pies>Okay, so a crop and rotate is just,
+it's considered a completely new image</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/154-0
+00:14:06.075 --> 00:14:08.035
+<v Rebekah Fowles>Yeah, so that's a, yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/157-0
+00:14:10.555 --> 00:14:13.115
+<v Rebekah Fowles>It's a destructive, yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/155-1
+00:14:10.612 --> 00:14:11.995
+<v Christopher Pies>that's replacing one.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/156-0
+00:14:12.875 --> 00:14:13.195
+<v Christopher Pies>Okay.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/158-0
+00:14:13.115 --> 00:14:13.595
+<v Abe Fawson>Mhm.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/160-0
+00:14:14.075 --> 00:14:18.075
+<v Rebekah Fowles>The old,
+the old classifieds editor did save that</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/159-0
+00:14:14.835 --> 00:14:14.995
+<v Christopher Pies>What?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/160-1
+00:14:18.075 --> 00:14:21.915
+<v Rebekah Fowles>data.
+That was part of CAPI where it would have</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/160-2
+00:14:21.915 --> 00:14:27.995
+<v Rebekah Fowles>the coordinates and like the rotation
+angle and stuff and it would actually</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/160-3
+00:14:27.995 --> 00:14:33.835
+<v Rebekah Fowles>save that as part of the image object.
+But we don't do that anymore, so.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/161-0
+00:14:34.075 --> 00:14:34.635
+<v Rebekah Fowles>No worries.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/164-0
+00:14:34.715 --> 00:14:38.051
+<v Abe Fawson>Yeah,
+to just cut scope when we're adding in</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/164-1
+00:14:38.051 --> 00:14:42.574
+<v Abe Fawson>the image editor,
+we just kept it really simple. And so far,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/162-0
+00:14:38.195 --> 00:14:38.475
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/164-2
+00:14:42.574 --> 00:14:43.835
+<v Abe Fawson>nobody cares, so.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/163-0
+00:14:43.915 --> 00:14:44.235
+<v Rebekah Fowles>Yes.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/167-0
+00:14:45.675 --> 00:14:48.187
+<v Christopher Pies>Yeah, I mean,
+I'm sure at that point it's like,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/167-1
+00:14:48.187 --> 00:14:51.746
+<v Christopher Pies>you have the original image,
+just re-upload it and make a new crop.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/166-0
+00:14:49.515 --> 00:14:50.595
+<v Rebekah Fowles>Yeah, yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/165-0
+00:14:50.395 --> 00:14:50.635
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/167-2
+00:14:51.746 --> 00:14:54.310
+<v Christopher Pies>If you don't, that's your fault, not ours.
+Okay,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/167-3
+00:14:54.310 --> 00:14:56.875
+<v Christopher Pies>let's see if there's any other questions
+I have.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/168-0
+00:15:04.155 --> 00:15:04.635
+<v Christopher Pies>Um...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/170-0
+00:15:08.195 --> 00:15:10.579
+<v Christopher Pies>Yeah,
+I suppose that's the only other thing</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/170-1
+00:15:10.579 --> 00:15:15.186
+<v Christopher Pies>that I'm trying to think through is, okay,
+we obviously want this code to be unified</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/170-2
+00:15:15.186 --> 00:15:18.546
+<v Christopher Pies>code and not have anything living in CAPI
+or KSL API anymore.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/170-3
+00:15:18.546 --> 00:15:22.774
+<v Christopher Pies>And so we're going to have to have the
+listing service handling the attaching</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/170-4
+00:15:22.774 --> 00:15:26.622
+<v Christopher Pies>these listing or these photos to their
+listings. With that being said,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/170-5
+00:15:26.622 --> 00:15:29.115
+<v Christopher Pies>the listing service doesn't currently
+handle.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/171-0
+00:15:29.435 --> 00:15:30.315
+<v Christopher Pies>Cars.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/169-0
+00:15:29.995 --> 00:15:30.715
+<v Rebekah Fowles>Cars.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/172-0
+00:15:31.195 --> 00:15:36.489
+<v Christopher Pies>But my thoughts there is we just add
+another deployment that is like specific</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/172-1
+00:15:36.489 --> 00:15:41.919
+<v Christopher Pies>to cars right now that handles attaching
+photos and doing some of its rendition</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/172-2
+00:15:41.919 --> 00:15:47.486
+<v Christopher Pies>stuff into the existing structure that it
+needs separate from the classifieds one</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/172-3
+00:15:47.486 --> 00:15:51.355
+<v Christopher Pies>and we just have two different
+deployments running that.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/173-0
+00:15:51.835 --> 00:15:57.147
+<v Christopher Pies>are handling this data processing,
+one for classifieds, one for cars,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/173-1
+00:15:57.147 --> 00:16:00.866
+<v Christopher Pies>and then eventually once cars is in
+classifieds,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/173-2
+00:16:00.866 --> 00:16:03.675
+<v Christopher Pies>it just adopts the classifieds thing.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/174-0
+00:16:05.435 --> 00:16:06.075
+<v Christopher Pies>And.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/175-0
+00:16:07.275 --> 00:16:10.185
+<v Christopher Pies>I think that's probably fine,
+but so I'll just have to think through</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/175-1
+00:16:10.185 --> 00:16:13.643
+<v Christopher Pies>that part one and how it works with the
+listing service and to them with the fact</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/175-2
+00:16:13.643 --> 00:16:16.258
+<v Christopher Pies>that it's going to be touching two
+different Mongo databases,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/175-3
+00:16:16.258 --> 00:16:17.355
+<v Christopher Pies>which I don't love, but...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/176-0
+00:16:18.755 --> 00:16:20.315
+<v Christopher Pies>I think we kind of need to at this point.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/178-0
+00:16:24.635 --> 00:16:27.317
+<v Rebekah Fowles>Yeah,
+until we're able to get all of our data</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/177-0
+00:16:25.115 --> 00:16:25.835
+<v Christopher Pies>But I should.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/178-1
+00:16:27.317 --> 00:16:30.525
+<v Rebekah Fowles>in one place,
+I think that's what you're going to have</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/178-2
+00:16:30.525 --> 00:16:30.875
+<v Rebekah Fowles>to do.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/180-0
+00:16:31.755 --> 00:16:35.418
+<v Christopher Pies>So I think, yeah,
+just the goal for our team then probably</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/180-1
+00:16:35.418 --> 00:16:38.957
+<v Christopher Pies>is just making sure that the back end can
+be completely,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/180-2
+00:16:38.957 --> 00:16:43.925
+<v Christopher Pies>or the front end can then upload to the
+assigned URLs and the KSL and KAPI back</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/180-3
+00:16:43.925 --> 00:16:48.955
+<v Christopher Pies>end pieces of image processing are just
+completely eliminated, no longer needed.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/179-0
+00:16:48.915 --> 00:16:49.195
+<v Abe Fawson>No.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/181-0
+00:16:53.515 --> 00:16:56.209
+<v Christopher Pies>All right,
+I don't think I have any other questions.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/181-1
+00:16:56.209 --> 00:17:00.225
+<v Christopher Pies>Anybody else have anything that I think
+we might need to be aware of and think</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/181-2
+00:17:00.225 --> 00:17:01.395
+<v Christopher Pies>through and talk about?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/182-0
+00:17:01.275 --> 00:17:06.155
+<v Rebekah Fowles>I think it would be great if this could
+be built in a way to where we could.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/183-0
+00:17:07.755 --> 00:17:09.595
+<v Rebekah Fowles>I either.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/184-0
+00:17:12.475 --> 00:17:13.435
+<v Rebekah Fowles>What am I trying to say?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/185-0
+00:17:15.115 --> 00:17:20.835
+<v Rebekah Fowles>The profile image uploads,
+those don't necessarily need to exist.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/185-1
+00:17:20.835 --> 00:17:24.821
+<v Rebekah Fowles>Like,
+can we can we make this a unified image</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/185-2
+00:17:24.821 --> 00:17:26.555
+<v Rebekah Fowles>listing image? Like.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/186-0
+00:17:28.435 --> 00:17:29.755
+<v Rebekah Fowles>What am I trying to say?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/188-0
+00:17:30.715 --> 00:17:36.315
+<v Abe Fawson>We have a separate image manager for
+profile images and for listings.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/188-1
+00:17:36.315 --> 00:17:39.995
+<v Abe Fawson>Can we unify and have a single image
+manager?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/187-0
+00:17:36.795 --> 00:17:37.355
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/189-0
+00:17:40.555 --> 00:17:43.515
+<v Rebekah Fowles>Do we want to do that is the next
+question. Thank you, Abe.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/190-0
+00:17:44.555 --> 00:17:46.075
+<v Christopher Pies>Well, let's see, so...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/191-0
+00:17:47.275 --> 00:17:48.715
+<v Christopher Pies>I suppose.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/193-0
+00:17:50.835 --> 00:17:55.097
+<v Christopher Pies>If we have a single listing,
+or not listing, an image process,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/193-1
+00:17:55.097 --> 00:17:58.277
+<v Christopher Pies>that just says, hey,
+I want to upload a photo,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/192-0
+00:17:55.115 --> 00:17:56.075
+<v Rebekah Fowles>Service.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/193-2
+00:17:58.277 --> 00:18:01.863
+<v Christopher Pies>then I suppose the only difference
+between the data,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/193-3
+00:18:01.863 --> 00:18:07.006
+<v Christopher Pies>what the back end knows what to do with
+each individual photo upload is the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/193-4
+00:18:07.006 --> 00:18:10.795
+<v Christopher Pies>metadata on the photo, right?
+So you upload it and say,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/194-0
+00:18:11.195 --> 00:18:16.075
+<v Christopher Pies>Metadata means this is a listing vertical
+classifieds.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/197-0
+00:18:17.475 --> 00:18:21.227
+<v Christopher Pies>photo index zero, right?
+And then it gets uploaded to the bucket,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/195-0
+00:18:21.195 --> 00:18:21.595
+<v Abe Fawson>M.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/197-1
+00:18:21.227 --> 00:18:24.638
+<v Christopher Pies>does all its checks,
+fires off its pubsub message that it's</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/197-2
+00:18:24.638 --> 00:18:27.253
+<v Christopher Pies>done.
+And then the profile service would have</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/197-3
+00:18:27.253 --> 00:18:31.289
+<v Christopher Pies>its back end process so that it goes, oh,
+there was an image uploaded,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/197-4
+00:18:31.289 --> 00:18:34.302
+<v Christopher Pies>do I care about this one?
+Is it a profile thing? No,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/197-5
+00:18:34.302 --> 00:18:36.235
+<v Christopher Pies>just back the message and move on.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/196-0
+00:18:35.675 --> 00:18:36.715
+<v Abe Fawson>That ignores it.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/198-0
+00:18:36.555 --> 00:18:38.667
+<v Christopher Pies>The listing service that would have its
+piece,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/198-1
+00:18:38.667 --> 00:18:40.555
+<v Christopher Pies>it's listening to that same pub-sub topic.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/200-0
+00:18:40.595 --> 00:18:45.316
+<v Abe Fawson>So yeah,
+already we do messages and profiles use</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/200-1
+00:18:45.316 --> 00:18:51.676
+<v Abe Fawson>the same image back end somewhat.
+Profile does async signed URLs,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/200-2
+00:18:51.676 --> 00:18:59.193
+<v Abe Fawson>whereas messages uploads directly,
+but they both go through the same service,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/200-3
+00:18:59.193 --> 00:18:59.675
+<v Abe Fawson>same.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/201-0
+00:18:59.715 --> 00:19:01.035
+<v Abe Fawson>back-end processes.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/199-0
+00:19:01.035 --> 00:19:01.355
+<v Christopher Pies>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/202-0
+00:19:02.755 --> 00:19:06.565
+<v Rebekah Fowles>Does video have to be excluded from this
+as well? Like,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/202-1
+00:19:06.565 --> 00:19:09.355
+<v Rebekah Fowles>I know that we made video its own, but...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/205-0
+00:19:08.395 --> 00:19:13.426
+<v Abe Fawson>Videos are very different processing
+things. So I just, yeah,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/203-0
+00:19:10.995 --> 00:19:13.355
+<v Rebekah Fowles>Okay, then I won't worry about it.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/205-1
+00:19:13.426 --> 00:19:19.675
+<v Abe Fawson>I don't see a point in combining them
+because most of it wouldn't be shared.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/204-0
+00:19:17.755 --> 00:19:17.915
+<v Rebekah Fowles>Okay.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/207-0
+00:19:21.355 --> 00:19:23.995
+<v Christopher Pies>Unless you just called it like a media
+uploader, right?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/206-0
+00:19:21.675 --> 00:19:22.155
+<v Abe Fawson>But...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/208-0
+00:19:23.995 --> 00:19:28.795
+<v Rebekah Fowles>That's what I was kind of moving towards
+asking.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/209-0
+00:19:24.355 --> 00:19:27.737
+<v Abe Fawson>Yeah, media. Yeah,
+you could do a media uploader,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/209-1
+00:19:27.737 --> 00:19:32.675
+<v Abe Fawson>but you do need a whole separate video
+processor versus image processor.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/210-0
+00:19:33.915 --> 00:19:34.315
+<v Christopher Pies>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/211-0
+00:19:39.275 --> 00:19:40.395
+<v Christopher Pies>OK, so...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/212-0
+00:19:41.515 --> 00:19:45.262
+<v Christopher Pies>Abe,
+where is the profile stuff being</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/212-1
+00:19:45.262 --> 00:19:49.995
+<v Christopher Pies>processed?
+What service in Marketplace backend?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/215-0
+00:19:50.795 --> 00:19:55.211
+<v Abe Fawson>It is not in Marketplace back. So I mean,
+we do have, yeah,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/213-0
+00:19:53.115 --> 00:19:54.395
+<v Rebekah Fowles>It's A microservice.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/215-1
+00:19:55.211 --> 00:20:00.880
+<v Abe Fawson>so we do have Marketplace back end
+service for picking up the pub sub events</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/215-2
+00:20:00.880 --> 00:20:04.708
+<v Abe Fawson>in the profile stuff,
+but there's a whole separate,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/215-3
+00:20:04.708 --> 00:20:08.315
+<v Abe Fawson>because we created this image service
+before we.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/214-0
+00:20:08.235 --> 00:20:08.875
+<v Christopher Pies>Okay.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/218-0
+00:20:09.995 --> 00:20:13.475
+<v Christopher Pies>So, the image service,
+if it's on separate deployment.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/217-0
+00:20:10.075 --> 00:20:11.835
+<v Abe Fawson>Switch to Marketplace backend.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/216-0
+00:20:10.955 --> 00:20:12.235
+<v Rebekah Fowles>Went with the mono repo.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/219-0
+00:20:14.155 --> 00:20:14.555
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/220-0
+00:20:14.395 --> 00:20:14.875
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/221-0
+00:20:16.555 --> 00:20:18.875
+<v Abe Fawson>Image Images Services.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/222-0
+00:20:19.835 --> 00:20:23.835
+<v Abe Fawson>And there's an image download and image
+upload.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/224-0
+00:20:25.835 --> 00:20:31.076
+<v Abe Fawson>And originally we figured, hey,
+we can make this work for listings too.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/224-1
+00:20:31.076 --> 00:20:36.244
+<v Abe Fawson>And we decided that we didn't need to
+specify exact sizing for images.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/224-2
+00:20:36.244 --> 00:20:41.849
+<v Abe Fawson>We just do t-shirt sizing and so that we
+could adjust the sizing later on if</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/224-3
+00:20:41.849 --> 00:20:45.271
+<v Abe Fawson>needed.
+And we thought it would be great if we</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/224-4
+00:20:45.271 --> 00:20:45.635
+<v Abe Fawson>just.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/225-0
+00:20:46.155 --> 00:20:53.024
+<v Abe Fawson>Resized when they're requested and cached,
+and so we put a CDN in front of the image</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/225-1
+00:20:53.024 --> 00:20:57.307
+<v Abe Fawson>download,
+and so when different sizes are requested,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/225-2
+00:20:57.307 --> 00:21:01.995
+<v Abe Fawson>it just resizes it, stores it at the CDN,
+and they get...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/226-0
+00:21:04.235 --> 00:21:07.275
+<v Abe Fawson>That's how they get her handled.
+But anyway,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/226-1
+00:21:07.275 --> 00:21:10.315
+<v Abe Fawson>that's not what was implemented on
+listings.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/227-0
+00:21:13.195 --> 00:21:18.668
+<v Abe Fawson>So it's a different concept altogether
+that we were hoping we could move towards,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/227-1
+00:21:18.668 --> 00:21:23.675
+<v Abe Fawson>but it was never adopted probably because
+it wasn't a drop-in replacement.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/229-0
+00:21:30.235 --> 00:21:35.423
+<v Christopher Pies>So then how does listings do it today
+then when it comes to getting different</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/230-0
+00:21:35.355 --> 00:21:38.155
+<v Abe Fawson>They have a completely different service.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/229-1
+00:21:35.423 --> 00:21:36.155
+<v Christopher Pies>renditions?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/231-0
+00:21:39.035 --> 00:21:40.475
+<v Abe Fawson>They don't go through this service.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/233-0
+00:21:39.435 --> 00:21:44.567
+<v Rebekah Fowles>The filters are made on upload.
+So where with the messages, images,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/233-1
+00:21:44.567 --> 00:21:48.340
+<v Rebekah Fowles>they get resized only when they're
+requested for.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/232-0
+00:21:44.955 --> 00:21:45.355
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/233-2
+00:21:48.340 --> 00:21:53.774
+<v Rebekah Fowles>That's not the case with listings.
+Listings just do all the resizing up</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/233-3
+00:21:53.774 --> 00:21:55.435
+<v Rebekah Fowles>front and store those.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/234-0
+00:21:55.355 --> 00:21:58.475
+<v Abe Fawson>You do all the sizes and we store all the
+sizes.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/235-0
+00:22:00.475 --> 00:22:01.435
+<v Christopher Pies>Then what has been the...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/236-0
+00:22:01.275 --> 00:22:03.035
+<v Abe Fawson>Even if they never get used.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/238-0
+00:22:03.435 --> 00:22:09.701
+<v Christopher Pies>So then the desire that is wanted in the
+future is that we just upload the main</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/238-1
+00:22:09.701 --> 00:22:13.538
+<v Christopher Pies>photo.
+That's the only one that we store in GCS,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/238-2
+00:22:13.538 --> 00:22:18.395
+<v Christopher Pies>I'm guessing. Yeah, GCS.
+And then the CDN just handles the...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/239-0
+00:22:20.635 --> 00:22:22.715
+<v Christopher Pies>the caching of different renditions.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/241-0
+00:22:23.995 --> 00:22:26.750
+<v Abe Fawson>Yeah,
+but you don't want to have an infinite</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/241-1
+00:22:26.750 --> 00:22:31.096
+<v Abe Fawson>number of renditions. We figured that,
+you know, small, medium, large,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/241-2
+00:22:31.096 --> 00:22:35.320
+<v Abe Fawson>extra large was good enough.
+And then you can do any small tweaks on</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/241-3
+00:22:35.320 --> 00:22:37.035
+<v Abe Fawson>the front end just with CSS.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/240-0
+00:22:36.875 --> 00:22:38.155
+<v Rebekah Fowles>The CSS, yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/242-0
+00:22:41.115 --> 00:22:42.075
+<v Abe Fawson>But yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/243-0
+00:22:42.795 --> 00:22:45.955
+<v Christopher Pies>Okay, so then what is...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/244-0
+00:22:47.675 --> 00:22:53.448
+<v Christopher Pies>Are we required to then at least
+currently upload and save all of the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/244-1
+00:22:53.448 --> 00:22:55.675
+<v Christopher Pies>different renditions today?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/245-0
+00:22:56.955 --> 00:22:58.816
+<v Abe Fawson>No,
+the backend creates the different</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/245-1
+00:22:58.816 --> 00:22:59.355
+<v Abe Fawson>renditions.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/246-0
+00:23:00.795 --> 00:23:03.273
+<v Christopher Pies>That's what I meant,
+like the back end currently,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/246-1
+00:23:03.273 --> 00:23:05.355
+<v Christopher Pies>and which back end is like Cappy back end?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/248-0
+00:23:07.195 --> 00:23:12.235
+<v Abe Fawson>I'm not sure where we they build a new
+image service.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/247-0
+00:23:07.355 --> 00:23:08.555
+<v Rebekah Fowles>It, it's the...</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/250-0
+00:23:10.955 --> 00:23:15.381
+<v Rebekah Fowles>I'm pretty sure that was part of what
+Stephen did as just the replacement.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/250-1
+00:23:15.381 --> 00:23:19.098
+<v Rebekah Fowles>So KAPI and KSL API,
+they are just wrappers that push it along</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/250-2
+00:23:19.098 --> 00:23:22.993
+<v Rebekah Fowles>to the new image service,
+but the new image service functions the</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/250-3
+00:23:22.993 --> 00:23:27.065
+<v Rebekah Fowles>same as what was happening before
+independently in KSL API and KAPI,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/250-4
+00:23:27.065 --> 00:23:30.075
+<v Rebekah Fowles>which is making all of those renditions
+on upload.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/251-0
+00:23:31.195 --> 00:23:34.075
+<v Christopher Pies>Okay, so it essentially just moved code.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/252-0
+00:23:34.555 --> 00:23:35.035
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/253-0
+00:23:34.715 --> 00:23:35.195
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/254-0
+00:23:35.035 --> 00:23:37.535
+<v Christopher Pies>Okay,
+so I like being happy to a new service</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/254-1
+00:23:37.535 --> 00:23:39.035
+<v Christopher Pies>and then rewrote it and go.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/255-0
+00:23:39.915 --> 00:23:40.235
+<v Rebekah Fowles>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/256-0
+00:23:40.395 --> 00:23:40.875
+<v Christopher Pies>Okay.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/257-0
+00:23:40.675 --> 00:23:40.875
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/259-0
+00:23:48.555 --> 00:23:53.835
+<v Abe Fawson>And I haven't really worked with it a ton,
+so I can't tell you a whole lot about it.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/260-0
+00:23:52.875 --> 00:23:57.115
+<v Christopher Pies>Yeah,
+I'm probably going to not try to add any.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/261-0
+00:23:58.475 --> 00:24:02.440
+<v Christopher Pies>Caching and like removing any of that
+functionality during this thing is just</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/261-1
+00:24:02.440 --> 00:24:03.915
+<v Christopher Pies>making it possible to upload.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/262-0
+00:24:04.875 --> 00:24:05.275
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/263-0
+00:24:06.075 --> 00:24:10.384
+<v Rebekah Fowles>But we do have the pattern already
+established where messages is concerned,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/263-1
+00:24:10.384 --> 00:24:10.555
+<v Rebekah Fowles>so.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/264-0
+00:24:11.755 --> 00:24:15.035
+<v Rebekah Fowles>That pattern can be reused in that sense.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/265-0
+00:24:22.315 --> 00:24:23.675
+<v Christopher Pies>Yeah, it's just the.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/267-0
+00:24:27.595 --> 00:24:31.527
+<v Christopher Pies>I I don't think I want to worry about
+trying to change that pattern for</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/267-1
+00:24:31.527 --> 00:24:34.749
+<v Christopher Pies>listings during this.
+I think it's something that we could</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/266-0
+00:24:33.115 --> 00:24:33.515
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/267-2
+00:24:34.749 --> 00:24:36.115
+<v Christopher Pies>probably argue for later.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/269-0
+00:24:37.275 --> 00:24:39.435
+<v Christopher Pies>So that's just going to add up a lot of
+extra scope.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/268-0
+00:24:38.475 --> 00:24:38.875
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/270-0
+00:24:40.315 --> 00:24:40.795
+<v Abe Fawson>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/271-0
+00:24:42.075 --> 00:24:43.900
+<v Rebekah Fowles>Yeah,
+I'm pretty sure that's why it was done</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/271-1
+00:24:43.900 --> 00:24:44.955
+<v Rebekah Fowles>that way in the 1st place.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/272-0
+00:24:48.635 --> 00:24:49.275
+<v Rebekah Fowles>Done, Dare.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/273-0
+00:24:49.995 --> 00:24:50.475
+<v Christopher Pies>Yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/274-0
+00:24:50.795 --> 00:24:52.315
+<v Rebekah Fowles>Drop-in replacement, yeah.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/275-0
+00:24:55.995 --> 00:24:56.475
+<v Christopher Pies>Okay.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/276-0
+00:24:57.675 --> 00:24:58.635
+<v Christopher Pies>Alright, anything else?</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/277-0
+00:25:03.235 --> 00:25:03.755
+<v Spencer Dickson>Not for me.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/278-0
+00:25:04.715 --> 00:25:05.995
+<v Christopher Pies>OK, alright, if.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/279-0
+00:25:06.955 --> 00:25:10.837
+<v Christopher Pies>additional thoughts coming to you guys
+over the next couple of days,</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/279-1
+00:25:10.837 --> 00:25:12.075
+<v Christopher Pies>just send them my way.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/280-0
+00:25:15.995 --> 00:25:17.035
+<v Christopher Pies>Right, thanks for your time.</v>
+
+4eba6d13-6368-494d-bf0e-af7cabe0ebee/281-0
+00:25:19.315 --> 00:25:19.595
+<v Abe Fawson>Yeah.</v>
