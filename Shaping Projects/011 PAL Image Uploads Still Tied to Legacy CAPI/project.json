@@ -25,7 +25,7 @@
     {
       "url": "https://app.notion.com/p/deseret/PAL-Image-Uploads-Still-Tied-to-Legacy-CAPI-3b42ac5cb23580e9b553c96099d70f1c",
       "id": "3b42ac5cb23580e9b553c96099d70f1c",
-      "title": "PAL Image Uploads Still Tied to Legacy CAPI"
+      "title": "Move PAL Image Uploads from CAPI to GCS Signed URLs"
     },
     {
       "url": "https://app.notion.com/p/deseret/Photo-Uploads-Architecture-Design-Doc-3c72ac5cb23580bdbb59f0a6719f9dd0",
