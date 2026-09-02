@@ -179,7 +179,7 @@ PROXY only: [email-seller.ts:74-92](file:///Users/cpies/code/shaping/Research%20
 |---|---|---|
 | ksl-member (Python) | api/member_api/common/emails.py | publishes to `projects/mailchimp-340018/topics/mailchimp-member` |
 | member-backend (Go) | member-http-rest internal/pubsub/notify.go | publishes; env `MAILCHIMP_TOPIC` default `member-mailchimp-events` — reconcile the two names |
-| trufty-microservices/mailchimp-email-service (Python) | Generate_email.py, Processor.py | consumes and sends via **Mandrill** despite the name; 6 email types; TOTP is Python-only |
+| trufty-microservices/mailchimp-email-service (Python) | Generate_email.py, Processor.py | consumes member events, renders Jinja2 HTML from `html_templates/*.html`, and **publishes the rendered `body` to `Public_SendEmail`** (settings.toml `MAILGUN_PUBLISH_TOPIC`; comment: "until we have an API for mailgun requests"). The "→ Mandrill" picture in the package is stale. From `support@ksl.com` → Mailgun. TOTP borrows fraud_attempt.html "until design can give us a template for 2FA" |
 
 ---
 
@@ -229,3 +229,158 @@ PROXY only: [email-seller.ts:74-92](file:///Users/cpies/code/shaping/Research%20
 | saved-search-email-service + saved-search-alert-workers | Re-point from ksl-api endpoints to the central endpoint (with template/lookup relocation) |
 | Shared Go endpoint client | New: extract to marketplace-backend/lib/golang/ |
 | Credentials | Rotate 2 Mandrill keys + airlock key + Bronto creds; delete mandrill.ini; move to GSM |
+| Mailgun template library | Create ~35 templates from in-code renders (section 5); extend 3 producer transports + 2 feeds clients to pass `template`; define naming + upload process |
+
+---
+
+## 5. Template migration inventory (Mailgun templates)
+
+Target state (per [ADR 067](https://app.notion.com/p/31e2ac5cb23580eaa6e7c949c7a5b2bc)): transactional emails use Mailgun-hosted templates, referenced by name in the publish (`template` + `template_variables`). Today only the modern repos do this. Every legacy sender renders HTML in code and ships it as `body`, so those emails cannot benefit from central template management and break rendering guarantees.
+
+### 5.1 Mailgun template names already in use (modern repos)
+
+| Template name | Sender | Location |
+|---|---|---|
+| `jobs-employer-notification` | listing-jobs-http-rest | send_email.go:26 |
+| `jobs-application-confirmation` | listing-jobs-http-rest | send_email.go:27 |
+| `classifieds thank you` | listing-http-rest | send_email.go:21 |
+| `classifieds price drop notification` | listing-ps-price-drop | send_email.go:23 |
+| `classifieds subscription receipt` | subscription-ps-event-listener | domain.go:194 |
+| `classifieds two listing subscription receipt` | subscription-ps-event-listener | domain.go:196 |
+| `classifieds subscription payment failed` | subscription-ps-event-listener | domain.go:246 (hardcoded) |
+| `classifieds 2 listings subscription payment failed` | subscription-ps-event-listener | domain.go:213 — **dead: the failed path hardcodes the single-listing name at :246, so this never sends** |
+| `dealer - user contact event` | dealer-ps-notifications | app.go:621 |
+| `caramel - buyer submits offer` | third-party-caramel | app.go:931 |
+| `caramel offer feedback` | third-party-caramel | app.go:874 |
+
+Known drift (console-driven template management):
+- The jobs `email-templates/README.md` names the templates `jobs-application-employer` / `jobs-application-applicant`; the code uses different names. The README's example code block is wrong.
+- The price-drop spec names the template `general-listing-price-drop` / `listing-price-drop`; the code uses `classifieds price drop notification`.
+- 9 of the 11 names have no in-repo artifact at all (no MJML, no HTML, no variable manifest). Only the two jobs templates have checked-in source, and that source is a manually pasted mirror of the Mailgun console, not rendered at runtime.
+
+### 5.2 Pipeline gaps that block template adoption
+
+These changes must land before the template migration can start:
+1. **Producer transports cannot pass a template.** `ksl-api` [PubSubEmail.php:26-71](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/ksl-api/public_html/classifieds/common/api/classes/PubSub/PubSubEmail.php#L26-L71), `m-ksl-jobs` [EmailerQueue.php:25-32](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site-api/api/common/EmailerQueue.php#L25-L32), and `mieten` sendEmailToQueue.js:44-56 only forward subject/body/from/reply-to/recipients. The endpoint, the protobuf, and the consumer all support `template` + `template_variables` already.
+2. **The two feeds endpoint clients also lack the field** (feeds-ps-syncer emailer.go:141-160, feeds-ps-transformer emailer.go:127-146).
+3. **The consumer rejects template-only messages** (needs `body` or `plain_text`) — every template send must carry a `plain_text` fallback until F1 fixes this.
+4. **The Mandrill fallback silently drops `template`** — a template-only email that falls back sends empty. F1 must resolve this before legacy volume moves onto templates.
+5. Template variables ride as one JSON string; there are no per-recipient variables. Batch sends that personalize per recipient (saved-search alerts) need `isolate_recipients` or per-recipient publishes.
+
+### 5.3 Emails to move into Mailgun templates
+
+Counts: about 60 emails render in code today; about 35 are designed HTML emails that should become Mailgun templates. Line numbers are from the 2026-09-02 checkouts.
+
+**ksl-api — general classifieds** (Plates renderer EmailController.php:178; templates under `general/api/template/emailTemplates/`)
+
+| Email | Sender | In-code template | Text variant |
+|---|---|---|---|
+| Thanks for posting | EmailController.php:240 | create.php (+ layout, footer) | create.text.php (rendered, then dropped on pub/sub path) |
+| Abuse/moderation notices — 23 types | :433 (type map :36-176) | abuse/{1..23}_*.php (46 files) | .text.php each, dropped |
+| Contact listing owner | :578 | owner.php | owner.text.php, dropped |
+| Dealer posting limit | :843 | email/limitTemplate.php ({%var%} substitution) | strip_tags |
+| Saved-search alert | :1044 | alert.php (+ alert-email.mjml source) | alert.text.php, dropped |
+| Auto-assigned featured | :938 (Mandrill-only) | autoassignslot.php | autoassignslot.text.php |
+
+**ksl-api — cars** (substitution helper :2620 with `${IF(x)}…${ENDIF}` conditionals — porting hazard)
+
+| Email | Sender | In-code template | Notes |
+|---|---|---|---|
+| New frontline listing | :603 | templates/new-frontline-ad.html (+ .txt, .mjml) | real text variant exists |
+| Dealer Exchange listing live | :734 | new-backlot-ad.html | text is inline PHP (:775-786, has TODO) |
+| Cars saved-search alert | :1985 | listing-alert.html + inline listing rows :2041-2128 + carousel :2195 | no text; listing rows should become `{{#each}}` |
+| Listing status (price drop / expiring ×3) | :2449 | ad-status.html (+ .txt, .mjml) | `${IF(isOwner)}` conditional |
+| Email seller (user-to-user) | :1004 | inline HTML :1035-1052 | inline text |
+| Contact ad owner (lead) | :458 | text-only (:523-538, html empty) | template optional |
+| Contact info updated | :1502 | inline HTML :1534-1543 | no text |
+| Expiration warning (@deprecated) | :1212 | inline HTML :1232-1241 | check before porting |
+| Want-to-list / low-price / SS stats report | :1284 / :273 / :1100 | inline text or HTML table | internal; template optional |
+| ADF XML leads | :1753, :1704 | inline ADF XML | **stays in code** — machine format |
+| Client Dashboard PDF | :1417 | body is `&nbsp;` + PDF attachment | template optional |
+
+Dead cars templates to confirm and delete: featured-dates.{html,txt,mjml}, payment-info.{html,txt}.
+
+**ksl-api — common / sports / news**
+
+| Email | Sender | Source | Notes |
+|---|---|---|---|
+| Feedback email | common EmailController:54 | caller-supplied body | template optional |
+| Pick'em invitation | PickemController:500 | inline one-line text | template optional |
+| Pick'em winner / invite-all / recap | PickemAdminController:440/516/623 | HTML from KSL CMS story XML + inline blocks | **content is editorial, CMS-driven** — scope decision Q14 |
+| Report This Ad | ReportThisAdController:61 | inline HTML :145-152 | small template |
+
+**m-ksl-classifieds-api** (Twig; `getTextBody()` is never set — zero plain-text coverage in the repo)
+
+| Email | Twig template | Mailgun candidate |
+|---|---|---|
+| Price drop / seller expiring / buyer expiring | templates/emails/listing-status.twig (+ MJML sources) | one template, variables incl. isPriceDrop |
+| Thanks for listing | thank-you.twig | `classifieds thank you` already exists in Mailgun for the modern sender — likely converge |
+| Dealer monthly report | dealer-report.twig | **hazard: embedded CID images + runtime-generated donut chart PNG** — needs hosted images (Q13) |
+
+**m-ksl-homes** (PHP templates + MJML sources under site-api/api/emailTemplates/)
+
+| Email | Template files | Today |
+|---|---|---|
+| New ad, to-ad-owner, to-builder, tour community | newAdEmail.php, toAdOwnerEmail.php, toBuilderEmail.php, tourCommunityEmail.php (+ .mjml each) | rendered in code, `body` → endpoint |
+| Homes/community/rent saved-search alerts | alertEmailCommon.php, alertEmailCommonNew.php, alertEmailCommonWithOthers.php (+ .mjml) | rendered in code → Mandrill |
+| Buy listing expire | buyExistingExpireEmail.php (+ .mjml) | → Mandrill |
+| Homie realtor emails | homieProEmail.php, homieUpgradeSteps.php | → Mandrill via ksl-api helper |
+| Abuse queue notices | abuseQueue/ set | `body` → endpoint |
+
+**m-ksl-jobs** (Plates; endpoint sends pass `body` only)
+
+| Email | Template | Notes |
+|---|---|---|
+| Posting/transaction confirmation (10 subject variants) | emailTemplates/confirmation.php + partials + white-label banners (ksljobs / siliconslopes) | one Mailgun template with a brand variable, or one per label (Q14) |
+| Jobs saved-search alert | alert.php | |
+| Authorized user added / invitation | authorizedUser.php, authorizedUserInvitation.php | |
+| Application → employer / applicant | application/recievedApplication.php, senderConfirmation.php | the modern jobs service already has Mailgun templates for the same purpose — converge |
+| Report crons (BBU, promo codes, feed, SS stats, client usage) | inline strings + CSV attachments | template optional (internal) |
+
+Orphan: highContractUsageNotification.php (zero references).
+
+**mieten** (inline MJML in JS, `mjml2html` at runtime; direct-Mandrill sends set `text: ''`)
+
+| Email | Template module |
+|---|---|
+| Tenant screening result | web/src/emailTemplates/screeningEmail.js |
+| Invoice paid / charge declined | memberInvoice.js (2 branches) |
+| Trial expiring/expired | trialExpiration.js |
+| Rent listing expiring | inline in crons/src/sendExpirationEmails.js:34 |
+| Listing-owner inquiry | inquiryEmail.js |
+| Contact sales | contactSalesEmail.js |
+| Listing activation | listingActivation.js |
+
+Orphan: featuredDatesConfirmation.js (212 lines, no callers).
+
+**ksl-emailer-queue / messages-email-notifications**
+
+| Email | Source | Notes |
+|---|---|---|
+| "You received a message on KSL.com" | inline MJML in buildEmail.ts:11-120 | highest-volume email family; no plain text; header image is the KSL Jobs logo on all verticals |
+
+**trufty-microservices / mailchimp-email-service** (Jinja2, rendered in code, `body` → Public_SendEmail)
+
+| Email | Template file |
+|---|---|
+| account_suspended, email_lockout, fraud_attempt, social_link_verification, totp (borrows fraud_attempt.html), user_suspended, verification_email, member_info_change + social_account_connected (borrow fraud_attempt.html) | html_templates/*.html (7 files, 9 actions) |
+
+**marketplace-graphql**
+
+| Email | Source | Notes |
+|---|---|---|
+| Business package interest | businesspackageemailsender.go getBody:163-409 — MJML compiled by hand, pasted as a Go string; the MJML lives in a comment | prime conversion target |
+| Phone deny-list alert | phone-deny-list.go:293-306 | text-only, but placed in the HTML `body` field — at minimum move it to `plain_text` |
+
+### 5.4 Keep in code (not template candidates)
+
+- ADF XML dealer leads (machine format for dealer CRMs) — dealer-ps-notifications adf.go and ksl-api cars :1753/:1704.
+- Plain-text operational emails: profile-http-rest Zendesk alerts (4), feeds reports and alerts (8), internal stats reports. ADR 067 templates target designed emails; text-only internal mail can stay `plain_text`.
+- The `ksl` CMS form emailer (form_emailer_mandrill_responsive.php): the body is generated from arbitrary CMS-defined form fields. A generic form-submission template is possible; otherwise it stays body-based (Q14).
+- PDF-attachment carriers (cars Client Dashboard, jobs/mieten CSV reports).
+
+### 5.5 Plain-text strategy and process gap
+
+- Authored text variants exist only in ksl-api general (all Plates emails + 23 abuse types) and cars (new-frontline-ad.txt, ad-status.txt). The pub/sub path currently **drops** the rendered text — only `body` is published. Fix this during migration, or text coverage regresses further.
+- Everything else is machine-derived (`strip_tags`), duplicated HTML, an empty string, or absent. Each new Mailgun template needs a text-fallback decision (Q11).
+- Process gap: no versioning, CI, or API-based upload exists for Mailgun templates anywhere. The only documented workflow (jobs email-templates/README.md) is "compile MJML locally, paste into the Mailgun console", and its template names already drifted from the code. Naming is inconsistent (`classifieds thank you` vs `jobs-employer-notification` vs `dealer - user contact event`). Define a naming convention, an in-repo source of truth, and an upload mechanism as part of F10 (Q12).

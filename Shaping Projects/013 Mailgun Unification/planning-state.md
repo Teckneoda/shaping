@@ -14,6 +14,9 @@
 - **Some cleanup is already done**: the `mailgun-service` repo was archived 2024-01 and only ever held boilerplate; the ksl-api members Bronto endpoints are dead ("No longer available").
 - **No NetCore email integration exists anywhere** — the provider decision stays open without code impact.
 - project.json now tracks 13 repos (the 5 original + 8 core pipeline repos).
+- **Template inventory is complete (2026-09-02).** The modern repos reference 11 Mailgun template names; no legacy repo uses one. About 60 emails render HTML in code; about 35 are designed emails that must move into Mailgun templates ([Services.md section 5](Services.md)). Three legacy producer transports and the two feeds clients cannot pass a `template` field yet.
+- **Member pipeline correction:** `mailchimp-email-service` no longer sends through Mandrill. It renders Jinja2 templates and publishes the body to `Public_SendEmail`, so member emails already deliver through Mailgun. Phase 3 becomes template migration + endpoint adoption + topic reconciliation.
+- Template drift found in the modern repos: the 2-listing subscription payment-failed template can never send (the code hardcodes the single-listing name), and two docs name templates that do not match the code's constants.
 
 ## Still Needs Research
 
@@ -25,6 +28,7 @@
 - Trace the member-api password-reset / activation email path (ksl-api delegates there; repo not yet researched).
 - Collect volume baselines per sender (Datadog / Mailgun dashboards) for parity testing and metric targets.
 - Sync the dirty, stale local ddm-protobuf checkout (behind 11, modified generated files) before any local proto research.
+- Audit the Mailgun console: list the templates that exist there today, and compare against the 11 names referenced in code (does `classifieds 2 listings subscription payment failed` exist? do the drifted README names exist as orphans?).
 
 ## Unanswered Questions
 
@@ -38,6 +42,10 @@
 - **Q8**: Response-shape coupling — several callers parse Mandrill `reject_reason`/`status` arrays. What is the parity strategy when the response becomes queue-shaped?
 - **Q9**: Should `isolate_recipients` become the default at the central endpoint to stop address leakage on multi-recipient sends?
 - **Q10**: Who owns rotation of the exposed credentials (2 Mandrill keys, 1 committed ini, 1 airlock key, Bronto SOAP creds)?
+- **Q11**: Plain-text strategy for Mailgun templates — who authors text variants, and do we preserve the existing `.text.php` copy that the pub/sub path currently drops?
+- **Q12**: Template naming convention, in-repo source of truth, and upload mechanism (Mailgun templates API vs console paste) — who owns the process?
+- **Q13**: The CAPI dealer monthly report embeds CID images and a runtime-generated chart PNG. Move to hosted images in a template, or keep it body-based?
+- **Q14**: Template scope edges — CMS-driven Pick'em emails, the white-label jobs confirmation (one template with a brand variable, or one per label), and the dynamic `ksl` form emailer: template, or stay body-based?
 
 ## Research Sources Consulted
 
@@ -49,4 +57,5 @@
 
 ## Changelog
 
+- 2026-09-02 (second pass): Template migration research. Added Services.md section 5 (full template inventory: 11 Mailgun templates in use, ~35 in-code HTML emails to migrate, transport gaps, plain-text strategy, process gap) and Features.md F10. Corrected the member pipeline (already publishes to Public_SendEmail; Jinja rendering remains). Added Q11–Q14.
 - 2026-09-02: Initial shaping pass. Added 8 core pipeline repos to project.json (ksl-emailer-queue, ksl-emailer-queue-endpoint, ddm-protobuf, email, m-ksl-homes, m-ksl-jobs, saved-search-email-service, saved-search-alert-workers). Wrote Features.md and Services.md from the full inventory. Synced local repos (ddm-protobuf skipped: dirty + behind 11). Synced findings to the Notion package SHAPING section.

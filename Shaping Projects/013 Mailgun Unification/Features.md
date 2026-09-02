@@ -31,6 +31,7 @@ Move services that publish directly to the email topic onto the central endpoint
 - Verify or add form support for `tags` and `delivery_time`. Every direct publisher sets tags. The Caramel feedback email needs `delivery_time` (+24 h).
 - `isolate_recipients` and attachments are already in the endpoint contract.
 - Confirm HTML `body` semantics when no template is used.
+- The two feeds endpoint clients hardcode their form fields and cannot pass `template` at all. Extend them (or the shared client from this feature) before any feeds email uses a template.
 
 Inter-service authentication exists. The endpoint accepts a member JWT (`Bearer`) and a service token (`ddm-jwt`, added 2026-06-16, used by the feeds services). The blocker comment in m-ksl-homes ("not setup for inter-service authentication yet") appears stale. Verify, then unblock the cron-driven senders.
 
@@ -62,7 +63,9 @@ These repos already use the central endpoint for their main flows. Migrate the r
 
 ## F7 — Member pipeline (Phase 3)
 
-Pipeline today: `ksl-member` (Python) and `member-backend` (Go) publish member events. The `mailchimp-email-service` (Python, Trufty) consumes them and sends through Mandrill. Six email types: account_suspended, email_lockout, verification_email, totp, fraud_attempt, user_suspended. TOTP still depends on the Python service. Confirm ownership and the migration plan with Justin Carmony and Chris Ward (Q4). Reconcile the two topic names found in code (`mailchimp-member` in project `mailchimp-340018` vs `member-mailchimp-events`).
+Pipeline today: `ksl-member` (Python) and `member-backend` (Go) publish member events. The `mailchimp-email-service` (Python, Trufty) consumes them. **Correction (2026-09-02): the service no longer sends through Mandrill.** It renders Jinja2 HTML templates in code and publishes the rendered body to `Public_SendEmail` (settings.toml `MAILGUN_PUBLISH_TOPIC`), so delivery already goes through the central pipeline to Mailgun. The package's "member pipeline → Mandrill" picture is stale.
+
+Remaining Phase 3 work: move the 7 Jinja templates (9 actions) into Mailgun templates (see F10), switch the publish to the central endpoint, and reconcile the two topic names found in code (`mailchimp-member` in project `mailchimp-340018` vs `member-mailchimp-events`). TOTP still depends on the Python service and currently borrows the fraud_attempt template ("until design can give us a template for 2FA"). Confirm ownership and the migration plan with Justin Carmony and Chris Ward (Q4).
 
 ## F8 — Credential remediation (cross-cutting, do first)
 
@@ -83,6 +86,22 @@ Remove only after traffic and ownership verification:
 - Vendored dead libraries: PHPMailer in `ksl-global`, Swift Mailer in `nest-tools`.
 - Fork archival after migration: `mandrill-api-php`, `bronto-api-php-client`; drop the Bronto dependency from `ksl-api/composer.json`.
 - The orphan pull subscription `Prod_SharedFeatures_SendEmail` on the email topic (verify no consumer first).
+
+## F10 — Template migration to Mailgun (cross-cutting)
+
+Every email whose HTML lives in application code must move into a Mailgun-hosted template. The publish then references the template by name (`template` + `template_variables`), so the email renders correctly and the design has one home. This applies ADR 067 to the legacy fleet. The full inventory is in [Services.md section 5](Services.md).
+
+Current state:
+- The modern repos already reference 11 Mailgun template names. Two of those names have drift bugs (a dead 2-listing payment-failed template; README names that do not match code).
+- No legacy repo uses a Mailgun template. About 60 emails render HTML in code (Plates PHP, Twig, MJML-in-JS, Jinja2, inline strings) and publish the rendered `body`. About 35 of them are designed HTML emails that should become Mailgun templates.
+
+Work items, in order:
+1. Unblock the pipeline (with F1/F2): add `template`/`template_variables` pass-through to the three legacy producer transports (`PubSubEmail.php`, jobs `EmailerQueue.php`, mieten `sendEmailToQueue.js`) and the two feeds clients. Fix the consumer's template-only rejection and the Mandrill-fallback template drop first — until then every template send needs a `plain_text` fallback, and a fallback delivery would send an empty email.
+2. Define the template process: naming convention, in-repo source of truth (MJML), and an upload path (Mailgun templates API, not console paste). Today the only workflow is manual console paste, and names have already drifted.
+3. Migrate templates per phase, converging duplicates (legacy CAPI thank-you vs the existing `classifieds thank you`; legacy jobs application emails vs the existing jobs templates; the three saved-search alert designs per vertical).
+4. Preserve or improve plain-text: authored `.text.php` variants exist for the ksl-api general emails but are dropped on the pub/sub path today. Do not lose them in migration.
+
+Known hazards (details in Services.md 5.3/5.5): cars `${IF()}`/`${ENDIF}` conditional syntax; pre-rendered HTML loops that should become `{{#each}}` arrays; CID/embedded images and a runtime-generated chart in the CAPI dealer report; CMS-driven Pick'em content; white-label jobs confirmation banners; the dynamic `ksl` form emailer.
 
 ## Additional sender locations (stretch)
 
