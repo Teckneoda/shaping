@@ -1,0 +1,17 @@
+Chris Pies:
+I'm shaping a package that will use some of mailgun's email verification features when users sign up, that can flag emails as "do not send".
+ 
+I'm not familiar with the flow / repos involved with the signup process.
+Do you know?
+
+Chris Ward:
+By signup, do you mean create account?
+ 
+Chris Pies:
+Yes
+
+Chris Ward:
+I believe account creation has been ported to member-backendrepo.  It automatically sends emails using https://github.com/deseretdigital/trufty-microservices/tree/main/mailchimp-email-service, which utilizes a pubsub, and doesn't actually use mailchimp. (if I remember correctly--it's been years).
+ 
+The member api stores an emailAllow field, but not specifics regarding which emails a user subscribes to.
+ 

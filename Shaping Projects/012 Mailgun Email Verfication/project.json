@@ -1,0 +1,35 @@
+{
+  "repositories": [
+    {
+      "org": "deseretdigital",
+      "repo": "m-ksl-myaccount-v2"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "member-backend"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "trufty-microservices"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "ksl-emailer-queue"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "ksl-emailer-queue-endpoint"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "ddm-protobuf"
+    }
+  ],
+  "notion_docs": [
+    {
+      "url": "https://app.notion.com/p/deseret/Mailgun-verification-3b42ac5cb23580a0847ec44d7d2d12f5?v=2be2ac5cb23580cb882a000c3a41b92a",
+      "id": "3b42ac5cb23580a0847ec44d7d2d12f5",
+      "title": "Mailgun verification"
+    }
+  ]
+}
