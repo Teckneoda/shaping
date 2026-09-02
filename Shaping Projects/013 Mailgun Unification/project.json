@@ -1,0 +1,63 @@
+{
+  "repositories": [
+    {
+      "org": "deseretdigital",
+      "repo": "ksl-api"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "m-ksl-classifieds-api"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "m-ksl-myaccount-v2"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-backend"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "marketplace-graphql"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "ksl-emailer-queue"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "ksl-emailer-queue-endpoint"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "ddm-protobuf"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "email"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "m-ksl-homes"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "m-ksl-jobs"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "saved-search-email-service"
+    },
+    {
+      "org": "deseretdigital",
+      "repo": "saved-search-alert-workers"
+    }
+  ],
+  "notion_docs": [
+    {
+      "url": "https://app.notion.com/p/deseret/Mailgun-unification-3c72ac5cb2358050bc87dcb6af0352c5",
+      "id": "3c72ac5cb2358050bc87dcb6af0352c5",
+      "title": "Mailgun unification"
+    }
+  ]
+}
