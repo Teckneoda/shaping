@@ -10,22 +10,24 @@ Terms used in this document:
 
 ## F1 — Central pipeline hardening (Phase 1, highest priority)
 
-Modernize the consumer and make its contract provider-neutral. A Go rewrite with Datadog tracing is the preferred shape. The rewrite decision is open (Q2).
+Harden the consumer in place and make its contract provider-neutral (Q1). **Decision (Q2): the Go rewrite is a separate package** — this package fixes the Node consumer's defects and does not rewrite it.
 
-Required fixes, found in the current consumer code:
-1. Do not throw after a successful Mandrill fallback. The current code throws, Pub/Sub retries, and the user gets duplicate emails (`messageHandler.ts:98`).
-2. Do not re-encode attachment content for Mandrill. The current code double-encodes base64 and corrupts attachments (`mandrill.ts:17-20`).
-3. Accept template-only messages. The current code rejects a message that has a `template` but no `body` or `plain_text` (`index.ts:120-123`).
-4. Throw real `Error` objects from the Mandrill sender. The current plain-object throw defeats the `SendError` check and logs full email bodies.
-5. Support recipient isolation in the Mailgun sender. A multi-recipient send currently shows all addresses to every recipient.
-6. Remove `DEBUG=1` from production. The current setting logs full email payloads (PII).
-7. Add a dead-letter queue to the email topic path. Today the only behavior is endless retry until message retention expires.
-8. Attach a schema to the email topic, or enforce the contract at the central endpoint.
-9. Add end-to-end observability: Datadog tracing and consistent logs from endpoint to provider result. The current consumer has zero APM.
-10. Resolve the sending-domain mismatch. The whitelist allows `ksl.com`, `utah.com`, and `thememories.com`, but all Mailgun traffic sends through the single `MAILGUN_DOMAIN=ksl.com`.
-11. Document that the Mandrill fallback silently drops `template` and `delivery_time`. Preserve or remove that behavior deliberately.
+Already fixed upstream (verified 2026-09-02 against the synced checkout): the consumer accepts template-only messages, and `isolate_recipients` works end-to-end in both senders (opt-in with a warning log — Q9).
+
+Required fixes, still present in the current consumer code:
+1. Do not throw after a successful Mandrill fallback. The current code throws, Pub/Sub retries, and the user gets duplicate emails.
+2. Do not re-encode attachment content for Mandrill. The current code double-encodes base64 and corrupts attachments.
+3. Throw real `Error` objects from the Mandrill sender. The current plain-object throw defeats the `SendError` check and logs full email bodies.
+4. Remove `DEBUG=1` from production. The current setting logs full email payloads (PII).
+5. Add a dead-letter queue to the email topic path. Today the only behavior is endless retry until message retention expires.
+6. Attach a schema to the email topic, or enforce the contract at the central endpoint (Q3 makes the endpoint the enforcement point).
+7. Add observability the build team can support until the rewrite lands: structured logs end to end; Datadog tracing via dd-trace for Node if cheap, else it ships with the rewrite package.
+8. Resolve the sending-domain mismatch. The whitelist allows `ksl.com`, `utah.com`, and `thememories.com`, but all Mailgun traffic sends through the single `MAILGUN_DOMAIN=ksl.com`.
+9. Document that the Mandrill fallback silently drops `template` and `delivery_time`. Preserve or remove that behavior deliberately.
 
 ## F2 — Central endpoint adoption
+
+**Decision (Q3): the central endpoint is the only blessed publish path.** All direct topic publishes retire, including ksl-api `PubSubEmail`. **Decision (Q8): the endpoint response is fire-and-forget** — one normalized "accepted" result; callers that parse Mandrill rejection detail get rewritten (see F4); bounce handling belongs to the Mailgun verification package (012).
 
 Move services that publish directly to the email topic onto the central endpoint. Close the endpoint contract gaps first:
 - Verify or add form support for `tags` and `delivery_time`. Every direct publisher sets tags. The Caramel feedback email needs `delivery_time` (+24 h).
@@ -48,6 +50,8 @@ Add a unified adapter (central endpoint, or Pub/Sub) to `AdapterFactory` in the 
 - Remove the per-vertical gate. `PubSubEmail::shouldSendThroughMailgun()` allows only `cars` and `classifieds`. All other verticals fall to Mandrill.
 - Migrate the Mandrill-only methods: general `sendMandrillEmail`, `sendMandrillEmailJSON`, `sendAutoAssignedFeaturedEmail`; cars `sendEmailToAE`, `sendAdfPhoneContactMandrill`; common `sendFeedbackEmail`; the six Pick'em senders; `HomieEmailHelper`.
 - Keep the saved-search alert endpoints working during migration. Active callers: `saved-search-email-service`, `saved-search-alert-workers`, and the ksl-api alerts workers. This traffic explains the "unexplained CAPI email endpoint" observation.
+- Retire `PubSubEmail` entirely once ksl-api sends go through the central endpoint (Q3).
+- Rewrite the response parsers to fire-and-forget (Q8): `saved-search-email-service` bounce branches, `nest-tools` emailexpireads, homes EmailController response checks. Rejection detail stops being available synchronously; bounce data moves to project 012.
 
 ## F5 — Classifieds direct integrations (Phase 4a)
 
@@ -67,21 +71,25 @@ Pipeline today: `ksl-member` (Python) and `member-backend` (Go) publish member e
 
 Remaining Phase 3 work: move the 7 Jinja templates (9 actions) into Mailgun templates (see F10), switch the publish to the central endpoint, and reconcile the two topic names found in code (`mailchimp-member` in project `mailchimp-340018` vs `member-mailchimp-events`). TOTP still depends on the Python service and currently borrows the fraud_attempt template ("until design can give us a template for 2FA"). Confirm ownership and the migration plan with Justin Carmony and Chris Ward (Q4).
 
-## F8 — Credential remediation (cross-cutting, do first)
+## F8 — Credential end-of-life (cross-cutting)
 
-Rotate and move to managed secrets, independent of slice timing:
-- One Mandrill API key literal appears in 12 files: 9 in `ksl-api` (including `library/MandrillEmailHelper.php:20` and two test files) and 3 in `m-ksl-jobs`.
+**Direction (Q10, pending confirmation by the Trufty and Platform teams):** no rotation. The migration deletes each key literal as its repo moves off Mandrill, and the Mandrill account shuts down at package end — which invalidates both exposed Mandrill keys, including every copy in git history. The same pattern applies to the Bronto SOAP credentials via the Phase 5 migration (F11).
+
+The exposure inventory (all live until the shutdowns):
+- One Mandrill API key literal in 12 files: 9 in `ksl-api` (including `library/MandrillEmailHelper.php:20` and two test files) and 3 in `m-ksl-jobs`.
 - A committed key file: `ksl-api/public_html/sports/v2/mandrill.ini`.
 - A second, different Mandrill key in `m-ksl-jobs/crons/regular-actions/statsFromMandrill.php:62`.
-- An airlock API key in `ksl-api/examples/general/airlock/SendMandrillEmail.php:5`.
 - Hard-coded Bronto SOAP credentials in `ksl-news-api/src/Helper/BrontoEmailHelper.php`.
+- An airlock API key in `ksl-api/examples/general/airlock/SendMandrillEmail.php:5` — **not covered by any shutdown**; verify and revoke it separately (Q10).
+
+Open with Trufty & Platform (Q10): is the months-long exposure window during the build acceptable, or do the two Mandrill keys get rotated at package start anyway?
 
 ## F9 — Dead-code cleanup (Phase 6)
 
 Remove only after traffic and ownership verification:
 - `mailgun-service` repo — already archived (2024-01). It was one-commit boilerplate with no Mailgun code.
 - `AmazonSESAdapter` — zero call sites found in code. The Datadog zero-traffic claim in SC-383437 is not verified; run the query before removal.
-- `mandrill_messages_etls` Airflow DAG — present in both `dbi-dags` and `dbi-dags-airflow3`. Its presence in the Airflow 3 repo suggests it is still scheduled. Check the Airflow UI (Q5).
+- `mandrill_messages_etls` Airflow DAG — present in both `dbi-dags` and `dbi-dags-airflow3`. **Decision (Q5): no Airflow action in this package.** Document for the reporting owner that this migration eliminates the Mandrill traffic that feeds the DAG and its BigQuery tables; the DAG's retirement is theirs to schedule.
 - Dead Mandrill secret plumbing in `m-ksl-cars-api` and `m-ksl-cars-ui` (Terraform/CI only; no sender code remains).
 - Vendored dead libraries: PHPMailer in `ksl-global`, Swift Mailer in `nest-tools`.
 - Fork archival after migration: `mandrill-api-php`, `bronto-api-php-client`; drop the Bronto dependency from `ksl-api/composer.json`.
@@ -96,12 +104,24 @@ Current state:
 - No legacy repo uses a Mailgun template. About 60 emails render HTML in code (Plates PHP, Twig, MJML-in-JS, Jinja2, inline strings) and publish the rendered `body`. About 35 of them are designed HTML emails that should become Mailgun templates.
 
 Work items, in order:
-1. Unblock the pipeline (with F1/F2): add `template`/`template_variables` pass-through to the three legacy producer transports (`PubSubEmail.php`, jobs `EmailerQueue.php`, mieten `sendEmailToQueue.js`) and the two feeds clients. Fix the consumer's template-only rejection and the Mandrill-fallback template drop first — until then every template send needs a `plain_text` fallback, and a fallback delivery would send an empty email.
-2. Define the template process: naming convention, in-repo source of truth (MJML), and an upload path (Mailgun templates API, not console paste). Today the only workflow is manual console paste, and names have already drifted.
+1. Unblock the pipeline (with F1/F2): add `template`/`template_variables` pass-through to the three legacy producer transports (`PubSubEmail.php` — retiring per Q3, so its senders go straight to the endpoint — jobs `EmailerQueue.php`, mieten `sendEmailToQueue.js`) and the two feeds clients. The consumer's template-only rejection is already fixed upstream; the Mandrill-fallback template drop remains — resolve it (F1) before legacy volume moves onto templates.
+2. **Decision (Q12):** templates stay managed in the Mailgun console. Add a checked-in template registry (name, owner, variables, source reference) to stop the name drift. No CI upload pipeline in this package.
 3. Migrate templates per phase, converging duplicates (legacy CAPI thank-you vs the existing `classifieds thank you`; legacy jobs application emails vs the existing jobs templates; the three saved-search alert designs per vertical).
-4. Preserve or improve plain-text: authored `.text.php` variants exist for the ksl-api general emails but are dropped on the pub/sub path today. Do not lose them in migration.
+4. Plain-text: **the build team decides the strategy (Q11)**. Constraint: do not lose the authored `.text.php` variants that exist today — the pub/sub path already drops them.
 
-Known hazards (details in Services.md 5.3/5.5): cars `${IF()}`/`${ENDIF}` conditional syntax; pre-rendered HTML loops that should become `{{#each}}` arrays; CID/embedded images and a runtime-generated chart in the CAPI dealer report; CMS-driven Pick'em content; white-label jobs confirmation banners; the dynamic `ksl` form emailer.
+Scope edges settled (Q14): Pick'em emails stay CMS/body-based; the jobs confirmation becomes one Mailgun template with a brand variable (ksljobs / siliconslopes); the `ksl` form emailer stays body-based. All three still migrate transport to the central endpoint. Still open: the CAPI dealer report with CID images and a generated chart (Q13).
+
+Known hazards (details in Services.md 5.3/5.5): cars `${IF()}`/`${ENDIF}` conditional syntax; pre-rendered HTML loops that should become `{{#each}}` arrays; the Q13 dealer report.
+
+## F11 — Bronto newsletter migration (Phase 5)
+
+**Decision (Q7): fully in scope.** Move the live Bronto newsletter integrations off Bronto:
+- `ksl-news-api`: `BrontoEmailHelper` SOAP signup path (`MemberProvider` → `MemberService::confirmSubscription`), plus the `BrontoAdProvider` "Bronto ads" feature (migrate or deprecate).
+- `ksl`: the `bronto/` directory, including the unsubscribe flow (`bronto/unsubscribe.php`) and `newsletterSync.php`.
+- `dado`: newsletter signup on account creation (`modules/member/controllers/member.php`).
+- After migration: archive the `bronto-api-php-client` fork, drop the Bronto composer dependency from `ksl-api`, and remove the hard-coded SOAP credentials (F8).
+
+Blocker: **Q15** — the replacement destination for newsletter subscriptions is a product decision. Shape the code moves now; the build waits on that decision.
 
 ## Additional sender locations (stretch)
 
@@ -109,6 +129,6 @@ These senders are out of the core slices. Document them; migrate them when their
 - `pinpoint-beeswax` — AdOps campaign alerts (Mandrill).
 - `gcp-cloud-functions` dragnet `send-mandrill-email` — Search team reports. The folder name says Mandrill; the code uses the mailgun.js SDK.
 - `ddm-python-packages/ddm_mandrill` — shared Python Mandrill helper.
-- KSL News senders: iWitness (`ksl-news-web-v2`), Pick'em crons (`ksl-news-crons`), the live Bronto newsletter signup in `ksl-news-api` (product decision, Q7).
+- KSL News senders: iWitness (`ksl-news-web-v2`) and the Pick'em crons (`ksl-news-crons`). The Bronto newsletter work moved into scope as F11.
 - Direct-topic publishers outside marketplace: `utah-com`, `thememories-rebuild`, `ksl-news-monorepo` events-report-cron, `toolbox`. These are on the topic already; move them to the endpoint later.
-- Roughly 35 PHP `mail()` call sites across legacy repos. Most are operational alerts to individual engineers, some to stale personal addresses. Decide: route to the queue, or replace with Slack/Datadog alerts (Q6).
+- Roughly 35 PHP `mail()` call sites across legacy repos. Most are operational alerts to individual engineers, some to stale personal addresses. **Decision (Q6): route them through the queue — confirmed as a stretch goal of this package.**

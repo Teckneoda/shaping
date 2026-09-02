@@ -228,8 +228,9 @@ PROXY only: [email-seller.ts:74-92](file:///Users/cpies/code/shaping/Research%20
 | Member pipeline | Confirm owner; migrate 6 email types; keep TOTP path until ported |
 | saved-search-email-service + saved-search-alert-workers | Re-point from ksl-api endpoints to the central endpoint (with template/lookup relocation) |
 | Shared Go endpoint client | New: extract to marketplace-backend/lib/golang/ |
-| Credentials | Rotate 2 Mandrill keys + airlock key + Bronto creds; delete mandrill.ini; move to GSM |
-| Mailgun template library | Create ~35 templates from in-code renders (section 5); extend 3 producer transports + 2 feeds clients to pass `template`; define naming + upload process |
+| Credentials | No rotation (Q10, pending Trufty/Platform confirmation): delete literals per-repo during migration; Mandrill account shutdown at package end invalidates both keys; revoke the airlock key separately; delete mandrill.ini |
+| Mailgun template library | Create ~35 templates from in-code renders (section 5); extend producer transports + feeds clients to pass `template`; console-managed with a checked-in registry (Q12) |
+| Bronto newsletter path (F11) | Migrate signup (ksl-news-api, dado) and unsubscribe (ksl) off Bronto; archive bronto-api-php-client; destination pending Q15 (product) |
 
 ---
 
@@ -263,9 +264,9 @@ Known drift (console-driven template management):
 These changes must land before the template migration can start:
 1. **Producer transports cannot pass a template.** `ksl-api` [PubSubEmail.php:26-71](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/ksl-api/public_html/classifieds/common/api/classes/PubSub/PubSubEmail.php#L26-L71), `m-ksl-jobs` [EmailerQueue.php:25-32](file:///Users/cpies/code/shaping/Research%20Repos/Legacy/m-ksl-jobs/site-api/api/common/EmailerQueue.php#L25-L32), and `mieten` sendEmailToQueue.js:44-56 only forward subject/body/from/reply-to/recipients. The endpoint, the protobuf, and the consumer all support `template` + `template_variables` already.
 2. **The two feeds endpoint clients also lack the field** (feeds-ps-syncer emailer.go:141-160, feeds-ps-transformer emailer.go:127-146).
-3. **The consumer rejects template-only messages** (needs `body` or `plain_text`) — every template send must carry a `plain_text` fallback until F1 fixes this.
+3. ~~The consumer rejects template-only messages~~ **Fixed upstream** (verified 2026-09-02): the gate now accepts `template` without `body`/`plain_text`.
 4. **The Mandrill fallback silently drops `template`** — a template-only email that falls back sends empty. F1 must resolve this before legacy volume moves onto templates.
-5. Template variables ride as one JSON string; there are no per-recipient variables. Batch sends that personalize per recipient (saved-search alerts) need `isolate_recipients` or per-recipient publishes.
+5. Template variables ride as one JSON string; there are no per-recipient variables. `isolate_recipients` now works end-to-end (verified 2026-09-02: Mailgun batch-splitting with recipient-variables; Mandrill `preserve_recipients:false`) but stays opt-in with a warning log (Q9). Batch sends that personalize per recipient (saved-search alerts) set the flag or publish per recipient.
 
 ### 5.3 Emails to move into Mailgun templates
 
@@ -383,4 +384,6 @@ Orphan: featuredDatesConfirmation.js (212 lines, no callers).
 
 - Authored text variants exist only in ksl-api general (all Plates emails + 23 abuse types) and cars (new-frontline-ad.txt, ad-status.txt). The pub/sub path currently **drops** the rendered text — only `body` is published. Fix this during migration, or text coverage regresses further.
 - Everything else is machine-derived (`strip_tags`), duplicated HTML, an empty string, or absent. Each new Mailgun template needs a text-fallback decision (Q11).
-- Process gap: no versioning, CI, or API-based upload exists for Mailgun templates anywhere. The only documented workflow (jobs email-templates/README.md) is "compile MJML locally, paste into the Mailgun console", and its template names already drifted from the code. Naming is inconsistent (`classifieds thank you` vs `jobs-employer-notification` vs `dealer - user contact event`). Define a naming convention, an in-repo source of truth, and an upload mechanism as part of F10 (Q12).
+- Process gap: no versioning, CI, or API-based upload exists for Mailgun templates anywhere. The only documented workflow (jobs email-templates/README.md) is "compile MJML locally, paste into the Mailgun console", and its template names already drifted from the code. Naming is inconsistent (`classifieds thank you` vs `jobs-employer-notification` vs `dealer - user contact event`).
+- **Decision (Q12)**: templates stay managed in the Mailgun console; a checked-in template registry (name, owner, variables, source reference) stops the name drift. No CI upload in this package.
+- **Decision (Q11)**: the build team picks the plain-text strategy. Constraint: preserve the authored `.text.php` variants — the pub/sub path drops them today.
