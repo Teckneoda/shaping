@@ -310,7 +310,7 @@ prompt_notion_docs() {
     for d in "${existing[@]}"; do
       doc_options+=("+$d")
     done
-    multi_select_notion "Notion documents (deselect to remove)" "${doc_options[@]}"
+    multi_select_plain "Notion documents (deselect to remove)" "${doc_options[@]}"
     existing=("${_RESULT_ARRAY[@]+"${_RESULT_ARRAY[@]}"}")
   fi
 
@@ -337,10 +337,10 @@ prompt_notion_docs() {
   fi
 }
 
-# ─── Multi-select for notion docs (no "Add new" row, just toggle + done)
+# ─── Plain multi-select (no "Add new" row, just toggle + done) ─────
 # Pre-selected items prefixed with "+". Sets _RESULT_ARRAY.
 
-multi_select_notion() {
+multi_select_plain() {
   local prompt="$1"
   shift
   local options=() selected=()
@@ -364,7 +364,7 @@ multi_select_notion() {
   bold "$prompt"; printf '\n'
   dim "  ↑/↓ move, Space toggle, Enter confirm"; printf '\n\n'
 
-  _draw_notion_menu() {
+  _draw_plain_menu() {
     local c="$1"
     for i in "${!options[@]}"; do
       local marker="○"
@@ -387,7 +387,7 @@ multi_select_notion() {
     fi
   }
 
-  _draw_notion_menu "$cursor"
+  _draw_plain_menu "$cursor"
 
   while true; do
     local key
@@ -411,14 +411,14 @@ multi_select_notion() {
             [[ ${selected[$i]} -eq 1 ]] && _RESULT_ARRAY+=("${options[$i]}")
           done
           local kept=${#_RESULT_ARRAY[@]}
-          printf '  %s: %s\n' "$prompt" "$(green "$kept doc(s) kept")"
+          printf '  %s: %s\n' "$prompt" "$(green "$kept selected")"
           show_cursor
           return
         fi
         ;;
     esac
     move_up "$total"
-    _draw_notion_menu "$cursor"
+    _draw_plain_menu "$cursor"
   done
 }
 
@@ -659,7 +659,7 @@ for n in data.get('notion_docs', []):
 
 cmd_archive() {
   printf '\n'
-  bold "━━━ Archive Shaping Project ━━━"; printf '\n'
+  bold "━━━ Archive Shaping Projects ━━━"; printf '\n'
 
   local projects=()
   while IFS= read -r d; do
@@ -671,13 +671,36 @@ cmd_archive() {
     echo "No projects to archive." >&2; exit 1
   fi
 
-  select_one "Select project to archive" "${projects[@]}"
-  local chosen_project="$_RESULT"
+  multi_select_plain "Select project(s) to archive" "${projects[@]}"
+  local chosen=("${_RESULT_ARRAY[@]+"${_RESULT_ARRAY[@]}"}")
 
-  mv "$PROJECTS_DIR/$chosen_project" "$ARCHIVE_DIR/$chosen_project"
+  if [[ ${#chosen[@]} -eq 0 ]]; then
+    echo "No projects selected — nothing archived."
+    exit 0
+  fi
+
+  # Move each chosen project, and collect the paths to stage.
+  # The old path is staged only if git tracks files there (a never-committed
+  # project has no deletions to stage, and its old pathspec would error).
+  local commit_paths=() p
+  for p in "${chosen[@]}"; do
+    mv "$PROJECTS_DIR/$p" "$ARCHIVE_DIR/$p"
+    green "✓ Archived: $p → _archived/"; printf '\n'
+    commit_paths+=("Shaping Projects/_archived/$p")
+    if [[ -n "$(git -C "$ROOT_DIR" ls-files -- "Shaping Projects/$p")" ]]; then
+      commit_paths+=("Shaping Projects/$p")
+    fi
+  done
+
+  local names=""
+  for p in "${chosen[@]}"; do
+    [[ -n "$names" ]] && names+=", "
+    names+="$p"
+  done
 
   printf '\n'
-  green "✓ Archived: $chosen_project → _archived/"; printf '\n\n'
+  "$SCRIPT_DIR/git-commit-push.sh" -m "Archive shaping project(s): $names" --no-push -- "${commit_paths[@]}"
+  printf '\n'
 }
 
 # ─── Main ──────────────────────────────────────────────────────────

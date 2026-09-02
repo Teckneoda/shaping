@@ -32,7 +32,7 @@ mv "/Users/cpies/code/shaping/Shaping Projects/<NNN Name>" "/Users/cpies/code/sh
 ```
 This mirrors `cmd_archive` in [`scripts/project-manager.sh`](../../scripts/project-manager.sh). Quote paths — folder names contain spaces. Do not rename or renumber.
 
-(If several projects need archiving, doing the `mv` directly is faster than the script's one-at-a-time interactive menu and produces the identical result. If you'd rather drive the interactive picker, run `scripts/project-manager.sh archive` once per project so the user selects in their terminal.)
+(If you'd rather drive the interactive picker, run `scripts/project-manager.sh archive` once — its multi-select menu lets the user archive any number of projects in one run, and it then commits the moves itself via `git-commit-push.sh` with `--no-push`. In that case skip the commit in step 4 and only push.)
 
 ## 4. Commit and push to GitHub
 
@@ -50,5 +50,5 @@ Confirm what moved (`<NNN Name>` → `_archived/`), what was left active, and th
 - `scripts/list-projects.sh` — candidate gathering (step 1).
 - `scripts/resolve-project.sh` — number → folder (step 3).
 - `scripts/git-commit-push.sh` — the shared commit/push primitive (step 4); `commit-push` wraps the same script for standalone use.
-- `scripts/project-manager.sh archive` — the canonical single-project interactive archive; this skill batches the same operation.
+- `scripts/project-manager.sh archive` — the canonical interactive archive (multi-select; commits with `--no-push`); this skill does the same operation plus the push.
 - `shape` — the reverse workflow (starting/researching a project).

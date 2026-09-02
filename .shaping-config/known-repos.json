@@ -1,7 +1,11 @@
 [
+  "ksl-api",
   "m-ksl-classifieds-api",
+  "m-ksl-myaccount-v2",
   "marketplace-backend",
   "marketplace-frontend",
   "marketplace-graphql",
-  "nest"
+  "member-backend",
+  "nest",
+  "trufty-microservices"
 ]

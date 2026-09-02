@@ -40,12 +40,12 @@ Creating, updating, and archiving projects is handled by [`scripts/project-manag
 
 - **New project** (user asks to start a new shaping project): run `scripts/project-manager.sh new`
 - **Edit a project's repos/Notion docs**: run `scripts/project-manager.sh update`
-- **Archive a project** (e.g., "archive 9"): run `scripts/project-manager.sh archive`
+- **Archive one or more projects** (e.g., "archive 9"): run `scripts/project-manager.sh archive` (multi-select; commits the moves automatically, no push)
 
 The script automatically:
 - Numbers new projects as the next in sequence, scanning **both** `Shaping Projects/` and `Shaping Projects/_archived/` so archived numbers are never reused.
 - Scaffolds `project.json`, `Features.md`, `Services.md`, and `planning-state.md` for new projects.
-- Moves projects into `_archived/` (preserving the full `NNN <Project Name>` folder name) when archiving.
+- Moves projects into `_archived/` (preserving the full `NNN <Project Name>` folder name) when archiving. Archive is multi-select (1+ projects per run) and commits the moves via `scripts/git-commit-push.sh` with the message `Archive shaping project(s): <names>` (commit only, no push).
 
 The script is **interactive** (arrow-key menus, prompts for project name, repos, and Notion docs). Run it so the user can interact with it directly in their terminal rather than trying to drive the menus yourself. The default GitHub org is `deseretdigital`.
 
