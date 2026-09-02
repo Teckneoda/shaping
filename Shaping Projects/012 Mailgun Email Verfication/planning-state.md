@@ -55,4 +55,5 @@ Full chain with code references: see [Services.md](Services.md).
 - ddm-platform — Mailgun DNS records; `/emailer-queue` ingress.
 
 ## Changelog
+- **2026-09-02** (later): Pushed the services summary and open questions Q1–Q9 to the Notion doc's TECHNICAL DETAILS section (notion-sync).
 - **2026-09-02**: Initial shaping session. Read `conversation.txt`; validated Chris Ward's flow end to end across 4 repos with code references. Added repos `ksl-emailer-queue`, `ksl-emailer-queue-endpoint`, `ddm-protobuf` to project.json; cloned `member-backend`, `trufty-microservices`, `ksl-emailer-queue-endpoint` locally. Wrote Features.md (F1–F8) and Services.md. Opened Q1–Q9. Synced findings to the Notion doc's TECHNICAL DETAILS section.
